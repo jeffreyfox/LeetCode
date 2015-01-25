@@ -1,7 +1,7 @@
 class Solution {
 public:
     //move from current position (row,col) to next position
-	void move(int &row, int &col, int dir) {
+    void move(int &row, int &col, int dir) {
 		if(dir == 1) col += 1; //right
 		else if(dir == 2) row -= 1; //up
 		else if(dir == 3) col -= 1; //left
