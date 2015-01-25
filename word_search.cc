@@ -1,5 +1,6 @@
 class Solution {
 public:
+    //move from current position (row,col) to next position
 	void move(int &row, int &col, int dir) {
 		if(dir == 1) col += 1; //right
 		else if(dir == 2) row -= 1; //up
@@ -7,6 +8,7 @@ public:
 		else if(dir == 4) row += 1; //down
 		else row = col = -1; //not move
 	}
+	//check if position (row, col) exceeds boundary
 	bool isValid(int row, int col, int m, int n) {
 		return(row >= 0 && row < m && col >= 0 && col < n);
 	}
@@ -21,7 +23,7 @@ public:
 		vector<int> col(len, -1); //column number at step k
 		vector<vector<bool> > visited(m, vector<bool>(n, false));//site visited? 
 		
-		for(int l = 0; l < tot; ++l) {
+		for(int l = 0; l < tot; ++l) { //loop thru all elements in the board
 			//invariant: k characters matched (now matching word[k] with position[k] determined from position[k-1] and dir[k-1])
 			k = 0; //reset k everytime!
 			while(1) {
