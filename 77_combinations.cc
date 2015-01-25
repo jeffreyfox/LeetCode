@@ -7,11 +7,8 @@ public:
 		return ret;
 	}
 	//picking num numbers from beg to end (inclusive)
-	void iterative(int beg, int end, int num, 
-	               vector<int> &path, vector<vector<int> > &ret) {
-		if(num == 0) {
-			ret.push_back(path);
-		}
+	void iterative(int beg, int end, int num, vector<int> &path, vector<vector<int> > &ret) {
+		if(num == 0) ret.push_back(path);
 		else {
 			for(int k = beg; k <= end; ++k) {
 				vector<int> newpath(path);
