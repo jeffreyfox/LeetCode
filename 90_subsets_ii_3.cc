@@ -22,7 +22,7 @@ public:
         for(int j = 0; j <= ct; ++j) {
             for(int k = 1; k <= j; ++k) ss.push_back(S[i]);
             dfs(i+ct, S, count, ss, ret);
-            for(int k = 1; k <= j; ++k) ss.erase(ss.end()-1);
+            ss.erase(ss.end()-j, ss.end());
         }
     }
 };
