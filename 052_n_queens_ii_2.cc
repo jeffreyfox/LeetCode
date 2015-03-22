@@ -1,19 +1,19 @@
 //recursive solution
 class Solution {
 public:
-    int totalNQueens(int n) {
-        vector<int> col(n, -1);
-        int count = 0;
-        solveUtil(n, 0, col, count);
-        return count;
-    }
+	int totalNQueens(int n) {
+		vector<int> col(n, -1);
+		int count = 0;
+		solveUtil(n, 0, col, count);
+		return count;
+	}
     
 	//check row i
 	void solveUtil(int n, int i, vector<int> &col, int &count) {
-	    if(i == n) { 
-	        count ++;
-	        return;
-	    }
+		if(i == n) { 
+			count ++;
+			return;
+		}
 		for(int j = 0; j < n; ++j) { //try the j-th column
 			if(canPlace(col, i, j)) {
 				col[i] = j;
