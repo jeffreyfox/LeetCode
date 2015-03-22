@@ -1,10 +1,10 @@
 class Solution {
 public:
-    //divide and conquer
-    int maxSubArray(int A[], int n) {
-    	return maxSubArrayUtil(A, 0, n-1);
+	//divide and conquer
+	int maxSubArray(int A[], int n) {
+		return maxSubArrayUtil(A, 0, n-1);
 	}
-	
+
 	int maxSubArrayUtil(int A[], int p, int r) {
 		if(r == p) return A[p]; //maxSum = arr[p]
 		else {
@@ -34,5 +34,5 @@ public:
 			if(sum > maxSumR) maxSumR = sum;
 		}
 		return maxSumL+maxSumR+A[q];
-    }
+	}
 };
