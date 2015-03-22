@@ -1,19 +1,20 @@
 //recursive solution
 class Solution {
 public:
-    vector<vector<string> > solveNQueens(int n) {
-        vector<int> col(n, -1);
-        vector<vector<string> > ret;
-        solveUtil(n, 0, col, ret);
-        return ret;
-    }
+	vector<vector<string> > solveNQueens(int n) {
+		vector<int> col(n, -1);
+		vector<vector<string> > ret;
+		solveUtil(n, 0, col, ret);
+		return ret;
+	}
     
 	//check row i
 	void solveUtil(int n, int i, vector<int> &col, vector<vector<string> > &ret) {
-	    if(i == n) { 
-	        saveSol(n, col, ret);
-	        return;
-	    }
+		if(i == n) { 
+			saveSol(n, col, ret);
+			return;
+		}
+		
 		for(int j = 0; j < n; ++j) { //try the j-th column
 			if(canPlace(col, i, j)) {
 				col[i] = j;
@@ -32,7 +33,7 @@ public:
 	}
 	
 	void saveSol(int n, vector<int> &col, vector<vector<string> > &ret) {
-	    vector<string> tmp;
+		vector<string> tmp;
 		for(int i = 0; i < n; ++i) {
 			string str(n, '.');
 			str[col[i]] = 'Q';
