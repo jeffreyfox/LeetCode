@@ -1,15 +1,13 @@
 class Solution {
 public:
-    double findMedianSortedArrays(int A[], int m, int B[], int n) {
-        int k = (m+n)/2; 
-        if((m+n)%2 == 0) {
-            int a = Select(A, m, B, n, k);
-            int b = Select(A, m, B, n, k+1);
-            return double(a+b)/2.0;
-        } else { //odd
-            return Select(A, m, B, n, k+1);
-        }
-    }
+	double findMedianSortedArrays(int A[], int m, int B[], int n) {
+		int k = (m+n)/2; 
+		if((m+n)%2 == 0) { //even
+			int a = Select(A, m, B, n, k);
+			int b = Select(A, m, B, n, k+1);
+			return double(a+b)/2.0;
+		} else return Select(A, m, B, n, k+1); //odd
+	}
 
 	//Binary search algorithm to selelect k-th order statistics from two SORTED arrays. Average O(m+n) time.
 	int Select(int A[], int m, int B[], int n, int k) {
