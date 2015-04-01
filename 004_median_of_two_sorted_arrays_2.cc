@@ -9,7 +9,7 @@ public:
 		} else return Select(A, m, B, n, k+1); //odd
 	}
 
-	//Binary search algorithm to selelect k-th order statistics from two SORTED arrays. Average O(m+n) time.
+	//Binary search algorithm to selelect k-th order statistics from two SORTED arrays. Average O(log(m+n)) time.
 	int Select(int A[], int m, int B[], int n, int k) {
 		int idx = SelectUtil(A, B, n, 0, m-1, k); //search in A
 		if(m == 0) return B[k-1];
