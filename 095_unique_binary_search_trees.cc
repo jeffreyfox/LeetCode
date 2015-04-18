@@ -10,7 +10,8 @@
 class Solution {
 public:
     vector<TreeNode *> generateTrees(int n) {
-        vector<vector<vector<TreeNode *> > > t(n+2, vector<vector<TreeNode *> >(n+2)); //table: t[i][j] is a vector of all possible trees having numbers in [i .. j-1], 1 =< i <= j <= n+1;
+        //table: t[i][j] is a vector of all possible trees having numbers in [i .. j-1], 1 =< i <= j <= n+1
+        vector<vector<vector<TreeNode *> > > t(n+2, vector<vector<TreeNode *> >(n+2)); 
         int i, j, k, sz, ls, rs, ll, rr;
         for(i = 0; i <= n+1; ++i) //size 0 subtree
             t[i][i].push_back(NULL);    
