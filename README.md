@@ -1,3 +1,3 @@
 # LeetCode
 
-This repository includes files for my LeetCode solutions.
+This repository contains C++ and Java codes for my solutions for LeetCode problems.
