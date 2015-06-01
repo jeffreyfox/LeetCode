@@ -11,19 +11,11 @@ public class Solution {
         for (int i = 0; i < ne; ++i)  //add edges to graph
             g.addEdge(prerequisites[i][1], prerequisites[i][0]);
         
-        color = new char[numCourses]; //default false
-        for (int i = 0; i < numCourses; ++i)
-            color[i] = 'w'; //default white
-            
-        hasCycle = false;
-        
-        for (int v = 0; v < numCourses; ++v)
-            if (color[v] == 'w')
-                dfs(g, v);
-        
-        return !hasCycle;
+        Cycle cycleFinder = new Cycle(g);
+        return !cycleFinder.hasCycle();
     }
     
+    //inner class for directed graph representation
     private class Digraph {
         private int V;
         private ArrayList<Integer>[] adj;
@@ -33,20 +25,37 @@ public class Solution {
             for (int i = 0; i < V; ++i) 
                 adj[i] = new ArrayList<Integer>();
         }
+        public int V() { return V; }
         public void addEdge(int v, int w) { adj[v].add(w); }
         public ArrayList<Integer> adj(int v) { return adj[v]; }
     }
     
-    private void dfs(Digraph g, int v) {
-        color[v] = 'g'; //first discovered, color as grey
-        for (int w : g.adj(v)) {
-            if (hasCycle) return;
-            if (color[w] == 'w') dfs(g, w);
-            else if (color[w] == 'g') hasCycle = true; //found cycle
+    //inner class for cycle detection
+    private class Cycle {
+        private char[] color; // white, grey, or black
+        private boolean hasCycle;
+        
+        public Cycle(Digraph g) {
+            color = new char[g.V()]; //default false
+            for (int i = 0; i < g.V(); ++i)
+                color[i] = 'w'; //default white
+            
+            hasCycle = false;
+        
+            for (int v = 0; v < g.V(); ++v)
+                if (color[v] == 'w')
+                    dfs(g, v);
         }
-        color[v] = 'b'; //finished, color as black
+        
+        private void dfs(Digraph g, int v) {
+           color[v] = 'g'; //first discovered, color as grey
+            for (int w : g.adj(v)) {
+                if (hasCycle) return;
+                if (color[w] == 'w') dfs(g, w);
+                else if (color[w] == 'g') hasCycle = true; //found cycle
+            }
+            color[v] = 'b'; //finished, color as black
+        }
+        public boolean hasCycle() { return hasCycle; }
     }
-    
-    private char[] color; // white, grey, or black
-    private boolean hasCycle;
 }
