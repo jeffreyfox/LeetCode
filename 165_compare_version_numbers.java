@@ -1,3 +1,4 @@
+// Java solution using Strings.split function and Integer.parseInt()
 // Caveat: String.split method takes a regular expression as delimiter.
 // can't use "." because it is a special character and means "any character", and will ignore any characters. Need to use escape "\\."
 // Also, "1.0" is treated the same as "1"
@@ -15,4 +16,14 @@ public class Solution {
         }
         return 0;
     }
+
+/*  // function to parse int
+    private int Str2Int(String num) {
+        int ret = 0;
+        for (int i = 0; i < num.length(); ++i) {
+            ret = ret*10 + (num.charAt(i)-'0');
+        }
+        return ret;
+    }
+*/
 }
