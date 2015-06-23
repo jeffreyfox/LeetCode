@@ -1,3 +1,16 @@
+/// Just minic the elementary school multiplication method
+///      1 2 3 4   (num[2], outer loop)
+///    x   5 6 7   (num[1], inner loop)
+/// -------------
+///      8 6 3 8
+///    7 4 0 4
+///  6 1 7 0
+/// -------------
+///  6 9 9 6 7 8
+/// product of num1[i] and num2[j] should be aligned to num[i+j+1], because:
+/// l - 1 - (l1-1-i + l2-1-j) = i+j+1
+/// each time inner loop is done, the carry should go to num[i].
+/// In the end, strip off the leading zeros of the string
 class Solution {
 public:
     string multiply(string num1, string num2) {
