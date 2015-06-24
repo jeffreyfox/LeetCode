@@ -1,5 +1,5 @@
 // Use next permutation algorithm to print permutations in lexigraphical order.
-// Copied from 046_permutation_2.cc
+// Copied from 046_permutation.cc
 
 class Solution {
 public:

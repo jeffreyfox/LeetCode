@@ -1,25 +1,51 @@
-// perform swaps iteratively, back-tracking
-// Note that this method does not print the permutations in lexigraphical order!
-// The algorithm to print the lexigraphical order is in 046_permutaionts_2.cc.
+// Use next permutation algorithm to print permutations in lexigraphical order.
+// use a tag to indicate the status of permutation. If reaching the last permutation (descending order), return false. 
+// Also works for cases when duplicated entries exist
+// Attention: If use a counter to print exactly n! permutations, then does not for cases where duplicated entries exist!
 
 class Solution {
 public:
     vector<vector<int>> permute(vector<int>& nums) {
         vector<vector<int> > ret;
-        permute(nums, 0, ret);
+        //first sort the initial array!
+        sort(nums.begin(), nums.end()); 
+        while(1) {
+            ret.push_back(nums);
+            if(!nextPermutation(nums)) break; //reaching the end
+        }
         return ret;
     }
-    //permute nums[k .. end)
-    void permute(vector<int>& nums, int k, vector<vector<int> >& ret) {
+    
+    // slightly modified next permutation routine from problem #31
+    bool nextPermutation(vector<int>& nums) {
         int n = nums.size();
-        if(k == n-1) ret.push_back(nums);
-        for(int i = k; i < n; ++i) {
-            swap(nums[k], nums[i]);
-            permute(nums, k+1, ret);
-            swap(nums[k], nums[i]);
-        }
+        //find largest k such that nums[k] < nums[k+1]
+        int k;
+        for (k = n-2; k >= 0; --k)
+            if (nums[k] < nums[k+1]) break;
+        
+        // already last one (descending order), return false
+        if(k == -1) return false;
+        
+        //find largest l > k such that nums[l] > nums[k]
+        int l;
+        for (l = n-1; l > k; --l)
+            if (nums[l] > nums[k]) break;
+        //swap nums[l] and nums[k]
+        swap(nums, k, l);
+        //reverse elements after k
+        reverse(nums, k+1, n-1);
+        return true;
     }
-    void swap(int &a, int &b) {
-        int t = a; a = b; b = t;
+    
+    //reserve array elements nums[lo .. hi]
+    void reverse(vector<int>& nums, int lo, int hi) {
+        for (int i = 0; i < (hi-lo+1)/2; ++i) 
+            swap(nums, lo+i, hi-i);        
+    }
+    
+    //swap two array elements
+    void swap(vector<int>& nums, int i, int j) {
+        int t = nums[i]; nums[i] = nums[j]; nums[j] = t;
     }
 };
