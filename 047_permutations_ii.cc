@@ -1,11 +1,9 @@
 // Use next permutation algorithm to print permutations in lexigraphical order.
-// use a tag to indicate the status of permutation. If reaching the last permutation (descending order), return false. 
-// Also works for cases when duplicated entries exist
-// Attention: If use a counter to print exactly n! permutations, then does not for cases where duplicated entries exist!
+// Copied from 046_permutation_2.cc
 
 class Solution {
 public:
-    vector<vector<int>> permute(vector<int>& nums) {
+    vector<vector<int>> permuteUnique(vector<int>& nums) {
         vector<vector<int> > ret;
         //first sort the initial array!
         sort(nums.begin(), nums.end()); 
