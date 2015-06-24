@@ -1,4 +1,6 @@
-///iterative, back-tracking
+// perform swaps iteratively, back-tracking
+// Note that this method does not print the permutations in lexigraphical order!
+// The algorithm to print the lexigraphical order is in 046_permutaionts_2.cc.
 
 class Solution {
 public:
