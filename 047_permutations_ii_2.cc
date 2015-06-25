@@ -1,3 +1,5 @@
+// Recursive solution. Need to use a table to store the numbers used in current k-th position. We can't use something simpler such as checking current to be exchanged ia equal to previously exchanged one, because the subarray maybe unsorted, for example, given aabbccd, and after a while we have bcd|caba, and the second part is unsorted. Unless using a set structure, there is no way of preventing c to be swapped with second a, because the previous is a 'b'.
+
 class Solution {
 public:
     vector<vector<int> > permuteUnique(vector<int>& nums) {
