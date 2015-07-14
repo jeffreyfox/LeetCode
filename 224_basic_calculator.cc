@@ -1,46 +1,40 @@
-// Basic calculator with "+-*/" but no parentheses
-// No stack solution:
-// 1. when seeing an integer, run all the way to the end of integer and get the value. If it is after a '*' or '/', immediately calculate the 
-//    result and update num. Otherwise, initialize num to the value.
-// 2. when seeing a '+' or '-', add the preceding number (value stored in num and sign stored in sign) to res
-// 3. when seeing a '*' or '/', update last operator
-// Remember to reset num after processing "+-*/"
+// Basic calculator, with "+-" and parentheses, no "*/"
+// Two stacks, one for number and one for operators (can use one, where operator can be stored by an integer sign)
+// 1. when seeing a digit, update number
+// 2. when seeing a + or -, update result
+// 3. when seeing a '(', push result and operator to stack, reset num, res, and op
+// 4. when seeing a ')', first update res, and then pop num, res from stack, update res again (e.g. calculate 2 + (...)).
+// Finally after loop, update res if no '+' or '-' is seen in the string (e.g. (3))
 
-// Also, after loop, need to add final num to res, and return
-// Another tiny variation is to add a '+' in the end of string, and then can return res 
 class Solution {
 public:
     int calculate(string s) {
+        stack<int> nums;
+        stack<char> ops;
         int res = 0;
         int num = 0;
         char op = '+';
-        int sign = 1;
         for (int i = 0; i < s.size(); ++i) {
-            char c = s[i];
-            if (isDigit(c)) {
-                int val = c - '0';
-                int j = i+1;
-                while (j < s.size() && isDigit(s[j])) {
-                    val = val*10 + s[j] - '0';
-                    j++;
-                }
-                if (op == '*') num = num * val;
-                else if (op == '/') num = num / val;
-                else num = val;
-                i = j-1;
-            } else if (c == '+' || c == '-') {
-                res += num*sign;
-                sign = (c == '+') ? 1 : -1;
+            if (s[i] >= '0' && s[i] <= '9') {
+                num = num*10 + (s[i] - '0');
+            } else if (s[i] == '+' || s[i] == '-') {
+                res = (op == '+') ? res + num : res - num;
                 num = 0;
-                op = c;
-            } else if (c == '*' || c == '/') {
-                op = c;
-            } 
+                op = s[i];
+            } else if (s[i] == '(') {
+                nums.push(res); ops.push(op); //push number and sign to stack
+                num = 0; res = 0; op = '+';
+            } else if (s[i] == ')') {
+                res = (op == '+') ? res + num : res - num;
+                op = ops.top(); ops.pop();
+                num = nums.top(); nums.pop();
+                res = (op == '+') ? num + res : num - res;
+                num = 0;
+            }
         }
-
-        return res + num*sign;
+        if (num != 0)
+            res = (op == '+') ? res + num : res - num;
+        return res;
     }
-
-    bool isDigit(char c) { return c >= '0' && c <= '9'; }
 
 };
