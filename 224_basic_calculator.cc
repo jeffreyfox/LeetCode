@@ -6,6 +6,8 @@
 // 3. when seeing a '*' or '/', update last operator
 // Remember to reset num after processing "+-*/"
 
+// Also, after loop, need to add final num to res, and return
+// Another tiny variation is to add a '+' in the end of string, and then can return res 
 class Solution {
 public:
     int calculate(string s) {
