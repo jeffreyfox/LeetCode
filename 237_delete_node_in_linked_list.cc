@@ -6,6 +6,8 @@
  *     ListNode(int x) : val(x), next(NULL) {}
  * };
  */
+// remove the node and shift the later nodes to front by 1
+// time O(m) where m is the number of nodes after node
 class Solution {
 public:
     void deleteNode(ListNode* node) {
