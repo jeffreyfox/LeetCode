@@ -1,0 +1,21 @@
+if [ "$#" -ne 2 ]; then
+   echo "Please specify start and end indices!"
+   exit;
+fi
+
+lo=$1
+hi=$2
+cnt=0
+tot=`expr $hi - $lo`
+((tot++))
+for (( N = $lo; N <= $hi; N=N+1 ))
+do
+  file=$( printf '%03d' $N )
+  line=`ls ${file}*.cc 2>/dev/null` 
+  echo "[${file}] " $line
+  if [ ${#line} -ne 0 ]; then
+    ((cnt++))
+  fi
+done
+echo "Total: $tot"
+echo "Done : $cnt"
