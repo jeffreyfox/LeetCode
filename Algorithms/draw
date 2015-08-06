@@ -1,0 +1,29 @@
+if [ "$#" -ne 2 ]; then
+   echo "Please specify start and end indices!"
+   exit;
+fi
+
+lo=$1
+hi=$2
+cnt=0
+tot=`expr $hi - $lo`
+((tot++))
+for (( N = 0; N < 250; N=N+1 ))
+do
+  file=$( printf '%03d' $N )
+  cnt=`ls ${file}*.cc 2>/dev/null | wc -l` 
+  if [ $cnt -ne 0 ]; then
+    echo -en "X"
+    ((cnt++))
+  else 
+    echo -en " "
+  fi
+  if [ $((N%10)) -eq 0 ]; then
+    echo -en "\n"
+    printf '%03d' $N
+    echo -en "  "
+  fi
+done
+echo -en "\n"
+echo "Total: $tot"
+echo "Done : $cnt"
