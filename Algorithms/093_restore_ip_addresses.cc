@@ -1,3 +1,12 @@
+/*
+Given a string containing only digits, restore it by returning all possible valid IP address combinations.
+
+For example:
+Given "25525511135",
+
+return ["255.255.11.135", "255.255.111.35"]. (Order does not matter) 
+*/
+
 // recursive solution.
 // Need to add 4 periods, last one has to be after last character.
 // store positions of periods (index of character right before newly added period), and reconstruct the string when valid solutions are found
