@@ -1,17 +1,21 @@
 #
-for (( N = 0; N < 250; N=N+1 ))
+for (( N = 1; N < 250; N=N+1 ))
 do
+  res=$((N%10))
+  if [ $res -eq 1 ]; then
+    printf '%03d-%03d   ' $((N)) $((N+9))
+  fi
   file=$( printf '%03d' $N )
   cnt=`ls ${file}*.cc 2>/dev/null | wc -l` 
   if [ $cnt -ne 0 ]; then
-    echo -en "X"
+    echo -en "X "
   else 
-    echo -en " "
-  fi
-  if [ $((N%10)) -eq 0 ]; then
-    echo -en "\n"
-    printf '%03d' $((N+1))
     echo -en "  "
+  fi
+  if [ $res -eq 0 ]; then
+    echo -en "\n"
+  elif [ $res -eq 5 ]; then
+    echo -en "   "
   fi
 done
 echo -en "\n"
