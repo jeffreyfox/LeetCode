@@ -6,7 +6,7 @@ Your algorithm should have a linear runtime complexity. Could you implement it w
 */
 
 /// Use bit operations. Can extend to general cases (N times)
-/// Use an array to store the occurrences of each bit: 
+/// Use trhee variables to store the occurrences of each bit: 
 /// ones stores whether the bit has been set for AT LEAST 1 times
 /// twos stores whether the bit has been set for AT LEAST 2 times
 /// threes stores whether the bit has been set for 3 times
