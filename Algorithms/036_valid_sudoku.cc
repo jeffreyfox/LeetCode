@@ -13,7 +13,7 @@ A valid Sudoku board (partially filled) is not necessarily solvable. Only the fi
 /// Can use a single integer to record the state, using bit operations
 ///  1  1  1  1  1  1  1  1  1
 /// '9'       ...           '1'
-
+/// caveat: when calculating i/j index based on block index, 3*(ib/3)+jb/3 != (3*ib+jb)/3 
 class Solution {
 public:
     bool isValidSudoku(vector<vector<char>>& board) {
