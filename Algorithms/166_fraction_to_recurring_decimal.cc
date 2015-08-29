@@ -27,7 +27,7 @@ public:
         
         string decimal;
         int i = 0; //position of decimal
-        map<long, int> table; // the place in decimal that a given r value has appeared the first time
+        unordered_map<long, int> table; // the place in decimal that a given r value has appeared the first time
         do {
             q = (r*10) / b;
             if(!table.count(r)) { // not found
