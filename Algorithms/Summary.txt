@@ -1,0 +1,10 @@
+
+two pointers, hash table:
+1. Two Sum
+167. Two Sum II
+170. Two Sum III
+
+sliding window, hash table, string:
+3. Longest Substring Without Repeating Characters
+159. Longest Substring with At Most Two Distinct Characters 
+
