@@ -1,21 +1,28 @@
-// Need to take care of integer overflow
+/*
+Reverse digits of an integer.
+
+Example1: x = 123, return 321
+Example2: x = -123, return -321
+
+For the purpose of this problem, assume that your function returns 0 when the reversed integer overflows.
+*/
+
+// Need to consider integer overflow. Use long to store intermediate results.
+// If y > INT_MAX, then overflow (y should always be positive since it is long and will not overflow), also don't need to check -y < INT_MIN, as it is redundant. (We won't end up with y = 2147483647, since the input x cannot be as large as 7463847412)
+
 class Solution {
 public:
     int reverse(int x) {
         int sgn = (x >= 0) ? 1 : -1;
         if (x == 0) return 0;
-        unsigned y = abs(x); // no overflow
-        long z = 0;
-        while (y) {
-            int r = y % 10;
-            y = y / 10;
-            long nz = z*10 + r;
-            if (nz < z) return 0; //overflow
-            z = nz;
+        if(x == INT_MIN) return 0;
+        x = abs(x); // no overflow
+        long y = 0;
+        while (x) {
+            y = y*10 + x%10;
+            if(y > INT_MAX) return 0;
+            x = x / 10;
         }
-        if (sgn == 1 && z > INT_MAX) return 0; //overflow
-        if (sgn == -1 && z > long(INT_MAX) + 1) return 0; //overflow
-        return sgn*z;
+        return sgn > 0 ? y : -y;
     }
 };
-

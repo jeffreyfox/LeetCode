@@ -8,3 +8,5 @@ sliding window, hash table, string:
 3. Longest Substring Without Repeating Characters
 159. Longest Substring with At Most Two Distinct Characters 
 
+Integer operations, overflow checking
+7. Reverse Integer
