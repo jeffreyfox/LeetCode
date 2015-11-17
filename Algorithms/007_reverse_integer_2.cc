@@ -12,6 +12,8 @@ For the purpose of this problem, assume that your function returns 0 when the re
 // check overflow for multiplication: a > INT_MAX / b
 // check overflow for calculating absolute values: x == INT_MIN
 
+// Can combine multiplication and addition overflow check into one. See the next
+
 class Solution {
 public:
     int reverse(int x) {
@@ -30,3 +32,23 @@ public:
         return y;
     }
 };
+
+class Solution {
+public:
+    int reverse(int x) {
+        int sign = x > 0 ? 1 : -1;
+        if(x == 0) return 0;
+        if(x == INT_MIN) return 0;
+        x = abs(x); //no overflow
+        int y = 0;
+        while(x) {
+            int r = x % 10;
+            if(y > (INT_MAX - r) / 10) return 0; //overflow
+            y = y*10 + r;
+            x /= 10;
+        }
+        y = sign > 0 ? y : -y; //no overflow
+        return y;
+    }
+};
+
