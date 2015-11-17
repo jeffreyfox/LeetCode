@@ -10,3 +10,8 @@ sliding window, hash table, string:
 
 Integer operations, overflow checking
 7. Reverse Integer
+8. String to Integer (atoi)
+9. Palindrome Number
+
+Deterministic finite automata (DFA):
+8. String to Integer (atoi)
