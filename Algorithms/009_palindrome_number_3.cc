@@ -12,18 +12,25 @@ You could also try reversing an integer. However, if you have solved the problem
 There is a more generic way of solving this problem.
 */
 
-// Most straightforward solution: construct the reverse number from x, and compare with x
-// Doesn't handle overflow explicitly because when overflow happens, y != x
+// Another solution by comparing only half digits.
 
 class Solution {
 public:
     bool isPalindrome(int x) {
         if (x < 0) return false;
-        int y = 0, num = x;
-        while (num > 0) {
-            y = y * 10 + num % 10;
-            num /= 10;
+        if (x == 0) return true;
+        int nd = 0; //number of digits of x
+        int xx = x;
+        while(xx) {
+            xx /= 10;
+            nd++;
         }
-        return y == x;
+        int y = 0;
+        for(int i = 0; i < nd / 2; ++i) {
+            y = 10*y + x%10;
+            x /= 10;
+        }
+        if(nd & 1 == 1) x /= 10; //remove additional digit
+        return x == y;
     }
 };
