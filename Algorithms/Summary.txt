@@ -1,12 +1,14 @@
 
-Two pointers, hash table:
-1. Two Sum
-167. Two Sum II
-170. Two Sum III
+Two pointers
+1, 167, 170. Two Sum
 15. 3Sum
 16. 3Sum Closest
 18. 4Sum
 259. 3Sum Smaller
+26, 80. Remove Duplicates from Sorted Array
+
+Hash table:
+1, 167, 170. Two Sum
 
 2Sum, 3Sum, 4Sum, check duplicates, optimization
 15. 3Sum
@@ -23,8 +25,10 @@ Integer operations
 8. String to Integer (atoi): overflow checking
 9. Palindrome Number: overflow checking
 202. Happy Number
-263. Ugly Number
+263, 264. Ugly Number
 
 Deterministic finite automata (DFA):
 8. String to Integer (atoi)
 
+Dynamic Programming
+264. Ugly Number II
