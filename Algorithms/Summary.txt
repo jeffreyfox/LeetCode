@@ -18,10 +18,11 @@ sliding window, hash table, string:
 3. Longest Substring Without Repeating Characters
 159. Longest Substring with At Most Two Distinct Characters 
 
-Integer operations, overflow checking
-7. Reverse Integer
-8. String to Integer (atoi)
-9. Palindrome Number
+Integer operations
+7. Reverse Integer: overflow checking
+8. String to Integer (atoi): overflow checking
+9. Palindrome Number: overflow checking
+202. Happy number
 
 Deterministic finite automata (DFA):
 8. String to Integer (atoi)
