@@ -1,5 +1,23 @@
+1: two pointers, hash table, 234sum,
+3: sliding window, hash table, string
+7: integer, overflow
+8: integer, overflow, dfa
+9: integer, overflow
+15: two pointers, check duplicates, 234sum,
+16: two pointers, check duplicates, 234sum,
+18: two pointers, check duplicates, 234sum,
+26: two pointers
+80: two pointers,
+159: sliding window, hash table, string
+167: two pointers, hash table, 234sum, 
+170: two pointers, hash table, 234sum, 
+202: integer
+259: two pointers, check duplicates, 234sum,
+263: integer
+264: integer, DP, 
 
-Two pointers
+
+=== Two pointers ===
 1, 167, 170. Two Sum
 15. 3Sum
 16. 3Sum Closest
