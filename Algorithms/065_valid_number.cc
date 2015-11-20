@@ -27,6 +27,15 @@
 
 // Use finite automaton. Read charater one by one, depending on the current state and character read, jump to the next state
 // 9 states,  and 6 types of charaters defined in CharType
+// state 0: has only seen spaces so far, expects another space, a digit, a dot, or a sign
+// state 1: has read a sign (+/-), expects a digit, or a dot
+// state 2: has read a digit in coeffient part, expects another digit, a dot, a e/E, or space
+// state 3: has read a dot (.) before reading any digit, only expects a digit as fractional part only
+// state 4: has read a dot (.) after reading at least one digit, expects a digit, or e/E, or space
+// state 5: has read a e/E in exponent field, expects a sign, or a digit
+// state 6: has read a sign in exponent field, expects a digit
+// state 7: has read a digit in exponent field, expects another digit, or space
+// state 8: has read a trailing space, expects another space      
 // Small trick: add a space after string s, so we only need to check if state == 8 in the end. 
 // Alternative: not add a space, and instead check if state is one of 2,4,7,8 in the end.
 class Solution {
