@@ -61,3 +61,50 @@ public:
         return ret;
     }
 };
+
+// Can further optimize and only use one map to store the counts, when see the string, reduce the individual counts, when it reaches zero we know that we have exactly the amount we need.
+// similar to min window, use only one dict to store the counting information. The key is to restore the information after each run.
+
+class Solution {
+public:
+    vector<int> findSubstring(string s, vector<string>& words) {
+         vector<int> result;
+         int nwords = words.size();
+         if(nwords == 0) return result;
+         int lword = words[0].size();
+         if(s.empty()) return result;
+         unordered_map<string, int> dict, count;
+         int total_count = 0;
+         int n = s.size();
+         for(size_t i = 0; i < nwords; ++i)
+             dict[words[i]]++;
+        
+         for(size_t i = 0; i < lword; ++i) {
+             total_count = nwords;
+             count = dict;
+             int jstart = i, j = i;
+             while(j + lword <= n) {
+                 string str = s.substr(j, lword);
+                 if(count.find(str) == count.end()) {
+                     total_count = nwords;
+                     count.clear();
+                     jstart = j + lword;
+                 } else {
+                     total_count ++;
+                     count[str] ++;
+                     int c = dict[str];
+                     while(count[str] > c) {
+                         string tmp = s.substr(jstart, lword);
+                         count[tmp] --;
+                         total_count --;
+                         jstart += lword;
+                     }
+                 }
+                 if(total_count == words.size()) result.push_back(jstart);
+                 j += lword;
+             }
+         }
+         return result;
+    }
+};
+
