@@ -22,35 +22,77 @@ Note:
 
 */
 
-// BFS, when found a word in dictionary, remove it from dictionary.
-// Length is distance + 1 !
+// One-way BFS from beinWord to endWord. Do not remove elements from the original dictionary! Rather create a new one (unvisited) and remove from it.
+// Systematically trying the new word by altering one character of the new word. Do not create a new string, rather change the character in-place and revert back to original afterwards.
 
 class Solution {
 public:
-    int ladderLength(string beginWord, string endWord, unordered_set<string>& wordDict) {
-        typedef pair<string, int> Element;
-        deque<Element> q; //FIFO queue for BFS
-        int n = beginWord.size();
-        q.push_back(make_pair(beginWord, 0));
-        wordDict.erase(beginWord);
-        while(!q.empty()) {
-            string word = q.front().first;
-            int dist = q.front().second;
-            if(word == endWord) return dist+1; //found endWord, length is dist+1 !
-            q.pop_front();
-            string newWord = word;
-            for(int i = 0; i < n; i++) { //replace each digit
-                for (char c = 'a'; c <= 'z'; c++) { //try all possible ways
-                    if(c == word[i]) continue;
-                    newWord[i] = c;
-                    if(wordDict.count(newWord)) {
-                        q.push_back(make_pair(newWord, dist+1));
-                        wordDict.erase(newWord); //remove it from dictionary
-                    }
-                }
-                newWord[i] = word[i]; //revert
-            }
-        }
-        return 0;
+    int ladderLength(string beginWord, string endWord, unordered_set<string>& wordList) {
+       deque<pair<string, int> > q;
+       unordered_set<string> unvisited = wordList;
+       int wl = beginWord.size();
+
+       q.push_back(make_pair(beginWord, 1));
+       unvisited.erase(beginWord); //remove beginWord to unvisited
+       unvisited.insert(endWord); //insert beginWord to unvisited
+       while(!q.empty()) {
+           string wd = q.front().first;
+           int level = q.front().second;
+           if(wd == endWord) return level;
+           q.pop_front();
+           for(int i = 0; i < wl; ++i) {
+               char c = wd[i];
+               for(char ch = 'a'; ch <= 'z'; ++ch) {
+                   if(ch == c) continue;
+                   wd[i] = ch;
+                   if(unvisited.count(wd))  {
+                       q.push_back(make_pair(wd, level+1));
+                       unvisited.erase(wd);
+                   }
+               }
+               wd[i] = c; //revert back
+           }
+       }
+
+       return 0;
+    }
+};
+
+// Another version of BFS is to use two vectors, one for current level, one for next level, and in the end swap the two.
+class Solution {
+public:
+    int ladderLength(string beginWord, string endWord, unordered_set<string>& wordList) {
+       vector<string> current, next;
+       int level = 1;
+       unordered_set<string> unvisited = wordList;
+       int wl = beginWord.size();
+
+       unvisited.erase(beginWord);
+       unvisited.insert(endWord);
+
+       current.push_back(beginWord);
+       
+       while(!current.empty()) {
+           for(vector<string>::iterator it = current.begin(); it != current.end(); ++it) {
+               string wd = *it;
+               for(int i = 0; i < wl; ++i) {
+                   char c = wd[i];
+                   for(char ch = 'a'; ch <= 'z'; ++ch) {
+                       if(ch == c) continue;
+                       wd[i] = ch;
+                       if(wd == endWord) return level+1;
+                       if(unvisited.count(wd))  {
+                           next.push_back(wd);
+                           unvisited.erase(wd);
+                       }
+                   }
+                   wd[i] = c; //revert back
+               }
+           }
+           current.swap(next);
+           next.clear();
+           level++;
+       }
+       return 0;        
     }
 };
