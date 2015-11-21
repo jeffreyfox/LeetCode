@@ -149,3 +149,42 @@ public:
        return 0;
     }
 };
+
+/*
+=== Solution 4 ===
+Bidirectional BFS, recursive solution (64ms!)
+*/
+class Solution {
+public:
+    int ladderLength(string beginWord, string endWord, unordered_set<string>& wordList) {
+        unordered_set<string> unvisited = wordList;
+        unvisited.erase(beginWord);
+        unvisited.erase(endWord);
+        unordered_set<string> forwardSet, backwardSet;
+        forwardSet.insert(beginWord);
+        backwardSet.insert(endWord);
+        return ladderLengthUtil(forwardSet, backwardSet, unvisited, 2);
+    }
+    int ladderLengthUtil(unordered_set<string>& forwardSet, unordered_set<string>& backwardSet, unordered_set<string>& unvisited, int level) {
+        if(forwardSet.empty()) return 0;
+        if(forwardSet.size() > backwardSet.size()) return ladderLengthUtil(backwardSet, forwardSet, unvisited, level);
+        unordered_set<string> next;
+        for(auto word : forwardSet) {
+            //try all posssibilities
+            for(auto it = word.begin(); it != word.end(); ++it) {
+                char tmp = *it;
+                for(*it = 'a'; *it != 'z'; ++(*it)) {
+                    if(*it == tmp) continue;
+                    if(backwardSet.count(word)) return level;
+                    else if(unvisited.count(word)) { //not visited
+                        unvisited.erase(word);
+                        next.insert(word);
+                    }
+                }
+                *it = tmp; //revert back
+            }
+        }
+        return ladderLengthUtil(next, backwardSet, unvisited, level+1);
+    }
+};
+
