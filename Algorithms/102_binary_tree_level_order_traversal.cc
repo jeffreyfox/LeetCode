@@ -31,6 +31,8 @@ return its level order traversal as:
  * };
  */
 
+// Solution using one queue and a customized struct Element
+
 class Solution {
 public:
     struct Element {
@@ -56,3 +58,51 @@ public:
         return ret;
     }
 };
+
+// Solution using one queue and std::pair (4ms)
+class Solution {
+public:
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        vector<vector<int> > result;
+        if(!root) return result;
+        deque<pair<TreeNode*, int> > q; //include level
+        q.push_back(make_pair(root, 0));
+        int currLevel = -1;
+        while(!q.empty()) {
+            TreeNode *node = q.front().first;
+            int level = q.front().second;
+            q.pop_front();
+            if(level > currLevel) { 
+                result.push_back(vector<int>());  //start a new level
+                currLevel = level;
+            }
+            if(node->left) q.push_back(make_pair(node->left, level+1));
+            if(node->right) q.push_back(make_pair(node->right, level+1));
+            result[currLevel].push_back(node->val);
+        }
+        return result;
+    }
+};
+
+// Solution using 2 vectors (queues), one for current level and one for next level (8ms)
+class Solution {
+public:
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        vector<vector<int> > result;
+        if(!root) return result;
+        vector<TreeNode*> current, next;
+        current.push_back(root);
+        while(!current.empty()) {
+            result.push_back(vector<int>()); //start a new level (for current)
+            for(auto node : current) {
+                if(node->left) next.push_back(node->left);
+                if(node->right) next.push_back(node->right);
+                result.back().push_back(node->val); //push value to result
+            }
+            current.swap(next);
+            next.clear();
+        }
+        return result;
+    }
+};
+
