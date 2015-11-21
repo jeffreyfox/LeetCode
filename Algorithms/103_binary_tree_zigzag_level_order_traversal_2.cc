@@ -19,8 +19,6 @@ return its level order traversal as:
 ]
 */
 
-/// Using two stacks. Swap the two when exhausting one level. Use a level tag to track polarity, which determines whether left or right subtree gets pushed to stack first
-
 /**
  * Definition for a binary tree node.
  * struct TreeNode {
@@ -30,30 +28,68 @@ return its level order traversal as:
  *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
  * };
  */
+
+// Be careful when using bit operator!! if(level & 1 == 0) is wrong!, 1 == 0 has higher priority, should use if (!(level&1)).
+
+/// Using two stacks. Swap the two when exhausting one level. Use a level tag to track polarity, which determines whether left or right subtree gets pushed to stack first
 class Solution {
 public:
     vector<vector<int>> zigzagLevelOrder(TreeNode* root) {
         vector<vector<int> > ret;
         if(!root) return ret;
-        deque<TreeNode*> q1, q2;
+        deque<TreeNode*> current, next;
         int level = 0;
-        q1.push_back(root);
-        while(!q1.empty() || !q2.empty()) { //break when both q1 and q2 are empty
-            if(q1.empty()) { 
-                q1.swap(q2); //swap q1 and q2 when exhausing one level
+        current.push_back(root);
+        ret.push_back(vector<int>());
+        while(!current.empty() || !next.empty()) { //break when both current and next are empty
+            if(current.empty()) { // when exhausing current level ...
+                current.swap(next); //swap current and next
+                ret.push_back(vector<int>());
                 level ++;
             }
-            TreeNode *node = q1.back();  q1.pop_back();
-            if(level == ret.size()) ret.push_back(vector<int>());
-            ret[level].push_back(node->val);
+            TreeNode *node = current.back();  current.pop_back();
             if(level % 2 == 0) {
-                if(node->left) q2.push_back(node->left);
-                if(node->right) q2.push_back(node->right);
+                if(node->left) next.push_back(node->left);
+                if(node->right) next.push_back(node->right);
             } else {
-                if(node->right) q2.push_back(node->right);
-                if(node->left) q2.push_back(node->left);
+                if(node->right) next.push_back(node->right);
+                if(node->left) next.push_back(node->left);
             }
+            ret[level].push_back(node->val);
         }
         return ret;
+    }
+};
+
+// Solution with 2 stacks, and two loops
+class Solution {
+public:
+    vector<vector<int>> zigzagLevelOrder(TreeNode* root) {
+        vector<vector<int> > result;
+        if(!root) return result;
+        //stack for two levels
+        vector<TreeNode*> current, next;
+        int level = 0; //level and parity
+        current.push_back(root);
+        while(!current.empty()) {
+            result.push_back(vector<int>()); //new level
+            //user current as stack
+            for(vector<TreeNode*>::reverse_iterator it = current.rbegin(); it != current.rend(); ++it) {
+                TreeNode *node = *it;
+                if(level % 2 == 0) { //l=>r
+                    if(node->left) next.push_back(node->left);
+                    if(node->right) next.push_back(node->right);
+                } else {
+                    if(node->right) next.push_back(node->right);
+                    if(node->left) next.push_back(node->left);
+                }
+                //insert to result
+                result[level].push_back(node->val);
+            }
+            current.swap(next);
+            next.clear();
+            level++;
+        }
+        return result;
     }
 };

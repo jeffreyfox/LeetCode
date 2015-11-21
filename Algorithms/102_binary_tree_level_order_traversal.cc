@@ -106,3 +106,28 @@ public:
     }
 };
 
+// Recursive solution:
+class Solution {
+public:
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        vector<vector<int> > result;
+        if(!root) return result;
+        vector<TreeNode*> current;
+        current.push_back(root);
+        int level = 0;
+        levelOrder(current, result, level);
+        return result;
+    }
+    void levelOrder(vector<TreeNode*>& current, vector<vector<int> >& result, int level) {
+        if(current.empty()) return;
+        result.push_back(vector<int>());
+        vector<TreeNode*> next;
+        for(auto it : current) {
+            if(it->left) next.push_back(it->left);
+            if(it->right) next.push_back(it->right);
+            result[level].push_back(it->val);
+        }
+        levelOrder(next, result, level+1);
+    }
+};
+
