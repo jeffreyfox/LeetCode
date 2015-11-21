@@ -22,8 +22,11 @@ Note:
 
 */
 
-// One-way BFS from beinWord to endWord. Do not remove elements from the original dictionary! Rather create a new one (unvisited) and remove from it.
-// Systematically trying the new word by altering one character of the new word. Do not create a new string, rather change the character in-place and revert back to original afterwards.
+/* 
+=== Solution 1 ===
+One-way BFS from beinWord to endWord. Do not remove elements from the original dictionary! Rather create a new one (unvisited) and remove from it.
+Systematically trying the new word by altering one character of the new word. Do not create a new string, rather change the character in-place and revert back to original afterwards.
+*/
 
 class Solution {
 public:
@@ -58,7 +61,11 @@ public:
     }
 };
 
-// Another version of BFS is to use two vectors, one for current level, one for next level, and in the end swap the two.
+/*
+=== Solution 2 ===
+BFS with two sets, one for current level, one for next level, and in the end of each iteration swap the two.
+*/
+
 class Solution {
 public:
     int ladderLength(string beginWord, string endWord, unordered_set<string>& wordList) {
@@ -94,5 +101,51 @@ public:
            level++;
        }
        return 0;        
+    }
+};
+
+/*
+=== Solution 3 ===
+Bi-directional BFS to reduce search space. Start from two ends (begin/end), and only do BFS from the side with smaller search space. 
+When we find one string in the search front that belongs to the front of the other side, we have "connected" the two sides.
+*/
+
+class Solution {
+public:
+    int ladderLength(string beginWord, string endWord, unordered_set<string>& wordList) {
+       unordered_set<string> beginSet, nextSet, endSet;
+       unordered_set<string> unvisited = wordList;
+       int wl = beginWord.size();
+
+       unvisited.erase(beginWord);
+       unvisited.erase(endWord);
+
+       beginSet.insert(beginWord);
+       endSet.insert(endWord);
+       int level = 2;
+
+       while(!beginSet.empty()) {
+           //for(unordered_set<string>::iterator it = beginSet.begin(); it != beginSet.end(); ++it) {
+           for(auto wd : beginSet) {
+               for(int i = 0; i < wl; ++i) {
+                   char c = wd[i];
+                   for(char ch = 'a'; ch <= 'z'; ++ch) {
+                       if(ch == c) continue;
+                       wd[i] = ch;
+                      if(endSet.count(wd)) return level;
+                       if(unvisited.count(wd))  {
+                           nextSet.insert(wd);
+                           unvisited.erase(wd);
+                       }
+                   }
+                   wd[i] = c; //revert back
+               }
+           }
+           beginSet.swap(nextSet);
+           nextSet.clear();
+           level++;
+           if(beginSet.size() > endSet.size()) beginSet.swap(endSet);
+       }
+       return 0;
     }
 };
