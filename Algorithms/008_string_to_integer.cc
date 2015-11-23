@@ -58,3 +58,28 @@ public:
         else return OTHER;
     }
 };
+
+/// Solution without using dfa. First ignore all trailing spaces, then read possible signs, then read digits until a non-digit character appears or reaching the end. Be aware of overflow!
+
+class Solution {
+public:
+    int myAtoi(string str) {
+        int ret = 0;
+        int n = str.size();
+        int i = 0;
+        while(i < n && str[i] == ' ') i++;
+        if(i == n) return 0;
+        int sgn = 1;
+        if(str[i] == '-') { sgn = -1; i++; }
+        else if (str[i] == '+') { i++; }
+        for(; i < n; i++) {
+           char c = str[i];
+           if(c >= '0' && c <= '9') {
+               int num = c - '0';
+               if((INT_MAX - num) / 10 < ret) return sgn == -1 ? INT_MIN : INT_MAX;
+               ret = ret*10 + num;
+           } else return sgn*ret;
+        }
+        return sgn*ret;
+    }
+};
