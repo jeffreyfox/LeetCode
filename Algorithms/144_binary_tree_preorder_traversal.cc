@@ -42,3 +42,22 @@ public:
         preorder(root->right, ret);
     }
 };
+
+// Iterative solution using a stack
+
+class Solution {
+public:
+    vector<int> preorderTraversal(TreeNode* root) {
+        vector<int> ret;
+        if(!root) return ret;
+        deque<TreeNode*> s; //stack
+        s.push_back(root);
+        while(!s.empty()) {
+            TreeNode *node = s.back(); s.pop_back();
+            ret.push_back(node->val);
+            if(node->right) s.push_back(node->right);
+            if(node->left) s.push_back(node->left);
+        }
+        return ret;
+    }
+};

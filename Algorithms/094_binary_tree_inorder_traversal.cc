@@ -42,3 +42,84 @@ public:
         if(root->right) inorder(root->right, ret);
     }
 };
+
+// Iterative solution using a stack (and a tag indicating the number of times an element appears in stack).
+// Slightly different version with modified control flow with tag.
+
+class Solution {
+public:
+    vector<int> inorderTraversal(TreeNode* root) {
+        vector<int> result;
+        if(!root) return result;
+        deque<pair<TreeNode*, int> > st; //stack
+        st.push_back(make_pair(root, 0));
+        while(!st.empty()) {
+            TreeNode *node = st.back().first;
+            int tag = ++st.back().second;
+            if(tag == 1) {
+                if(node->left) st.push_back(make_pair(node->left, 0));
+            } else {
+                result.push_back(node->val);
+                st.pop_back();
+                if(node->right) st.push_back(make_pair(node->right, 0));
+            }
+        }
+        return result;
+    }
+};
+
+// Another iterative solution by pushing left spline in the stack
+class Solution {
+public:
+    vector<int> inorderTraversal(TreeNode* root) {
+        vector<int> result;
+        if(!root) return result;
+        deque<TreeNode*> st; //stack
+        while(root) {
+            st.push_back(root);
+            root = root->left;
+        }
+        while(!st.empty()) {
+            TreeNode* node = st.back(); st.pop_back();
+            result.push_back(node->val);
+            node = node->right;
+            while(node) {
+                st.push_back(node);
+                node = node->left;
+            }
+        }
+        return result;
+    }
+};
+
+// Morris traversal O(n) without using a stack or recursive calls.
+
+class Solution {
+public:
+    vector<int> preorderTraversal(TreeNode* root) {
+        vector<int> ret;
+        if(!root) return ret;
+
+        TreeNode *curr = root;
+        while(curr) {
+            if (!curr->left) {  //no left subtree, visit node and go to right subtree
+                ret.push_back(curr->val);
+                curr = curr->right;
+            } else {
+                TreeNode *prev = curr->left; //find curr's predecessor in the tree
+                while(prev->right != NULL && prev->right != curr)
+                    prev = prev->right;
+
+                if(prev->right == NULL) { //first time, modify pointer
+                     prev->right = curr;
+                     ret.push_back(curr->val); //visit node first (preorder)
+                     curr = curr->left; //go to left subtree
+                } else { //second time, revert pointer back to NULL
+                     prev->right = NULL;
+                     curr = curr->right; //go to right subtree
+                }
+            }
+        }
+        return ret;
+    }
+};
