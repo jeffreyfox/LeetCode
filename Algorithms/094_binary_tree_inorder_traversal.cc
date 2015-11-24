@@ -93,33 +93,29 @@ public:
 };
 
 // Morris traversal O(n) without using a stack or recursive calls.
-
 class Solution {
 public:
-    vector<int> preorderTraversal(TreeNode* root) {
-        vector<int> ret;
-        if(!root) return ret;
-
-        TreeNode *curr = root;
-        while(curr) {
-            if (!curr->left) {  //no left subtree, visit node and go to right subtree
-                ret.push_back(curr->val);
-                curr = curr->right;
+    vector<int> inorderTraversal(TreeNode* root) {
+        vector<int> result;
+        if(!root) return result;
+        TreeNode *node = root;
+        while(node) {
+            if(!node->left) {
+                result.push_back(node->val);
+                node = node->right;
             } else {
-                TreeNode *prev = curr->left; //find curr's predecessor in the tree
-                while(prev->right != NULL && prev->right != curr)
-                    prev = prev->right;
-
-                if(prev->right == NULL) { //first time, modify pointer
-                     prev->right = curr;
-                     ret.push_back(curr->val); //visit node first (preorder)
-                     curr = curr->left; //go to left subtree
-                } else { //second time, revert pointer back to NULL
-                     prev->right = NULL;
-                     curr = curr->right; //go to right subtree
+                TreeNode *child = node->left;
+                while(child->right != NULL && child->right != node) child = child->right;
+                if(child->right == NULL) {
+                    child->right = node; // first time, modify right pointer
+                    node = node->left; //move to left child
+                } else {
+                    child->right = NULL; //second time, reset right pointer to NULL
+                    result.push_back(node->val);
+                    node = node->right;
                 }
             }
         }
-        return ret;
+        return result;
     }
 };
