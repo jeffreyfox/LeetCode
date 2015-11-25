@@ -1,3 +1,11 @@
+/*
+Given a collection of intervals, merge all overlapping intervals.
+
+For example,
+Given [1,3],[2,6],[8,10],[15,18],
+return [1,6],[8,10],[15,18]. 
+*/
+
 /**
  * Definition for an interval.
  * struct Interval {
@@ -7,7 +15,39 @@
  *     Interval(int s, int e) : start(s), end(e) {}
  * };
  */
- 
+
+// One pass simple solution after sorting interval array
+
+bool compare_start(const Interval& a, const Interval& b) {
+    return a.start < b.start;
+}
+
+class Solution {
+public:
+    vector<Interval> merge(vector<Interval>& intervals) {
+        vector<Interval> result;
+        if(intervals.empty()) return result;
+        int n = intervals.size();
+        if(n == 1) return intervals;
+        sort(intervals.begin(), intervals.end(), compare_start);
+        result.push_back(intervals[0]);
+        Interval last = intervals[0];
+        for(int i = 1; i < intervals.size(); ++i) {
+            const Interval& curr = intervals[i];
+            if(curr.start <= last.end) {
+                //merge current with last
+                last.end = result.back().end = max(curr.end, result.back().end);
+            } else {
+                result.push_back(curr);
+                last = curr;
+            }
+        }
+        return result;
+    }
+};
+
+
+// An old solution 
 bool compare(const Interval &a, const Interval &b) {
     if(a.start < b.start) return true;
     if(a.start > b.start) return false;

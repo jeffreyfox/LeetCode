@@ -1,3 +1,17 @@
+/*
+Given a set of non-overlapping intervals, insert a new interval into the intervals (merge if necessary).
+
+You may assume that the intervals were initially sorted according to their start times.
+
+Example 1:
+Given intervals [1,3],[6,9], insert and merge [2,5] in as [1,5],[6,9].
+
+Example 2:
+Given [1,2],[3,5],[6,7],[8,10],[12,16], insert and merge [4,9] in as [1,2],[3,10],[12,16].
+
+This is because the new interval [4,9] overlaps with [3,5],[6,7],[8,10]. 
+*/
+
 /**
  * Definition for an interval.
  * struct Interval {
@@ -11,29 +25,39 @@
 /// scan intervals from left to right:
 // 1. if current interval overlaps with newInterval, then merge the two and update newInterval
 // 2. if not overlap, then push-back the one with smaller start time to final array, and make the other one as newInterval.
+// Use a tag "inserted" to check if newInterval already inserted. If yes, then no need to perform interval comparison in later step (just copy and paste)
+
 class Solution {
 public:
     vector<Interval> insert(vector<Interval>& intervals, Interval newInterval) {
-        int n = intervals.size();
-        vector<Interval> ret;
-        for (int i = 0; i < n; ++i) {
-            const Interval& curr = intervals[i];
-            if (isOverlap(curr, newInterval))
-                newInterval = getMergedInterval(curr, newInterval);
-            else if (newInterval.start < curr.start) { //non-overlap, newInterval smaller
-                ret.push_back(newInterval);
-                newInterval = curr;
-            } else ret.push_back(curr);
+        vector<Interval> result;
+        if(intervals.empty()) {
+            result.push_back(newInterval);
+            return result;
         }
-        ret.push_back(newInterval);
-        return ret;
+        int n = intervals.size();
+        bool inserted = false;
+        for(int i = 0; i < n; ++i) {
+           const Interval& current = intervals[i];
+           if(inserted) result.push_back(current);
+           else if(newInterval.start <= current.end && current.start <= newInterval.end) { //merge the two
+               newInterval.start = min(current.start, newInterval.start);
+               newInterval.end = max(current.end, newInterval.end);
+           } else { //not overlap
+               if(current.start > newInterval.start) {
+                   result.push_back(newInterval); //smaller start goes first
+                   result.push_back(current);
+                   inserted = true; //finshed insertion
+               } else {
+                   result.push_back(current); //smaller start goes first
+               }
+           }
+        }
+        if(!inserted) result.push_back(newInterval);
+        return result;
     }
-    
-    bool isOverlap(const Interval& i1, const Interval& i2) {
-        return (i1.start <= i2.end && i2.start <= i1.end);
-    }
-    
-    Interval getMergedInterval(const Interval& i1, const Interval& i2) {
-        return Interval(min(i1.start, i2.start), max(i1.end, i2.end));
+
+    bool isOverlap(const Interval& a, const Interval& b) {
+       return !((a.end < b.start) || (a.start > b.end));
     }
 };
