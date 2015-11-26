@@ -1,4 +1,30 @@
-// use an append function. Deal with one, five, ten
+/*
+Given an integer, convert it to a roman numeral.
+
+Input is guaranteed to be within the range from 1 to 3999.
+*/
+
+// A simple solution using a table
+
+const int values[13] = {1000,900,500,400,100,90,50,40,10,9,5,4,1};
+const string strs[13] = {"M","CM","D","CD","C","XC","L","XL","X","IX","V","IV","I"};
+        
+class Solution {
+public:
+    string intToRoman(int num) {
+        string s;
+        for(int i = 0; i < 13; ++i) {
+            while(num >= values[i]) {
+                num -= values[i];
+                s += strs[i];
+            }
+            if(num == 0) break;
+        }
+        return s;
+    }
+};
+
+// An old solution. use an append function. Deal with one, five, ten
 class Solution {
 public:
     string intToRoman(int num) {
