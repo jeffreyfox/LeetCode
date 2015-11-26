@@ -14,23 +14,23 @@ public:
     vector<string> generateParenthesis(int n) {
         vector<string> result;
         if(n < 1) return result;
-        string tmp(2*n, '0');
-        dfs(n, n, 0, tmp, result);
+        string str(2*n, '0');
+        dfs(n, n, 0, str, result);
         return result;
     }
-    void dfs(int nOpen, int nClose, int i, string& tmp, vector<string>& result) {
-        if(nOpen < 0 || nClose < 0 || nOpen > nClose) return;
-        
-        if(i == tmp.size()) {
-            result.push_back(tmp);
+    void dfs(int nl, int nr, int i, string& str, vector<string>& result) {
+        if(i == str.size()) {
+            result.push_back(str);
             return;
         }
-        
-        tmp[i] = '(';
-        dfs(nOpen-1, nClose, i+1, tmp, result);
-        
-        tmp[i] = ')';
-        dfs(nOpen, nClose-1, i+1, tmp, result);
+        if(nl > 0) {
+            str[i] = '(';
+            dfs(nl-1, nr, i+1, str, result);
+        }
+        if(nr > 0 && nl < nr) {
+            str[i] = ')';
+            dfs(nl, nr-1, i+1, str, result);
+        }
     }
 };
 
