@@ -1,4 +1,13 @@
-// code works for binary and hex and oct systems, except need to change R to 8 or 16 
+/*
+Given two binary strings, return their sum (also a binary string).
+
+For example,
+a = "11"
+b = "1"
+Return "100". 
+*/
+
+// General solution that works works for binary and hex and oct systems, except need to change R to 8 or 16 
 class Solution {
 public:
     string addBinary(string a, string b) {
@@ -29,5 +38,35 @@ public:
         if (n >= 0  && n <= 9)  return n + '0';
         if (n >= 10 && n <= 15) return n - 10 + 'A';
         return '0';
+    }
+};
+
+/* Another solution using bit operator to calculate sum and carry
+            sum = v1 ^ v2 ^ carry;
+            carry = (v1 & v2) | (v1 & carry) | (v2 & carry);
+
+// An alternative is use:
+            sum = v1 + v2 + carry;
+            carry = sum / 2;
+            sum %= 2;
+*/
+
+class Solution {
+public:
+    string addBinary(string a, string b) {
+        int l1 = a.size(), l2 = b.size();
+        int l = max(l1, l2);
+        string result(l, '0');
+        int sum = 0, carry = 0;
+        //i counts from right to left
+        for(int i = 0; i < l; ++i) {
+            int v1 = (i >= l1) ? 0 : a[l1-i-1] - '0';
+            int v2 = (i >= l2) ? 0 : b[l2-i-1] - '0';
+            sum = v1 ^ v2 ^ carry;
+            carry = (v1 & v2) | (v1 & carry) | (v2 & carry);
+            result[l-i-1] = sum + '0';
+        }
+        if(carry > 0) result = '1' + result;
+        return result;
     }
 };
