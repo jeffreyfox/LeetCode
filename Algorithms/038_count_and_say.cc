@@ -11,7 +11,45 @@ Given an integer n, generate the nth sequence.
 Note: The sequence of integers will be represented as a string. 
 */
 
-/// recursive solution, use the last string, and scan from left to right to find the number of duplicated entries, and append count as string
+/// Iterative solution, can place the countAndSay(string&) function directly into for loop to reduce unecessary function call cost
+
+class Solution {
+public:
+    string countAndSay(int n) {
+        string res = "1";
+        for(int i = 1; i < n; ++i) {
+            res = countAndSay(res);
+        }
+        return res;
+    }
+    
+    string countAndSay(const string& str) {
+        int n = str.size();
+        int count = 1;
+        string res;
+        for(int i = 1; i < n; ++i) {
+            if(str[i] == str[i-1]) count++;
+            else {
+                res += num2str(count) + str[i-1];
+                count = 1; //new character
+            }
+        }
+        res += num2str(count) + str[n-1];
+        return res;
+    }
+
+    string num2str(int n) {
+        if(n == 0) return "0";
+        string res;
+        while(n) {
+            res += char(n % 10 + '0') + res;
+            n /= 10;
+        }
+        return res;
+    }
+};
+
+/// An old solution, use the last string, and scan from left to right to find the number of duplicated entries, and append count as string
 class Solution {
 public:
     string countAndSay(int n) {
