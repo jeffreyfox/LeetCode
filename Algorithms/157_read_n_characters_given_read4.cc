@@ -12,6 +12,8 @@ The read function will only be called once for each test case.
 // Forward declaration of the read4 API.
 int read4(char *buf);
 
+// Solution: keep track of current buffer write position, and total number of characters read so far. Also decrement n by the number of characters written.
+
 class Solution {
 public:
     /**
@@ -20,18 +22,20 @@ public:
      * @return    The number of characters read
      */
     int read(char *buf, int n) {
-        int count = 0; //count how many characters are read at reach read4
-        char *beg = buf; //pointer to start of buffer
-        if(n == 0) return 0; //can be omitted
-        while(count < n) {
-            int r = read4(buf); //read next 4
-            count += r; //count how many characters are read
-            buf += r; //advance buf pointer
-            if (r < 4) break; //reach end
-        } 
-        //after loop count >=n or r == 4
-        int len = min(count, n);
-        beg[len] = 0; // necessary!
-        return len;
+        int once = 0, total = 0;
+        while(n >= 4) {
+            once = read4(buf);
+            total += once; //increment character counter
+            buf += once; //move buffer forward
+            if(once < 4) return total; //reached end of file
+            n -= 4; //for sure read-in 4 characters
+        }
+        //now n < 4
+        if(n > 0) {
+            once = read4(buf); //could read end of file
+            total += min(once, n);
+            buf += min(once, n);
+        }
+        return total;
     }
 };

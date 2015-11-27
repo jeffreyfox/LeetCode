@@ -12,44 +12,46 @@ The read function may be called multiple times.
 // Forward declaration of the read4 API.
 int read4(char *buf);
 
+// Since read can be called multiple times, we need to store the characters read but not copied to buf in one read call. There are two changes to simple read function:
+// 1. in the end any leftover characters are pushed to the queue
+// 2. in the beginning check if queue has leftovers, if yes copy to buffer. Has to handle cases where n is small than the number of leftovers.
+
 class Solution {
-    
 public:
-    Solution() { leftover[0] = '\0';}
     /**
      * @param buf Destination buffer
      * @param n   Maximum number of characters to read
      * @return    The number of characters read
      */
     int read(char *buf, int n) {
-       if (n == 0) return 0;
-        int count = 0;
-        //copy leftover to buf
-        while(count < n && nleft > 0) {
-           *buf++ = leftover[ileft];
-           ileft = (ileft+1) % 4; //current left-over character to be copied to buf
-           nleft--; //number of left-over characters
-           count++;
+        int once = 0, total = 0;
+        //if there is anything left in residue, pop out.
+        while(!q.empty() && n > 0) {
+            *(buf++) = q.front(); q.pop_front();
+            total ++;
+            n--;
         }
-        if(count == n)  return count;  //already read enough
-
-        //nleft = 0, leftover is empty. reset ileft
-        ileft = 0;
-        while(count < n) {
-            int r = read4(leftover);
-            nleft = r;
-            while(count < n && nleft > 0) {
-                *buf++ = leftover[ileft];
-                ileft = (ileft+1) % 4;
-                nleft--;
-                count++;
+        if(n == 0) return total; //finished
+        
+        while(n >= 4) {
+            once = read4(buf);
+            total += once;
+            buf += once;
+            if(once < 4) return total; //reached end of file
+            n -= once;
+        }
+        if(n > 0) {
+            once = read4(buf);
+            buf += min(once, n); //move buffer position
+            total += min(once, n);
+            int leftover = once - n;
+            for(int i = 0; i < leftover; ++i) { //has residue, push to queue
+                q.push_back(*(buf+i));
             }
-            if(r < 4) break; //reaching end
         }
-        return count;
+        return total;
     }
-
-    char leftover[4];
-    int nleft;
-    int ileft;
+    
+private:
+    deque<char> q;
 };
