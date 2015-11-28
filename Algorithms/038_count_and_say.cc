@@ -12,6 +12,7 @@ Note: The sequence of integers will be represented as a string.
 */
 
 /// Iterative solution, can place the countAndSay(string&) function directly into for loop to reduce unecessary function call cost
+// Caveat: in num2str, should be res = c + res, not res += c + res;
 
 class Solution {
 public:
@@ -42,7 +43,7 @@ public:
         if(n == 0) return "0";
         string res;
         while(n) {
-            res += char(n % 10 + '0') + res;
+            res = char(n % 10 + '0') + res;
             n /= 10;
         }
         return res;
