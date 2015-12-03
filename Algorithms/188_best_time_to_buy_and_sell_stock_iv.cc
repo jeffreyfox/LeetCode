@@ -20,20 +20,16 @@ Let the max profit after day j, when performing up to kk transactions be maxProf
    max( maxProf[jj][k-1] + price[j] - price[jj] ) for all 0 <= jj <= j
  = price[j] + max (maxProf[jj][k-1] - price[jj]) for all 0 <= jj <= j
 
-The relation can be expressed as:
-maxProf[j][k] = max(maxProf[j-1][k], price[j] + tmpMax[j][k-1])
+To avoid calculating the max for all jj's, we can keep a storage called tmpMax for the quantity max(maxProf[jj][k-1] - price[jj]) as j is incremented. So the DP relation can be expressed as:
 
-To avoid calculating the max for all jj's, we can keep a storage called tmpMax for the quantity max(maxProf[jj][k-1] - price[jj]) as j is incremented:
-- j = 0, tmpMax[j][k] = -price[0];  // maxProf[0][k] = 0
-- k = 0, tmpMax[j][k] = max(tmpMax[j-1][k], -price[j])  // maxPro[0][-1] = 0
-- j > 0 & k > 0, tmpMax[j][k] = max(tmpMax[j-1][k], maxProf[j][k-1]-price[j])
+maxProf[j][k] = max(maxProf[j-1][k], price[j] + tmpMax[j][k-1]),    j > 0 and k > 0
+              = 0,   j = 0 or k = 0
 
-so, for each new j, do this:
-for(int kk = 1; kk < k; ++kk)  {
-    mp[j][k] = max(mp[j-1][k], price[j] + tmp[jj][k-1]);
-    tmp[j][k] = max(tmp[j-1][k], mp[
-}
-where tmp[jj][k] is the maximum of mp[jj][k-1]-price[jj] observed so far (for all jj < j)
+tmpMax[j][k] = max(tmpMax[j-1][k], maxProf[j][k-1]-price[j]),  j > 0 and k > 0
+             = max(tmpMax[j-1][k], -price[j]),    j > 0 and k = 0   // maxPro[0][-1] = 0
+             = -price[0],   j = 0   // maxProf[0][k] = 0
+
+We noticed that maxProf[0][k] and maxProf[j][0] are always zero, and tmpMax[0][k] = -price[0] for all k, so we can initialize the array and later do not iterate over j = 0 and k = 0.
 */
 
 class Solution {
@@ -48,61 +44,48 @@ public:
             }
             return result;
         }
-        //now the real business
         vector<vector<int> > maxProf(n, vector<int>(k+1, 0)); //maxProfit performing upto k transactions
-        vector<vector<int> > tmpMax(n, vector<int>(k+1, 0)); //max of (maxProf[jj][k-1] - price[jj]) for all jj <= j.
-        for(int j = 0; j < n; ++j) {
-            for(int kk = 1; kk < k; ++kk) {
-                maxProf[j][kk] = max(maxProf[j][kk], prices[j] + tmpMax[j][kk-1]);
-                if(j == 0) tmpMax[j][kk] = maxProf[0][kk-1] - prices[0];
-                else tmpMax[j][kk] = max(tmpMax[j-1][kk], maxProf[j][kk-1]-prices[j]);
+        vector<vector<int> > tmpMax(n, vector<int>(k+1, 0)); //max of (maxProf[jj][k] - price[jj]) for all 0 <= jj <= j.
+
+        for(int kk = 0; kk < k; ++kk) tmpMax[0][kk] = -prices[0];
+
+        for(int j = 1; j < n; ++j) {
+            tmpMax[j][0] = max(tmpMax[j-1][0], -prices[j]); //handle kk = 0 case
+            for(int kk = 1; kk <= k; ++kk) {
+                maxProf[j][kk] = max(maxProf[j-1][kk], prices[j] + tmpMax[j][kk-1]);
+                tmpMax[j][kk] = max(tmpMax[j-1][kk], maxProf[j][kk]-prices[j]);
             }
         }
         return maxProf[n-1][k];
     }
 };
 
-/// Space optimized DP solution, also time-optimized for k > n/2 case.
+/*
+Space optimized solution: we noticed that maxProf[j][k] only requires values at j-1 and k-1, so we can replace the 2D array with 1D, by reducing the dimension for the day. We use the same array to track the maxProfit for kk transactions for the current day, and update it for the next day.
+*/
 
 class Solution {
 public:
     int maxProfit(int k, vector<int>& prices) {
-		int n = prices.size();
-		if(n <= 1) return 0;
-		int maxAll = 0; //maximum of all posibilities
-		
-		//notice the simple case where k exceed half of n! This reduces to buy_and_sell_stock_II!
-		//because, the maximum number of non-continuous POSITIVE segments in array of size N is (N+1)/2. e.g N = 5, PNPNP, N = 6, PNPNPN.
-		//check the price difference array which is of size n-1, thus maximum number of non-cont. POSITIVE segment is n/2.
-		if (k > n/2) {
-		    for (int i = 1; i < n; ++i)  {
-		        int diff = prices[i] - prices[i-1];
-		        if (diff > 0) maxAll += diff;
-		    }
-		    return maxAll;
-		}
-		
-		int numTrans = k; //number of transactions
-		//mp[j] is maximum prof at the end of day j after performing at most k transactions
-		vector<int> mp(n, 0); 
-		
-		//maxProf[k][j] is the maximum of two cases:
-		// a. no selling at day j, so upto k transactions (including 1,2,...k) at end of day j-1: mp[k][j-1]
-		// b. selling at day j: for some jj < j, perform upto k-1 transactions at jj, and buy at jj and sell at day j,
-		// the profit is the maximum of mp[k-1][jj] + prices[j] - prices[jj] among all 0 <= jj < j. Thus:
-		// mp[k][j] = max( mp[k][j-1], prices[j] + max(mp[k-1][jj]-prices[jj], for all jj < j) )
-		// when we increase j, we keep a variable tmpMax storing the last term and update properly.
-		// The clever part is to take prices[j] out of the maximum expression of jj.
-		
-		for(int k = 1; k <= numTrans; ++k) {
-			int tmpMax = mp[0] - prices[0]; //k = 1, tmpMax = mp[k-1][0] - prices[0];
-			for(int j = 1; j < n; ++j) {
-			    int old = mp[j]; //mp[k-1][j]
-				mp[j] = max(mp[j-1], tmpMax+prices[j]);
-				tmpMax = max(tmpMax, old-prices[j]);
-				maxAll = max(maxAll, mp[j]);
-			}
-		}
-		return maxAll;
+        int n = prices.size();
+        if(n <= 1) return 0;
+        int result = 0;
+        if(k >= n/2) {
+            for(int i = 1; i < n; ++i) {
+                result += max(0, prices[i] - prices[i-1]);
+            }
+            return result;
+        }
+        vector<int> maxProf(k+1, 0); //maxProfit performing upto k transactions
+        vector<int> tmpMax(k+1, -prices[0]); //max of (maxProf[jj][k] - price[jj]) for all 0 <= jj <= j.
+
+        for(int j = 1; j < n; ++j) {
+            tmpMax[0] = max(tmpMax[0], -prices[j]); //handle kk = 0 case
+            for(int kk = 1; kk <= k; ++kk) {
+                maxProf[kk] = max(maxProf[kk], prices[j] + tmpMax[kk-1]);
+                tmpMax[kk] = max(tmpMax[kk], maxProf[kk]-prices[j]);
+            }
+        }
+        return maxProf[k];
     }
-};
+}
