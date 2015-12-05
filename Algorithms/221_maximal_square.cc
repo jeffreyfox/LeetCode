@@ -10,7 +10,7 @@ For example, given the following matrix:
 Return 4. 
 */
 
-// Same idea as maximal rectangle, use routine in finding largest rectangle. Except when calculating area, use min(height, length)^2
+// Same idea as maximal rectangle, use routine in finding largest rectangle. Except when calculating area, use min(height, length)^2. See solutions in 085 maximal rectangle
 
 class Solution {
 public:
