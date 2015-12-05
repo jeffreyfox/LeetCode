@@ -5,73 +5,94 @@ get(key) - Get the value (will always be positive) of the key if the key exists 
 set(key, value) - Set or insert the value if the key is not already present. When the cache reached its capacity, it should invalidate the least recently used item before inserting a new item. 
 */
 
-/// Use a double-linked list, and use a dummy head and tail.
-/// Maintain a count of elements and capiticy.
-/// When an element has been touched, move to end of list
-/// When inserting a new element, first check if reaching maximum capacity. If yes, first delete head element. Then append new element to tail.
+/*
+ Use a double-linked list, and use a dummy head and tail.
+ Maintain a count of elements and capiticy.
+ When an element has been touched, move to end of list
+ When inserting a new element, first check if reaching maximum capacity. If yes, first delete head element. Then append new element to tail.
+ Also included proper delete functions when nodes are removed and in the destructor.
+ Caveat:
+  1. When using dummy head and tail, should create a new node, not doing this in the constructor:
+   ListNode dum1(0), *head = &dum1
+  It will cause failure in the set routine when head is referenced. This is because dum1 is a local variable in constructor, and outside this function it will be out-of-scope and later referencing will give segmentation fault error. The correct way is to use new to allocate space on the heap: ListNode *head = new ListNode(-1, 0);
+  2. The ListNode should have two data entries, key and value. Value is obvious, key is also needed to find the entry in the map when the entry needs to be erased.
+ 
+*/
 
-class LRUCache 	{
+class LRUCache{
+
 public:
     struct ListNode {
-        int key, value; //key and value
         ListNode *prev, *next;
-        ListNode(int k, int v): key(k), value(v), prev(NULL), next(NULL) {}
+        int key, val;
+        ListNode(int k, int v) : key(k), val(v), prev(NULL), next(NULL) {}
     };
 
     LRUCache(int capacity) {
-       head = new ListNode(-1, -1);
-       tail = new ListNode(-1, -1);
-       head->next = tail;
-       tail->prev = head;
-       this->capacity = capacity;
-       count = 0;
+        this->capacity = capacity;
+        this->N = 0;
+        //dummy head and tail
+        head = new ListNode(-1, 0);
+        tail = new ListNode(-1, 0);
+        head->next = tail;
+        tail->prev = head;
     }
 
     ~LRUCache() {
         ListNode *node = head;
         while(node) {
-            ListNode *tmp = node;
+            ListNode* tmp = node;
             node = node->next;
             delete tmp;
         }
     }
 
     int get(int key) {
-        map<int, ListNode*>::iterator it = st.find(key);
-        if(it == st.end()) return -1;
-        moveToTail(it->second);
-        return it->second->value;
+        if(dict.count(key)) {
+            ListNode* node = dict[key];
+            removeFromList(node);
+            appendToList(node);
+            return node->val;
+        } else return -1;       
     }
-
+    
     void set(int key, int value) {
-        map<int, ListNode*>::iterator it = st.find(key);
-        if (it == st.end()) { // not exist, add
-            if(count == capacity) {
-               deleteHead();
-               count--;
+        if(dict.count(key)) { //found, just update
+            ListNode* node = dict[key];
+            node->val = value;
+            removeFromList(node);
+            appendToList(node);
+        } else { //not found, insert
+            ListNode *node = new ListNode(key, value);
+            dict[key] = node;
+            appendToList(node);
+            N++;
+            if(N > capacity) {
+               node = head->next;
+               removeFromList(node);
+               dict.erase(node->key); //erase entry from map
+               delete node;
+               N--;
             }
-            ListNode *newnode = new ListNode(key, value);
-            appendToTail(newnode);
-            st[key] = newnode;
-            count++;
-        } else { //already exist, put to tail and update
-            moveToTail(it->second);
-            it->second->value = value;
         }
     }
 
-    map<int, ListNode*> st; //symbol table
-    ListNode *head, *tail; //dummy head and tail
-    int count, capacity;
-
-    void moveToTail(ListNode* node) {
-        if(node->next == tail) return; //no need to touch if already at tail
-        //first delete from middle
+private:
+    void removeFromList(ListNode* node) {
         node->prev->next = node->next;
         node->next->prev = node->prev;
-        //then append to tail
-        appendToTail(node);
     }
+    void appendToList(ListNode* node) {
+        node->prev = tail->prev;
+        node->next = tail;
+        tail->prev->next = node;
+        tail->prev = node;
+    }
+    int capacity;
+    int N;
+    unordered_map<int, ListNode*> dict;
+    ListNode *head, *tail;
+};
     void appendToTail(ListNode* node) {
         node->prev = tail->prev;
         node->next = tail;
