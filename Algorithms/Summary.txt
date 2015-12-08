@@ -1,55 +1,86 @@
-11/13 - 11/22: 36 problems revisted!
-
-
-1: two pointers, hash table, 234sum,
-3: sliding window, hash table, string
-7: integer, overflow
-8: integer, overflow, dfa
-9: integer, overflow
-15: two pointers, check duplicates, 234sum,
-16: two pointers, check duplicates, 234sum,
-18: two pointers, check duplicates, 234sum,
-26: two pointers
-80: two pointers,
-159: sliding window, hash table, string
-167: two pointers, hash table, 234sum, 
-170: two pointers, hash table, 234sum, 
-202: integer
-259: two pointers, check duplicates, 234sum,
-263: integer
-264: integer, DP, 
-
-
-=== Two pointers ===
-1, 167, 170. Two Sum
-15. 3Sum
-16. 3Sum Closest
-18. 4Sum
-259. 3Sum Smaller
-26, 80. Remove Duplicates from Sorted Array
-
-Hash table:
-1, 167, 170. Two Sum
-
-2Sum, 3Sum, 4Sum, check duplicates, optimization
-15. 3Sum
-16. 3Sum Closest
-18. 4Sum
-259. 3Sum Smaller
-
-sliding window, hash table, string:
-3. Longest Substring Without Repeating Characters
-159. Longest Substring with At Most Two Distinct Characters 
-
-Integer operations
-7. Reverse Integer: overflow checking
-8. String to Integer (atoi): overflow checking
-9. Palindrome Number: overflow checking
-202. Happy Number
-263, 264. Ugly Number
-
-Deterministic finite automata (DFA):
-8. String to Integer (atoi)
-
-Dynamic Programming
-264. Ugly Number II
+001_two_sum.cc
+003_longest_substr_wo_repeating_char.cc
+004_median_of_two_sorted_arrays.cc
+007_reverse_integer.cc
+008_string_to_integer.cc
+009_palindrome_number.cc
+012_integer_to_roman.cc
+013_roman_to_integer.cc
+014_longest_common_prefix.cc
+015_3sum.cc
+016_3sum_closest.cc
+018_4sum.cc
+020_valid_parentheses.cc
+021_merge_two_sorted_lists.cc
+022_generate_parenthesis.cc
+023_merge_k_sorted_lists.cc
+025_reverse_nodes_in_k_group.cc
+026_remove_duplicates_sorted_array.cc
+030_substr_concat_all_words.cc
+032_longest_valid_parentheses.cc
+038_count_and_say.cc
+043_multiply_strings.cc
+045_jump_game_ii.cc
+051_n_queens.cc
+052_n_queens_ii.cc
+053_maximum_subarray.cc
+055_jump_game.cc
+056_merge_intervals.cc
+057_insert_interval.cc
+065_valid_number.cc
+066_plus_one.cc
+067_add_binary.cc
+072_edit_distance.cc
+076_minimum_window_substring.cc
+078_subsets.cc
+080_remove_duplicates_sorted_array_ii.cc
+084_largest_rectangle_in_histogram.cc
+085_maximal_rectangle.cc
+088_merge_sorted_array.cc
+090_subsets_ii.cc
+094_binary_tree_inorder_traversal.cc
+102_binary_tree_level_order_traversal.cc
+103_binary_tree_zigzag_level_order_traversal.cc
+121_best_time_to_buy_and_sell_stock.cc
+122_best_time_to_buy_and_sell_stock_ii.cc
+123_best_time_to_buy_and_sell_stock_iii.cc
+126_word_ladder_ii.cc
+127_word_ladder.cc
+132_palindrome_partitioning_ii.cc
+135_candy.cc
+139_word_break.cc
+140_word_break_ii.cc
+144_binary_tree_preorder_traversal.cc
+145_binary_tree_postorder_traversal.cc
+146_lru_cache.cc
+149_max_points_on_a_line.cc
+151_reverse_words_in_a_string.cc
+152_maximum_product_subarray.cc
+157_read_n_characters_given_read4.cc
+158_read_n_characters_given_read4_ii.cc
+159_longest_substr_at_most_two_distinct_char.cc
+161_one_edit_distance.cc
+164_maximum_gap.cc
+167_two_sum_ii.cc
+170_two_sum_iii.cc
+179_largest_number.cc
+186_reverse_words_in_a_string_ii.cc
+188_best_time_to_buy_and_sell_stock_iv.cc
+202_happy_number.cc
+209_minimum_size_subarray_sum.cc
+218_the_skyline_problem.cc
+221_maximal_square.cc
+238_product_of_array_except_self.cc
+239_sliding_window_maximum.cc
+241_different_ways_to_add_parentheses.cc
+252_meeting_rooms.cc
+253_meeting_rooms_ii.cc
+256_paint_house.cc
+257_binary_tree_paths.cc
+259_3sum_smaller.cc
+263_ugly_number.cc
+264_ugly_number_ii.cc
+265_paint_house_ii.cc
+276_paint_fence.cc
+280_wiggle_sort.cc
+295_find_median_from_data_stream.cc
