@@ -1,0 +1,30 @@
+#!/bin/bash
+
+reverse=0
+if [ "$#" -eq 1 ]; then
+  if [ $1 = "-r" ]; then
+    reverse=1
+  fi   
+fi
+
+echo -en "\n"
+for (( N = 1; N <= 250; N=N+1 ))
+do
+  res=$((N%10))
+  if [ $res -eq 1 ]; then
+    printf '%03d-%03d | ' $((N)) $((N+9))
+  fi
+  file=$( printf '%03d' $N )
+  cnt=`grep -c ${file} Summary.txt`
+  if [ $cnt -ne 0 ] ; then
+    [ $reverse -eq 1 ] && echo -en "  " || echo -en "X "
+  else 
+    [ $reverse -eq 1 ] && echo -en "X " || echo -en "  "
+  fi
+  if [ $res -eq 0 ]; then
+    echo -en "| \n"
+  elif [ $res -eq 5 ]; then
+    echo -en "| "
+  fi
+done
+echo -en "\n"
