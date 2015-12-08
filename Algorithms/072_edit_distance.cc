@@ -9,6 +9,10 @@ c) Replace a character
 */
 
 /*
+https://leetcode.com/discuss/43398/20ms-detailed-explained-c-solutions-o-n-space
+*/
+
+/*
 Classic dynamic programing, classical solution using a 2-D matrix.
 Consider boundary cases.
 The matrix dp[i][j] means the edit distance for s[0, i) and t[0, j), excluding the last character. Here i and j means the length, not the index for the ending string.
