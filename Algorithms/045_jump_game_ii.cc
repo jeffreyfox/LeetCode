@@ -11,29 +11,27 @@ Given array A = [2,3,1,1,4]
 The minimum number of jumps to reach the last index is 2. (Jump 1 step from index 0 to 1, then 3 steps to the last index.)
 */
 
-// Maintain a range of indices reachable by at most njumps. Proceed to next one, when reaching the end break.
-//             [  2   3   1   1   4 ]
-//njump = 0      i,j
-//njump = 1           i   j
-//njump = 2                   i   j
+/*
+Solution 1. Standard BFS, each step, maintain a range [lo, hi] reachable from beginning, then scan all elements in the range, and calculate the newly reachable range as [hi+1, max( nums[i]+i) for all i between lo and hi]. If hi is not increased in the newly range, then cannot jump.
+*/
 
 class Solution {
 public:
-   int jump(vector<int>& nums) {
-       if(nums.empty()) return 0;
-       int n = nums.size();
-       if (n == 1) return 0;
-       int i(0), j(0), k(0);
-       int njump = 0;
-       // nums[i .. j] are reachable by njump jumps
-       while(i <= j && j < n-1) {
-          int max_r = -1; //maximum reachable
-          for(k = i; k <= j; ++k) {
-              max_r = max(max_r, k+nums[k]);
-          }
-          i = j+1; j = max_r;
-          njump ++;
-       }
-       return (i <= j) ? njump : -1;
-   }
+    int jump(vector<int>& nums) {
+        int n = nums.size();
+        if(n <= 1) return 0;
+        int lo = 0, hi = 0;
+        int step = 0;
+        while(hi < n-1) {
+           int tmp = hi;
+           for(int i = lo; i <= tmp; ++i) {
+               hi = max(hi, i+nums[i]);
+           }
+           if(hi == tmp) return -1;
+           lo = tmp+1;
+           step ++;
+        }
+        return step;
+    }
 };
+
