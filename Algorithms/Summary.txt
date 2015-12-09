@@ -4,6 +4,7 @@
 007_reverse_integer.cc
 008_string_to_integer.cc
 009_palindrome_number.cc
+011_container_with_most_water.cc
 012_integer_to_roman.cc
 013_roman_to_integer.cc
 014_longest_common_prefix.cc
@@ -19,6 +20,7 @@
 030_substr_concat_all_words.cc
 032_longest_valid_parentheses.cc
 038_count_and_say.cc
+042_trapping_rain_water.cc
 043_multiply_strings.cc
 045_jump_game_ii.cc
 051_n_queens.cc
@@ -30,6 +32,7 @@
 065_valid_number.cc
 066_plus_one.cc
 067_add_binary.cc
+068_text_justification.cc
 072_edit_distance.cc
 076_minimum_window_substring.cc
 078_subsets.cc
@@ -39,13 +42,16 @@
 088_merge_sorted_array.cc
 090_subsets_ii.cc
 094_binary_tree_inorder_traversal.cc
+099_recover_binary_search_tree.cc
 102_binary_tree_level_order_traversal.cc
 103_binary_tree_zigzag_level_order_traversal.cc
 121_best_time_to_buy_and_sell_stock.cc
 122_best_time_to_buy_and_sell_stock_ii.cc
 123_best_time_to_buy_and_sell_stock_iii.cc
+124_binary_tree_maximum_path_sum.cc
 126_word_ladder_ii.cc
 127_word_ladder.cc
+128_longest_consecutive_sequence.cc
 132_palindrome_partitioning_ii.cc
 135_candy.cc
 139_word_break.cc
@@ -83,4 +89,5 @@
 265_paint_house_ii.cc
 276_paint_fence.cc
 280_wiggle_sort.cc
+282_expression_add_operators.cc
 295_find_median_from_data_stream.cc
