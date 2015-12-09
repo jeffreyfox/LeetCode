@@ -1,0 +1,7 @@
+grep Hard Problems.csv | grep -oE "[0-9]{3}" > Hard.txt
+grep Medium Problems.csv | grep -oE "[0-9]{3}" > Medium.txt
+grep Easy Problems.csv | grep -oE "[0-9]{3}" > Easy.txt
+
+list_difficulty Hard.txt
+list_difficulty Medium.txt
+list_difficulty Easy.txt

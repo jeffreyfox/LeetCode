@@ -1,5 +1,14 @@
 #!/bin/bash
 
+if [ "$#" -ne 1 ]; then
+   echo "Please specify input file name!"
+   exit;
+fi
+
+file=$1
+
+echo "Generating report for $file ..."
+
 solved=0
 total=0
 while read N
@@ -12,10 +21,11 @@ do
     echo -en "$N "
   fi
   ((total++))
-done < Hard.txt
+done < $1
 
 echo -en "\n"
 echo "Total     = $total"
 echo "Solved    = $solved"
 echo "Remaining = $((total-solved))"
+echo -en "\n"
 
