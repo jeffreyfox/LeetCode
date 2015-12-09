@@ -43,6 +43,7 @@ Caveat:
 2. Don't forget the initial space assigned to each gap, so q = remaining/ngaps +1 !.
 3. don't forget to append padding spaces for left justification case.
 4. Properly initialize/reest the variable storing line contents at the beginning of each loop iteration.
+5. the condition after while(count <= maxWidth && j < n) should be (count <= maxWidth), but not (j == n). Because we could have count < maxWidth and j == n at the same time, and this is not reach last row, because j will retrace and leave the last word to the next line, which is the last line.
 */
 
 class Solution {
