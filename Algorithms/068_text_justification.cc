@@ -1,66 +1,92 @@
-//  Use two pointers, i and j.
-// i points to first word of a new line, scan j forward until either j reaches end, or accumulated length including j
-// (word width + minimun number of spaces) exceeds maxWidth. Then words[i..j) should be placed on the current line. 
-// next step let i equal j and iterate again, outer loops checks whether i < n.
-// Construct the string for each line based on different cases:
-// 1. if j == n, then it is the last row, left justified, so add one space after each word except the last word (j-1)
-// 2. if only one word allowed for one line, then left justify the word, and append spaces for padding
-// 3. if >1 words are placed in one line in the middle of text, then should distribute spaces properly, say we need to 
-//    distribute n spaces in m gaps (m+1 words).
-///  (a) each gap has at least n/m spaces
-///  (b) the residue n % m, if > 0,  should be distributed evenly from the left to right.
-/// For example, 6 spaces should be distributed to 4 gaps as:  2 2 1 1 
+/*
+Given an array of words and a length L, format the text such that each line has exactly L characters and is fully (left and right) justified.
 
-// Another caveat is string.append function may give error if argument is 0, so use a wrapper function to append spaces.
+You should pack your words in a greedy approach; that is, pack as many words as you can in each line. Pad extra spaces ' ' when necessary so that each line has exactly L characters.
+
+Extra spaces between words should be distributed as evenly as possible. If the number of spaces on a line do not divide evenly between words, the empty slots on the left will be assigned more spaces than the slots on the right.
+
+For the last line of text, it should be left justified and no extra space is inserted between words.
+
+For example,
+words: ["This", "is", "an", "example", "of", "text", "justification."]
+L: 16.
+
+Return the formatted lines as:
+
+[
+   "This    is    an",
+   "example  of text",
+   "justification.  "
+]
+
+Note: Each word is guaranteed not to exceed L in length.
+
+click to show corner cases.
+Corner Cases:
+
+    A line other than the last line might contain only one word. What should you do in this case?
+    In this case, that line should be left-justified.
+*/
+
+/*
+Two pointers, [i, j) to find the words to be put on each row.
+j starts from i, and scans forward until total character count > maxWIdth or j reaches the end.
+several cases:
+
+1. If count <= maxWidth that means j reaches the end. We just do left justification, append each word followed by one space.
+2. If count > maxWidth, then we retrace one step back. Now [i, j) contains all the words to put on current line. We need to decide on distribution of spaces.
+  2.1) if there is only one word, then same as left justification
+  2.2) If there is more than one word, then we have ngaps = nword-1 gaps to be filled. We first calculate the remaining number of spots to be filled by spaces, and more-or-less evenly distribute them among ngaps. First r gaps receive one more space than the rest, where r is remaining % ngaps.
+
+Caveat:
+1. Do not forget the case where there is only one word! In this case, number of gaps is 0, and division by gaps will result in error!
+2. Don't forget the initial space assigned to each gap, so q = remaining/ngaps +1 !.
+3. don't forget to append padding spaces for left justification case.
+4. Properly initialize/reest the variable storing line contents at the beginning of each loop iteration.
+*/
 
 class Solution {
 public:
     vector<string> fullJustify(vector<string>& words, int maxWidth) {
-        int i = 0, j = 0;
+        vector<string> result;
+        string line;
+        if(words.empty()) return result;
         int n = words.size();
-        int totWidth = 0, wordWidth = 0;
-        vector<string> ret;
-        while (i < n) {
-            string s;
-            totWidth = wordWidth = words[i].size(); //add first word
-            j = i+1;
-            while (j < n) {
-                wordWidth += words[j].size();
-                totWidth += 1+words[j].size();
-                if (totWidth > maxWidth) break;
-                j++;
-            }
-            //either j == n or totWidth > maxWidth. construct words from [i .. j)
-            int nWords = j-i;
-            if (j == n) { // last row
-                for (int k = i; k < j; ++k) {
-                    s += words[k];
-                    if (k < j-1) appendSpace(s, 1);
-                }
-                appendSpace(s, maxWidth-s.size()); //append padding spaces
-            } else if (nWords == 1) { // not last row, only one word
-                s = words[i];
-                appendSpace(s, maxWidth-s.size()); //append padding spaces
-            } else {  //not last row, multiple words
-                wordWidth -= words[j].size(); //exclude words[j]
-                int ngaps = maxWidth - wordWidth;
-                int nsp = ngaps / (nWords-1); //spaces in the middle
-                int res = ngaps % (nWords-1); //spaces at the first gap
-                for (int k = i; k < j; ++k) {
-                    s += words[k];
-                    if (k == j-1) continue;
-                    if (k-i < res) appendSpace(s, nsp+1); //one more!
-                    else appendSpace(s, nsp); 
-                }
-            }
-            ret.push_back(s);
-            i = j;
+        int i = 0, j = 0;  //each row put words[i, j) to the line
+        while(i < n) {
+           int count = 0; //character count one the current line
+           j = i;
+           line = words[i]; //should contain at least one word
+           count += words[j++].size();
+           while(count <= maxWidth && j < n) {
+               count += 1+words[j++].size(); //including one leading space
+           }
+           if(count <= maxWidth) { //reach the last row, then just append words
+               for(int k = i+1; k < j; ++k) { //left justified
+                   line += " " + words[k];
+               }
+               line += string(maxWidth-count, ' '); //append padding spaces!
+           } else {  //not reach last row, retrace one step back
+               count -= 1+words[--j].size();
+               int nwords = j-i; //number of words on the line
+               int ngaps = nwords-1; //number of gaps on the line
+               if(ngaps == 0) { // only one word on the line
+                   line += string(maxWidth-count, ' '); //append padding spaces
+               } else {
+                    int remaining = maxWidth-count; //left over amount to be filled by space
+                    //should spread residue to nwords-1 slots more-or-less evenly
+                    //first r gaps get q+1, the rest get q (don't forget initial one space)
+                    int q = remaining / ngaps + 1, r = remaining % ngaps;
+                    for(int k = i+1; k < j; ++k) {
+                        if(k-i <= r) line += string(q+1, ' ') + words[k];
+                        else line += string(q, ' ') + words[k];
+                    }
+               }
+           }
+           result.push_back(line);
+           i = j;
         }
-        return ret;
-    };
-
-    void appendSpace(string& s, int k) {
-        if (k > 0) s.append(k, ' ');
+        return result;
     }
-
 };
+
