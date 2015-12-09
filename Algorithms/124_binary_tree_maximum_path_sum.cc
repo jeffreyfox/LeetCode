@@ -23,35 +23,87 @@ Return 6.
  * };
  */
 
-/// Recursive solution. 
-// Maximum path sum of tree rooted at x is the maximum of:
-/// 1. maximum path sum of x's left subtree (not passing x)
-/// 2. maximum path sum of x's right subtree (not passing x)
-/// 3. maximum path crossing x (x->val + maximum path from x's left child to anywhere in x's left subtree + maximum path from x's right child to anywhere in x's right subtree)
-/// Note that the node values can be negative, so in case 3, some paths can be length 0.
+/*
+Recursive solution. 
+Maximum path sum of tree rooted at x is the maximum of three cases:
+ 1. maximum path sum of x's left subtree (not passing x), if x's left subtree exists
+ 2. maximum path sum of x's right subtree (not passing x), if x's right subtree exists
+ 3. maximum path crossing x (x->val + maximum path from x's left child to anywhere in x's left subtree + maximum path from x's right child to anywhere in x's right subtree)
+Note that the node values can be negative, so in case 3, so, some sub-paths can be length 0 (e.g. in case 3)
+
+Therefore, we store a maximum path sum for a path originating from the root, and ending at any nodes (including the root itself), as mfr (maximum from root). The function returns the maximum path sum of the tree and also sets the mfr value by the reference.
+maxPathSum(root) =  maximum of :
+1) maxPathSum(root->left) if left exists
+2) maxPathSum(root->right) if right exits
+3) root->val (has to include root) + max(0, mfr(root->left)) + max(0, mfr(root->right)). Because the mfr can be negative for a subtree, we should compare it with 0 before addition.
+Finally, we need to update the mfr of the root, which is simply:
+root->val + maximum of 0, mfr(root->left), andmfr(root->right).
+
+We initialize all values as INT_MIN.
+*/
+
+class Solution {
+public:
+
+    int maxPathSum(TreeNode* root) {
+        if(!root) return 0;
+        int mfr = INT_MIN; //max from root
+        return maxPathHelper(root, mfr);
+    }
+    int maxPathHelper(TreeNode* root, int& mfr) {
+        int mfr_left = INT_MIN, mfr_right = INT_MIN;
+        int mp_left = INT_MIN, mp_right = INT_MIN;
+        if(root->left) mp_left = maxPathHelper(root->left, mfr_left);
+        if(root->right) mp_right = maxPathHelper(root->right, mfr_right);
+        mfr = root->val + max(max(mfr_left, mfr_right), 0);
+
+        int maximum = root->val + max(0, mfr_left) + max(0, mfr_right);
+        maximum = max(maximum, mp_left);
+        maximum = max(maximum, mp_right);
+        return maximum;
+    }
+};
+
+/*
+A simplified version. For each subtree only calculate the maximum path originating from root, but keep a global maxSum variable that calculates the maximum path sum for each subtree. Update the maxSum for each subtree.
+*/
 
 class Solution {
 public:
     int maxPathSum(TreeNode* root) {
-       if(!root) return 0;
-       int sum_from_root(0);
-       return maxPathSum(root, sum_from_root);
+        if(!root) return 0;
+        int maxSum = INT_MIN;
+        maxFromRoot(root, maxSum);
+        return maxSum;
     }
-    int maxPathSum(TreeNode *root, int& sum_from_root) {
-        int msfr_left(INT_MIN), msfr_right(INT_MIN); //from root
-        int ms_left(INT_MIN), ms_right(INT_MIN);  //maximum path sum of left and right subtrees
-        if(root->left)
-            ms_left = maxPathSum(root->left, msfr_left);
-
-        if(root->right)
-            ms_right = maxPathSum(root->right, msfr_right);
-
-        //maximum sum of paths starting from root
-        sum_from_root = root->val + max(0, max(msfr_left, msfr_right));
-
-        //maximum sum of paths crossing root
-        int mps = root->val + max(msfr_left, 0) + max(msfr_right, 0);
-
-        return max(mps, max(ms_left, ms_right));
+    int maxFromRoot(TreeNode* root, int& maxSum) {
+        if(!root) return INT_MIN;
+        int left = max(maxFromRoot(root->left, maxSum), 0);
+        int right = max(maxFromRoot(root->right, maxSum), 0);
+        maxSum = max(maxSum, root->val + left + right); //update maxSum
+        return root->val + max(left, right);
     }
 };
+
+/*
+Can further simplify, and put maxSum as a class member.
+*/
+
+class Solution {
+public:
+    int maxPathSum(TreeNode* root) {
+        if(!root) return 0;
+        maxFromRoot(root);
+        return maxSum;
+    }
+    int maxFromRoot(TreeNode* root) {
+        if(!root) return INT_MIN;
+        int left = max(maxFromRoot(root->left), 0);
+        int right = max(maxFromRoot(root->right), 0);
+        maxSum = max(maxSum, root->val + left + right); //update maxSum
+        return root->val + max(left, right);
+    }
+    int maxSum = INT_MIN;
+};
+
+
