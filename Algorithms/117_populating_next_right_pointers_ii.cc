@@ -25,10 +25,6 @@ After calling your function, the tree should look like:
     4-> 5 -> 7 -> NULL
 */
 
-// General solution that works for all kinds of trees
-// Use a dummy head in current layer.
-// Use last layer to help progress the current layer
-
 /**
  * Definition for binary tree with next pointer.
  * struct TreeLinkNode {
@@ -37,6 +33,46 @@ After calling your function, the tree should look like:
  *  TreeLinkNode(int x) : val(x), left(NULL), right(NULL), next(NULL) {}
  * };
  */
+
+// General solution that works for all kinds of trees
+// Use a dummy head in current layer.
+// Use last layer to help progress the current layer
+
+// Solution 1. Use two dummy heads. Progress layer by layer. Use last layer to help traverse current layer. Remember to set the tail's next to NULL when finishing one layer.
+
+class Solution {
+public:
+    void connect(TreeLinkNode *root) {
+        if(!root) return;
+        //two dummy heads
+        TreeLinkNode* phead = new TreeLinkNode(0);
+        TreeLinkNode* qhead = new TreeLinkNode(0);
+        TreeLinkNode *p = phead, *q = qhead;
+        phead->next = root; root->next = NULL;
+        while(phead->next) {
+            p = p->next;
+            while(p && !p->left && !p->right)  p = p->next;
+            if(!p) {
+                q->next = NULL; //set tail pointer
+                phead->next = qhead->next;
+                p = phead;
+                q = qhead;
+                continue;
+            }
+            if(p->left) {
+                q->next = p->left;
+                q = q->next;
+            }
+            if(p->right) {
+                q->next = p->right;
+                q = q->next;
+            }
+        }
+        delete phead, qhead;
+    }
+};
+
+// Solution 2. An old solution with the same idea.
 
 class Solution {
 public:
