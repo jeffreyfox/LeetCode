@@ -55,3 +55,25 @@ public:
         return true;
     }
 };
+
+//Another solution using 3 bit vectors
+class Solution {
+public:
+    bool isValidSudoku(vector<vector<char>>& board) {
+        vector<int> row(9, 0), col(9, 0), block(9, 0); //bit status array
+        for(int i = 0; i < 9; ++i) {
+            for(int j = 0; j < 9; ++j) {
+                if(board[i][j] != '.') {
+                    int k = i/3*3 + j/3;
+                    int state = 1 << (board[i][j] - '1');
+                    if(state & (row[i] | col[j] | block[k])) return false;
+                    row[i] |= state;
+                    col[j] |= state;
+                    block[k] |= state;
+                }
+            }
+        }
+        return true;
+    }
+};
+
