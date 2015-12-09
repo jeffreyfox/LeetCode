@@ -119,3 +119,33 @@ public:
         return result;
     }
 };
+
+// Morris traversal with a slightly different while loop (visit node in the end of loop body)
+class Solution {
+public:
+    vector<int> inorderTraversal(TreeNode* root) {
+        vector<int> result;
+        if(!root) return result;
+        TreeNode *node = root;
+        while(node) {
+            if(node->left) {  // has left subtree
+                TreeNode *child = node->left;
+                while(child->right != NULL && child->right != node) child = child->right;
+                //reached right most child of left subtree
+                if(child->right == NULL) { //first time
+                    child->right = node;
+                    node = node->left;
+                    continue;
+                } else { //second time
+                   child->right = NULL; //second time
+                }
+            }
+            //visit node
+            result.push_back(node->val);
+            node = node->right;
+        }
+        return result;
+    }
+};
+
+
