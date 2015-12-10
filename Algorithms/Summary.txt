@@ -35,6 +35,7 @@
 066_plus_one.cc
 067_add_binary.cc
 068_text_justification.cc
+070_climbing_stairs.cc
 072_edit_distance.cc
 076_minimum_window_substring.cc
 078_subsets.cc
