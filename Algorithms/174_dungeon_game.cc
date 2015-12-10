@@ -20,8 +20,23 @@ Notes:
     Any room can contain threats or power-ups, even the first room the knight enters and the bottom-right room where the princess is imprisoned.
 */
 
-// DP solution. Start form the right bottom corner, calculate the minimum HP there, and retrace back to top left.
-// As starting point, set the right and bottom neighbor of P's cell to 1.
+/*
+Standard dynamic programming. Start from end and scan backwards, calculate the minimum points required at each position.DP solution. Retrace back to top left.
+As starting point, set the right and bottom neighbor of P's cell to 1.
+
+  dp[i][j]  | dp[i][j+1]
+  _ _ _ _ _ | _ _ _ _ _ _ 
+            |
+ dp[i+1][j] |  
+
+dp[i][j] stores the minimum points required at position [i][j] in order to reach the princess. We can reach pos[i][j] in two ways, from position [i-1][j] and position [i][j-1], and we can go from the place requiring minimum points. The points required at dp[i-1][j] is simply dp[i][j] - dungeon[i][j], and at least 1, so we have:
+dp[i][j] = max(1, min(dp[i+1][j], dp[i][j+1])-dungeon[i][j]).
+At the boundary, i = m-1 or j = n-1, we replace min by only one of the two neighbors.
+At the princess point, we have dp[m-1][n-1] = 1-dungeon[m-1][n-1].
+We can use sentinel nodes at the boundary, where all the sentinel values are INT_MAX, but for dp[m-1][n-1] to fit in the formula, we can set dp[m][n-1] and dp[m-1][n] as 1.	
+
+Another solution is to start scanning from top left, but we need to store to variables for each position: the maximum points required at start in order to reach here, and the remaining points at this position.
+*/
 
 class Solution {
 public:
@@ -37,4 +52,27 @@ public:
         return minHP[0][0];
     }
 };
+
+/* Same idea as Solution 1 but space optimized */
+
+class Solution {
+public:
+    int calculateMinimumHP(vector<vector<int>>& dungeon) {
+        int m = dungeon.size(), n = dungeon[0].size();
+        vector<int> dp(n, INT_MAX);
+        dp[n-1] = max(1, 1-dungeon[m-1][n-1]);
+        //for last row (i == m-1)
+        for(int j = n-2; j >= 0; j--)
+            dp[j] = max(1, dp[j+1]-dungeon[m-1][j]);
+
+        for (int i = m-2; i >= 0; i--) {
+            dp[n-1] = max(1, dp[n-1]-dungeon[i][n-1]);
+            for (int j = n-2; j >= 0; j--) {
+                dp[j] = max(1, min(dp[j], dp[j+1])-dungeon[i][j]);
+            }
+        }
+        return dp[0];
+    }
+};
+
 
