@@ -93,6 +93,7 @@
 256_paint_house.cc
 257_binary_tree_paths.cc
 259_3sum_smaller.cc
+260_single_number_iii.cc
 263_ugly_number.cc
 264_ugly_number_ii.cc
 265_paint_house_ii.cc
