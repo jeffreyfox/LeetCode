@@ -19,6 +19,7 @@
 026_remove_duplicates_sorted_array.cc
 030_substr_concat_all_words.cc
 032_longest_valid_parentheses.cc
+033_search_in_rotated_sorted_array.cc
 036_valid_sudoku.cc
 037_sudoku_solver.cc
 038_count_and_say.cc
@@ -40,6 +41,7 @@
 076_minimum_window_substring.cc
 078_subsets.cc
 080_remove_duplicates_sorted_array_ii.cc
+081_search_in_rotated_sorted_array_ii.cc
 084_largest_rectangle_in_histogram.cc
 085_maximal_rectangle.cc
 087_scramble_string.cc
@@ -61,6 +63,7 @@
 127_word_ladder.cc
 128_longest_consecutive_sequence.cc
 132_palindrome_partitioning_ii.cc
+134_gas_station.cc
 135_candy.cc
 138_copy_list_with_random_pointer.cc
 139_word_break.cc
@@ -71,6 +74,8 @@
 149_max_points_on_a_line.cc
 151_reverse_words_in_a_string.cc
 152_maximum_product_subarray.cc
+153_find_minimum_in_rotated_sorted_array.cc
+154_find_minimum_in_rotated_sorted_array_ii.cc
 157_read_n_characters_given_read4.cc
 158_read_n_characters_given_read4_ii.cc
 159_longest_substr_at_most_two_distinct_char.cc

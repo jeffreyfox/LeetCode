@@ -45,6 +45,9 @@ O(1) space greedy solution. 2 passes.
 Start from 0, move forward and record the lowest level in the tank (could be negative), and the associated site position. Say i, this means that, tank will reach lowest level after visiting site i, when reaching site i+1. 
 If the lowest level is non-negative, then we can complete circuit at site 0. Just return 0.
 Second pass starts form site i+1, and traverse to 0. Calculate the residue amount of gas after reaching 0. If the residue amount is larger than the deficit from 0 to i, then we can complete circle from site i+1.
+
+Caveat:
+min_pos+1 need to apply modulo N or not? Looks like not, since that corresponds to site 0, but we already identified site 0 with condition min_left >= 0.
 */
 
 class Solution {
@@ -84,7 +87,7 @@ public:
                 residue = 0;
             } 
         }
-        if(residue + min_left >= 0) return min_pos+1;
+        if(residue + min_left >= 0) return (min_pos+1)%gas.size();
         else return -1;
     }
 };
