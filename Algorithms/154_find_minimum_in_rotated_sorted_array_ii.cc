@@ -13,8 +13,9 @@ Find the minimum element.
 The array may contain duplicates.
 */
 
-// General solution that also works for duplicated cases
+// General solution that also works for duplicated cases (see comments in problem 153)
 // Compare mid with hi, when equals, hi-- (not lo++!)
+
 class Solution {
 public:
     int findMin(vector<int>& nums) {
