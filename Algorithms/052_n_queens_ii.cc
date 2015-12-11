@@ -45,32 +45,34 @@ public:
 class Solution {
 public:
     int totalNQueens(int n) {
-		vector<int> col(n, 0); //column number for Queen at each row
-		int count = 0; //counter
-		int irow = 0; //number of current row of Queen to be placed
-		while(1) { //break inside
-			if(irow == n) { //already found solution for last row
-				count++; //update counter
-				irow--; //retrace back to last row (check next solution)
-				col[irow] ++; //try next position of last row
-			} else if(col[irow] == n) { //exhausted all possibilities
-				col[irow] = 0; //reset value back to 0
-				irow --; //retrace back one row
-				if(irow < 0) break; //breaking condition
-				col[irow] ++; //try next position of last row
-			} else if (isAttack(col, irow, col[irow])) {
-				col[irow] ++; //try next column
-			} else { //not attacking, move to next row
-				irow++;
-			}
-		}
-		return count;
-	}
-	//check if current queeen at row irow, column jcol attacks with previously placed queens
-	bool isAttack(const vector<int>& col, int irow, int jcol) {
-		for(int i = 0; i < irow; ++i) {
-			if(col[i] == jcol || fabs(col[i] - jcol) == irow - i) return true;
-		}
-		return false;
-	}
+        if(n == 0) return 0;
+        int count = 0;
+        vector<int> pos(n, -1); //position of queen in row[i], can be between 0 and n-1
+        int i = 0, j = 0;
+        while(i >= 0) {
+            if(i == n) {
+                count++;
+                i--; //retrace back
+                continue;
+            }
+            j = pos[i]+1; //move one step to right and try new positions
+            while(j < n && !canPlace(i, j, pos)) j++;
+            if(j == n) { //tried all possibilities, retrace back
+                pos[i] = -1; i--;
+                continue;
+            }
+            //found a possible place, record and move to next row.
+            pos[i] = j;  i++;
+        }
+        return count;
+    }
+
+    //can place, check if Queen at [i][j] conflicts with queens in previous rows
+    bool canPlace(int i, int j, vector<int>& pos) {
+        for(int row = 0; row < i; ++row) {
+            int col = pos[row];
+            if(col == j || fabs(j - col) == i - row) return false;   //same col or diagonal
+        }
+        return true;
+    }
 };
