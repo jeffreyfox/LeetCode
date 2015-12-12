@@ -23,6 +23,7 @@
 036_valid_sudoku.cc
 037_sudoku_solver.cc
 038_count_and_say.cc
+041_first_missing_positive.cc
 042_trapping_rain_water.cc
 043_multiply_strings.cc
 045_jump_game_ii.cc
@@ -87,6 +88,7 @@
 179_largest_number.cc
 186_reverse_words_in_a_string_ii.cc
 188_best_time_to_buy_and_sell_stock_iv.cc
+200_number_of_islands.cc
 202_happy_number.cc
 209_minimum_size_subarray_sum.cc
 218_the_skyline_problem.cc
@@ -103,8 +105,13 @@
 263_ugly_number.cc
 264_ugly_number_ii.cc
 265_paint_house_ii.cc
+269_alien_dictionary.cc
+272_closest_binary_search_tree_value_ii.cc
 276_paint_fence.cc
 280_wiggle_sort.cc
 282_expression_add_operators.cc
+287_find_the_duplicate_number.cc
+291_word_pattern_ii.cc
 295_find_median_from_data_stream.cc
 296_best_meeting_point.cc
+305_number_of_islands_ii.cc
