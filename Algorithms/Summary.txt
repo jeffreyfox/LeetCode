@@ -114,4 +114,5 @@
 291_word_pattern_ii.cc
 295_find_median_from_data_stream.cc
 296_best_meeting_point.cc
+302_smallest_rectangle_enclosing_black_pixels.cc
 305_number_of_islands_ii.cc
