@@ -1,0 +1,22 @@
+#!/bin/bash
+
+if [ "$#" -ne 1 ]; then
+   echo "Please specify input file name!"
+   exit;
+fi
+
+file=$1
+
+echo "Generating solutions for $file ..."
+
+rm -f ${file}_sol.txt
+while read N
+do
+  echo "===== ${N} =====" >> ${file}_sol.txt
+  grep ${N} Problems.csv >> ${file}_sol.txt
+  echo -en "\n" >> ${file}_sol.txt
+  cat ${N}_*[a-z].cc 2> /dev/null >> ${file}_sol.txt
+  echo -en "\n" >> ${file}_sol.txt
+done < ${file}.txt
+
+echo "Finished generating ${file}_sol.txt !"
