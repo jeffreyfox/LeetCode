@@ -1,4 +1,5 @@
 001_two_sum.cc
+002_add_two_numbers.cc
 003_longest_substr_wo_repeating_char.cc
 004_median_of_two_sorted_arrays.cc
 007_reverse_integer.cc
@@ -11,6 +12,7 @@
 015_3sum.cc
 016_3sum_closest.cc
 018_4sum.cc
+019_remove_nth_node_from_end.cc
 020_valid_parentheses.cc
 021_merge_two_sorted_lists.cc
 022_generate_parenthesis.cc
