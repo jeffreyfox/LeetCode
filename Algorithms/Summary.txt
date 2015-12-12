@@ -17,6 +17,7 @@
 023_merge_k_sorted_lists.cc
 025_reverse_nodes_in_k_group.cc
 026_remove_duplicates_sorted_array.cc
+028_implement_strstr.cc
 030_substr_concat_all_words.cc
 032_longest_valid_parentheses.cc
 033_search_in_rotated_sorted_array.cc
@@ -91,11 +92,14 @@
 200_number_of_islands.cc
 202_happy_number.cc
 209_minimum_size_subarray_sum.cc
+214_shortest_palindrome.cc
 218_the_skyline_problem.cc
 221_maximal_square.cc
 238_product_of_array_except_self.cc
 239_sliding_window_maximum.cc
 241_different_ways_to_add_parentheses.cc
+246_strobogrammatic_number.cc
+247_strobogrammatic_number_ii.cc
 252_meeting_rooms.cc
 253_meeting_rooms_ii.cc
 256_paint_house.cc
