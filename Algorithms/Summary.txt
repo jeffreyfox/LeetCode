@@ -102,6 +102,7 @@
 241_different_ways_to_add_parentheses.cc
 246_strobogrammatic_number.cc
 247_strobogrammatic_number_ii.cc
+248_strobogrammatic_number_iii.cc
 252_meeting_rooms.cc
 253_meeting_rooms_ii.cc
 256_paint_house.cc
