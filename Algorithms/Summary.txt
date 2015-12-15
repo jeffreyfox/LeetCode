@@ -44,6 +44,7 @@
 072_edit_distance.cc
 076_minimum_window_substring.cc
 078_subsets.cc
+079_word_search.cc
 080_remove_duplicates_sorted_array_ii.cc
 081_search_in_rotated_sorted_array_ii.cc
 084_largest_rectangle_in_histogram.cc
@@ -97,6 +98,8 @@
 214_shortest_palindrome.cc
 218_the_skyline_problem.cc
 221_maximal_square.cc
+235_lowest_common_ancestor_of_binary_search_tree.cc
+236_lowest_common_ancestor_of_binary_tree.cc
 238_product_of_array_except_self.cc
 239_sliding_window_maximum.cc
 241_different_ways_to_add_parentheses.cc
@@ -122,4 +125,6 @@
 295_find_median_from_data_stream.cc
 296_best_meeting_point.cc
 302_smallest_rectangle_enclosing_black_pixels.cc
+303_range_sum_query_immutable.cc
+304_range_sum_query_2d_immutable.cc
 305_number_of_islands_ii.cc
