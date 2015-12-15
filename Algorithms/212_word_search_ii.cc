@@ -25,9 +25,14 @@ You would need to optimize your backtracking to pass the larger test. Could you 
 If the current candidate does not exist in all words' prefix, you could stop backtracking immediately. What kind of data structure could answer such query efficiently? Does a hash table work? Why or why not? How about a Trie? If you would like to learn how to implement a basic trie, please work on this problem: Implement Trie (Prefix Tree) first.
 */
 
-/// Use a Trie data-structure. 
-/// Perform dfs on the board, construct the string formed by the path, see if it is contained as prefix in the Trie, if not, then stop searching. This is the essense of using Trie to speed up search.
-/// One caveat is that you need to avoid duplicated entries in the return array, solution 1 erases the found entries in the Trie, solution 2 implements a found() function to check if the solution is in the array or not.
+/*
+Use a Trie data-structure. 
+ Perform dfs on the board, construct the string formed by the path, see if it is contained as prefix in the Trie, if not, then stop searching. This is the essense of using Trie to speed up search.
+ Caveats:
+1. in trie element removal, do not remove root.
+2. need to avoid duplicated entries in the return array, solution 1 erases the found entries in the Trie, solution 2 implements a found() function to check if the solution is in the array or not.
+3. When found a match, need to continue searching! Do not simply return!
+*/
 
 // Solution 1.
 class Trie {
