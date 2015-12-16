@@ -16,6 +16,12 @@ Note: next() and hasNext() should run in average O(1) time and uses O(h) memory,
  * };
  */
 
+/**
+ * Your BSTIterator will be called like this:
+ * BSTIterator i = BSTIterator(root);
+ * while (i.hasNext()) cout << i.next();
+ */
+
 // Push all left spline to a stack.
 // When popping, it a node has right subtree, push all left spline of the right child.
 
@@ -48,8 +54,3 @@ private:
     deque<TreeNode*> s; //stack
 };
 
-/**
- * Your BSTIterator will be called like this:
- * BSTIterator i = BSTIterator(root);
- * while (i.hasNext()) cout << i.next();
- */
