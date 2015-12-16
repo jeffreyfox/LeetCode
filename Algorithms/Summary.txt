@@ -5,6 +5,7 @@
 007_reverse_integer.cc
 008_string_to_integer.cc
 009_palindrome_number.cc
+010_regular_expression_matching.cc
 011_container_with_most_water.cc
 012_integer_to_roman.cc
 013_roman_to_integer.cc
@@ -29,6 +30,7 @@
 041_first_missing_positive.cc
 042_trapping_rain_water.cc
 043_multiply_strings.cc
+044_wildcard_matching.cc
 045_jump_game_ii.cc
 051_n_queens.cc
 052_n_queens_ii.cc
@@ -88,6 +90,7 @@
 164_maximum_gap.cc
 167_two_sum_ii.cc
 170_two_sum_iii.cc
+173_binary_search_tree_iterator.cc
 174_dungeon_game.cc
 179_largest_number.cc
 186_reverse_words_in_a_string_ii.cc
@@ -100,6 +103,7 @@
 214_shortest_palindrome.cc
 218_the_skyline_problem.cc
 221_maximal_square.cc
+230_kth_smallest_element_in_bst.cc
 235_lowest_common_ancestor_of_binary_search_tree.cc
 236_lowest_common_ancestor_of_binary_tree.cc
 238_product_of_array_except_self.cc
@@ -108,6 +112,7 @@
 246_strobogrammatic_number.cc
 247_strobogrammatic_number_ii.cc
 248_strobogrammatic_number_iii.cc
+251_flatten_2d_vector.cc
 252_meeting_rooms.cc
 253_meeting_rooms_ii.cc
 256_paint_house.cc
@@ -121,7 +126,9 @@
 272_closest_binary_search_tree_value_ii.cc
 276_paint_fence.cc
 280_wiggle_sort.cc
+281_zigzag_iterator.cc
 282_expression_add_operators.cc
+284_peeking_iterator.cc
 285_inorder_successor_in_bst.cc
 287_find_the_duplicate_number.cc
 291_word_pattern_ii.cc
@@ -133,3 +140,4 @@
 305_number_of_islands_ii.cc
 307_range_sum_query_mutable.cc
 308_range_sum_query_2d_mutable.cc
+312_burst_balloons.cc
