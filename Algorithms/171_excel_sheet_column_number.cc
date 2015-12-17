@@ -14,7 +14,11 @@ For example:
     AB -> 28 
 */
 
-// Iterative solution
+// Iterative solution. Just 26-base counting.
+// A-Z  : 1 - 26
+//   AAA 
+//   111 in 26-base counting
+
 class Solution {
 public:
     int titleToNumber(string s) {
