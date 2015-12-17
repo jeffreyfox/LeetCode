@@ -94,7 +94,9 @@
 161_one_edit_distance.cc
 164_maximum_gap.cc
 167_two_sum_ii.cc
+168_excel_sheet_column_title.cc
 170_two_sum_iii.cc
+171_excel_sheet_column_number.cc
 173_binary_search_tree_iterator.cc
 174_dungeon_game.cc
 179_largest_number.cc
