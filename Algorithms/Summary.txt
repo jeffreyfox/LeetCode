@@ -93,6 +93,7 @@
 159_longest_substr_at_most_two_distinct_char.cc
 161_one_edit_distance.cc
 164_maximum_gap.cc
+165_compare_version_numbers.cc
 167_two_sum_ii.cc
 168_excel_sheet_column_title.cc
 170_two_sum_iii.cc
@@ -106,12 +107,14 @@
 202_happy_number.cc
 203_remove_linked_list_elements.cc
 205_isomorphic_strings.cc
+206_reverse_linked_list.cc
 208_implement_trie.cc
 209_minimum_size_subarray_sum.cc
 212_word_search_ii.cc
 214_shortest_palindrome.cc
 218_the_skyline_problem.cc
 221_maximal_square.cc
+223_rectangle_area.cc
 226_invert_binary_tree.cc
 230_kth_smallest_element_in_bst.cc
 235_lowest_common_ancestor_of_binary_search_tree.cc
