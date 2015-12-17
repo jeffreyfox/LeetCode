@@ -18,7 +18,8 @@ do
    # echo -en "X "
     ((solved++))
   else 
-    echo -en "$N "
+  #  echo -en "$N "
+    echo `grep $N Problems.csv`
   fi
   ((total++))
 done < $1
