@@ -14,7 +14,7 @@ The maximum depth is the number of nodes along the longest path from the root no
  * };
  */
 
-// Recursive solution
+// Recursive solution. Easy.
 
 class Solution {
 public:

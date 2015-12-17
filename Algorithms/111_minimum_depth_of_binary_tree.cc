@@ -19,6 +19,7 @@ The minimum depth is the number of nodes along the shortest path from the root n
 // 2. only left child: minD = 1 + minD of left
 // 3. only right child: minD = 1 + minD of right
 // 4. both childs: mindepth = 1 + min(minD of left, minD of right)
+// The reason for the difference is that if a node has one empty subtree, and the other is not empty, the empty subtree does not count as the mininum depth path.
 
 class Solution {
 public:
@@ -31,3 +32,29 @@ public:
         return minD+1;
     }
 };
+
+// An alternative solution
+class Solution {
+public:
+    int minDepth(TreeNode* root) {
+        if(!root) return 0;
+        if((root->left == NULL) ^ (root->right == NULL))  //only one subtree is not null
+            return root->left ? minDepth(root->left)+1 : minDepth(root->right)+1;
+        else //either both are null, or none are null
+            return minD = min(minDepth(root->left), minDepth(root->right)) + 1;
+    }
+};
+
+// The following solution is WRONG!
+class Solution {
+public:
+    int minDepth(TreeNode* root) { //wrong solution. fails when left is NULL, and right is not
+        if(!root) return 0;
+        int d = 1;
+        if(root->left) d = minDepth(root->left) + 1;
+        if(root->right) d = min(d, minDepth(root->right)+1);
+        return d;
+    }
+};
+
+

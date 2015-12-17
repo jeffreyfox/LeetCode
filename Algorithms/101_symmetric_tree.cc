@@ -30,7 +30,7 @@ But the following is not:
 
 // Recursive solution. check if the left and right subtrees are symmetric or not
 // Two non-empty trees are symmetric iff:
-// 1. root1 = root2 &&
+// 1. root1->val = root2->val &&
 // 2. 1's left is symmetric to 2's right &&
 // 3. 2's left is symmetric to 1's right
 
@@ -44,8 +44,7 @@ public:
     bool isSymmetric(TreeNode* left, TreeNode *right) {
         if(left == NULL) return right == NULL;
         if(right == NULL) return false;
-        if(left->val != right->val) return false;
-        return isSymmetric(left->left, right->right) && isSymmetric(left->right, right->left);
+        return p->val == q->val && isSymmetric(p->left, q->right) && isSymmetric(p->right, q->left);
     }
 };
 

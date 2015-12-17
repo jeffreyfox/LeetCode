@@ -1,3 +1,11 @@
+/*
+Remove all elements from a linked list of integers that have value val.
+
+Example
+Given: 1 --> 2 --> 6 --> 3 --> 4 --> 5 --> 6, val = 6
+Return: 1 --> 2 --> 3 --> 4 --> 5 
+*/
+
 /**
  * Definition for singly-linked list.
  * struct ListNode {
@@ -6,22 +14,30 @@
  *     ListNode(int x) : val(x), next(NULL) {}
  * };
  */
+
+// Solution using a dummy head
+
 class Solution {
 public:
     ListNode* removeElements(ListNode* head, int val) {
-        ListNode dum(0), *dummy(&dum);
+        if(!head) return NULL;
+        ListNode* dummy = new ListNode(0);
         dummy->next = head;
-        ListNode *p(head), *q(dummy);
-        while(p) {
-            if(p->val == val) { //delete p
-                q->next = p->next;
-                delete p;
-                p = q->next;
-            } else {
-                q = p;
+        ListNode *p = dummy, *q = dummy->next;
+        //q is one step ahead of p
+        while(q) {
+            if(q->val == val) { //delete q
+                p->next = q->next;
+                delete q;
+                q = p->next;
+            } else { //just move forward
                 p = p->next;
+                q = q->next;
             }
         }
-        return dummy->next;
+        head = dummy->next;
+        delete dummy;
+        return head;
     }
 };
+
