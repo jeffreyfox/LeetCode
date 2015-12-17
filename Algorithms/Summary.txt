@@ -140,6 +140,7 @@
 269_alien_dictionary.cc
 272_closest_binary_search_tree_value_ii.cc
 276_paint_fence.cc
+278_first_bad_version.cc
 280_wiggle_sort.cc
 281_zigzag_iterator.cc
 282_expression_add_operators.cc
