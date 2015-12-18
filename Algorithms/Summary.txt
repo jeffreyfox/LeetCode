@@ -20,6 +20,7 @@
 023_merge_k_sorted_lists.cc
 025_reverse_nodes_in_k_group.cc
 026_remove_duplicates_sorted_array.cc
+027_remove_element.cc
 028_implement_strstr.cc
 030_substr_concat_all_words.cc
 032_longest_valid_parentheses.cc
@@ -49,6 +50,7 @@
 079_word_search.cc
 080_remove_duplicates_sorted_array_ii.cc
 081_search_in_rotated_sorted_array_ii.cc
+083_remove_duplicates_from_sorted_list.cc
 084_largest_rectangle_in_histogram.cc
 085_maximal_rectangle.cc
 087_scramble_string.cc
@@ -137,6 +139,7 @@
 263_ugly_number.cc
 264_ugly_number_ii.cc
 265_paint_house_ii.cc
+266_palindrome_permutation.cc
 269_alien_dictionary.cc
 272_closest_binary_search_tree_value_ii.cc
 276_paint_fence.cc
@@ -144,10 +147,12 @@
 280_wiggle_sort.cc
 281_zigzag_iterator.cc
 282_expression_add_operators.cc
+283_move_zeroes.cc
 284_peeking_iterator.cc
 285_inorder_successor_in_bst.cc
 287_find_the_duplicate_number.cc
 291_word_pattern_ii.cc
+292_nim_game.cc
 295_find_median_from_data_stream.cc
 296_best_meeting_point.cc
 302_smallest_rectangle_enclosing_black_pixels.cc
