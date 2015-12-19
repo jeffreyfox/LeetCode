@@ -1,3 +1,11 @@
+/*
+Given a sorted linked list, delete all nodes that have duplicate numbers, leaving only distinct numbers from the original list.
+
+For example,
+Given 1->2->3->3->4->4->5, return 1->2->5.
+Given 1->1->1->2->3, return 2->3. 
+*/
+
 /**
  * Definition for singly-linked list.
  * struct ListNode {
@@ -6,35 +14,38 @@
  *     ListNode(int x) : val(x), next(NULL) {}
  * };
  */
-// When visiting a node, see if it has the same value as next, if yes, set removal tag of next elements
-// Use a dummy head
+
+// use two pointers. Also dummy head, because head might be deleted.
 
 class Solution {
 public:
     ListNode* deleteDuplicates(ListNode* head) {
-        if(head == NULL || head->next == NULL) return head;
-        bool isDup = false, isDupNext = false;
-        ListNode dum(0), *p(&dum);
-        p->next = head;
-        ListNode *curr = head, *prev(p), *next(NULL);
-        while (curr) {
-            isDup = isDupNext;
-            next = curr->next;
-            if(next && next->val == curr->val) {
-               isDupNext = true; //mark next as isdup
-               isDup = true;
-            } else { //not the same
-               isDupNext = false;
+        if(!head || !head->next) return head;
+        ListNode *dummy = new ListNode(0);
+        dummy->next = head;
+
+        ListNode *p = dummy, *q = p->next;
+        //p is tail of processed list, q is its next, r is one node past the last duplicated entry.
+        while(q) {
+            ListNode* r = q->next;
+            while(r && r->val == q->val) r = r->next;
+            //r is either null or first entry not equal to q
+            if(r == q->next) { //no duplicated entry
+                p = q;
+                q = r; //just move forward
+                continue;
             }
-            if (isDup) { //remove current node
-               ListNode *tmp = curr;
-               prev->next = next;  curr = next;
-               delete tmp;
-            } else {
-                prev = curr;
-                curr = next;
+            //then delete everything from q to r's ancestor
+            while(q != r) {
+                ListNode * t = q;
+                delete t;
+                q = q->next;
             }
+            //after loop q == r
+            p->next = q;
         }
-        return p->next;
+        head = dummy->next;
+        delete dummy;
+        return head;
     }
 };
