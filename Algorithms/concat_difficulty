@@ -13,12 +13,17 @@ fname=${file}_sol.cc
 rm -f $fname
 while read N
 do
+  cnt=`grep -c $N Summary.txt`
+  if [ $cnt -eq 0 ] ; then
+      continue;
+  fi
   echo "/**************************************************** " >> $fname
   echo -en " ***    " >> $fname
-  grep ${N} Problems.csv >> $fname
+  grep $N Problems.csv >> $fname
   echo " ****************************************************/" >> $fname
   echo -en "\n" >> $fname
-  cat ${N}_*[a-z].cc 2> /dev/null >> $fname
+ # cat ${N}_*[a-z].cc 2> /dev/null >> $fname
+  cat ${N}_*.cc 2> /dev/null >> $fname
   echo -en "\n" >> $fname
 done < ${file}.txt
 
