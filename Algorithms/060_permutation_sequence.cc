@@ -56,7 +56,15 @@ public:
     }
 };
 
-// Solution 2 using a bit status number.
+/*
+Solution 2 using a bit status number.
+Caveat:
+ When testring if a digit is unset, use
+ !(x & (1 << n)). not ~ , because inverting boolean and inverting bit number are totally different things!
+ ! 1 = !(true) = false
+ ~ 1 = -2 = true!
+*/
+
 class Solution {
 public:
     string getPermutation(int n, int k) {
