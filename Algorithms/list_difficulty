@@ -18,11 +18,11 @@ do
    # echo -en "X "
     ((solved++))
   else 
-  #  echo -en "$N "
-    echo `grep $N Problems.csv`
+    echo -en "$N "
+  #  echo `grep $N Problems.csv`
   fi
   ((total++))
-done < $1
+done < ${file}.txt
 
 echo -en "\n"
 echo "Total     = $total"
