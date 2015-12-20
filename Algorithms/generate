@@ -8,4 +8,4 @@ list_difficulty Easy
 concat_difficulty Hard
 concat_difficulty Medium
 concat_difficulty Easy
-cat Hard_sol.cc Medium_sol.cc Easy_sol.cc > All_sol.cc
+concat_difficulty All

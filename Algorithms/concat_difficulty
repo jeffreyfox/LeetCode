@@ -9,6 +9,9 @@ file=$1
 
 echo "Generating solutions for $file ..."
 
+#reverse
+tac ${file}.txt > tmp.txt
+
 fname=${file}_sol.cc
 rm -f $fname
 while read N
@@ -22,9 +25,10 @@ do
   grep $N Problems.csv >> $fname
   echo " ****************************************************/" >> $fname
   echo -en "\n" >> $fname
- # cat ${N}_*[a-z].cc 2> /dev/null >> $fname
   cat ${N}_*.cc 2> /dev/null >> $fname
   echo -en "\n" >> $fname
-done < ${file}.txt
+done < tmp.txt
 
 echo "Finished generating $fname !"
+
+rm -rf tmp.txt
