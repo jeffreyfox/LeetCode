@@ -1,4 +1,17 @@
 /*
+Validate if a given string is numeric.
+
+Some examples:
+"0" => true
+" 0.1 " => true
+"abc" => false
+"1 a" => false
+"2e10" => true
+
+Note: It is intended for the problem statement to be ambiguous. You should gather all requirements up front before implementing one. 
+*/
+
+/*
  * A valid number consists of several fields:
  *    -28.82e-20 
  * 00012222233334444  
@@ -38,6 +51,7 @@
 // state 8: has read a trailing space, expects another space      
 // Small trick: add a space after string s, so we only need to check if state == 8 in the end. 
 // Alternative: not add a space, and instead check if state is one of 2,4,7,8 in the end.
+
 class Solution {
 public:
     enum CharType { SPACE=0, DIGIT, DOT, SIGN, EXPO, OTHER };
@@ -96,3 +110,4 @@ public:
 
     vector<vector<int> > dfa;
 };
+
