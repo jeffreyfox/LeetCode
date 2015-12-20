@@ -143,6 +143,7 @@
 251_flatten_2d_vector.cc
 252_meeting_rooms.cc
 253_meeting_rooms_ii.cc
+254_factor_combinations.cc
 256_paint_house.cc
 257_binary_tree_paths.cc
 259_3sum_smaller.cc
