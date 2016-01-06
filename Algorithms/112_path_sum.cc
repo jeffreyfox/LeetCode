@@ -31,6 +31,7 @@ return true, as there exist a root-to-leaf path 5->4->11->2 which sum is 22.
 // 1. If reaching an leaf node, check if it's value is equal to sum
 // 2. If an internal node, then check left or right subtree
 // 3. if root is empty return false
+
 class Solution {
 public:
     bool hasPathSum(TreeNode* root, int sum) {
@@ -40,3 +41,21 @@ public:
         return hasPathSum(root->left, sum) || hasPathSum(root->right, sum);
     }
 };
+
+//Solution 2.
+class Solution {
+public:
+    bool hasPathSum(TreeNode* root, int sum) {
+        if(!root) return false;
+        return dfs(root, sum);
+    }
+    bool dfs(TreeNode* root, int sum) {
+        int x = root->val;
+        //reaching leaf
+        if(!root->left && !root->right && sum == x) return true;
+        if(root->left && dfs(root->left, sum-x)) return true;
+        if(root->right && dfs(root->right, sum-x)) return true;
+        return false;
+    }
+};
+
