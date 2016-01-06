@@ -29,28 +29,25 @@ return
  * };
  */
 
-// DFS backtracking.
+// DFS backtracking. Recursive solution.
+// Caveats: when reaching leaf, compare sum with x, not with zero!
 
 class Solution {
 public:
     vector<vector<int>> pathSum(TreeNode* root, int sum) {
-        vector<vector<int> > ret;
-        if(!root) return ret;
+        vector<vector<int> > result;
+        if(!root) return result;
         vector<int> path;
-        pathSum(root, sum, path, ret);
-        return ret;
+        dfs(root, sum, path, result);
+        return result;
     }
-    void pathSum(TreeNode *root, int sum, vector<int>& path, vector<vector<int> >& ret) {
-        if(root == NULL) return;
-        
-        path.push_back(root->val);
-        
-        if(!root->left && !root->right && sum == root->val) {
-            ret.push_back(path); //add to solution
-        } else {
-            pathSum(root->left, sum-root->val, path, ret); //left subtree
-            pathSum(root->right, sum-root->val, path, ret); //right subtree
-        }
-        path.pop_back(); //back track
+    void dfs(TreeNode* root, int sum, vector<int>& path, vector<vector<int> >& result) {
+        int x = root->val;
+        path.push_back(x);
+        //reaching leaf
+        if(!root->left && !root->right && sum == x) result.push_back(path);
+        if(root->left) dfs(root->left, sum-x, path, result);
+        if(root->right) dfs(root->right, sum-x, path, result);
+        path.pop_back();
     }
 };
