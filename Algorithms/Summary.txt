@@ -28,6 +28,7 @@
 031_next_permutation.cc
 032_longest_valid_parentheses.cc
 033_search_in_rotated_sorted_array.cc
+035_search_insert_position.cc
 036_valid_sudoku.cc
 037_sudoku_solver.cc
 038_count_and_say.cc
@@ -40,6 +41,7 @@
 045_jump_game_ii.cc
 046_permutations.cc
 047_permutations_ii.cc
+049_group_anagrams.cc
 051_n_queens.cc
 052_n_queens_ii.cc
 053_maximum_subarray.cc
@@ -66,8 +68,12 @@
 087_scramble_string.cc
 088_merge_sorted_array.cc
 090_subsets_ii.cc
+093_restore_ip_addresses.cc
 094_binary_tree_inorder_traversal.cc
+095_unique_binary_search_trees_ii.cc
+096_unique_binary_search_trees.cc
 097_interleaving_string.cc
+098_validate_binary_search_tree.cc
 099_recover_binary_search_tree.cc
 100_same_tree.cc
 101_symmetric_tree.cc
@@ -76,6 +82,8 @@
 104_maximum_depth_of_binary_tree.cc
 110_balanced_binary_tree.cc
 111_minimum_depth_of_binary_tree.cc
+112_path_sum.cc
+113_path_sum_ii.cc
 115_distinct_subsequences.cc
 116_populating_next_right_pointers.cc
 117_populating_next_right_pointers_ii.cc
@@ -86,6 +94,7 @@
 126_word_ladder_ii.cc
 127_word_ladder.cc
 128_longest_consecutive_sequence.cc
+129_sum_root_to_leaf_numbers.cc
 132_palindrome_partitioning_ii.cc
 134_gas_station.cc
 135_candy.cc
@@ -130,6 +139,7 @@
 223_rectangle_area.cc
 226_invert_binary_tree.cc
 230_kth_smallest_element_in_bst.cc
+231_power_of_two.cc
 235_lowest_common_ancestor_of_binary_search_tree.cc
 236_lowest_common_ancestor_of_binary_tree.cc
 237_delete_node_in_linked_list.cc
