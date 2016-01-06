@@ -30,6 +30,7 @@ Return the sum = 12 + 13 = 25.
 // Post-order traversal using a stack.
 // Keep a running partial sum, and when reaching a leaf, add the partial sum to total sum.
 // First time visiting a node, add value to partial sum. When finished processing left and right subtrees, remove the value from partial sum.
+// Caveats: avoid adding value to partial sum multiple times! Only do it when tag == 0.
 
 class Solution {
 public:
@@ -57,3 +58,37 @@ public:
         return total_sum;
     }
 };
+
+// Another solution. Similar, but add pathSums when node has been added.
+class Solution {
+public:
+    int sumNumbers(TreeNode* root) {
+        if(!root) return 0;
+        stack<pair<TreeNode*, int> > st;
+        st.push(make_pair(root, 0));
+        int sum = 0, pathSum = root->val;
+        while(!st.empty()) {
+            TreeNode* node = st.top().first;
+            int tag = st.top().second;
+            if(tag == 0) {
+                st.top().second++;
+                if(node->left) { 
+                    st.push(make_pair(node->left, 0));
+                    pathSum = pathSum*10 + node->left->val;
+                }
+            } else if(tag == 1) {
+                st.top().second++;
+                if(node->right) {
+                    st.push(make_pair(node->right, 0));
+                    pathSum = pathSum*10 + node->right->val;
+                }
+            } else {
+                st.pop();
+                if(!node->left && !node->right) sum += pathSum; //leaf node, add to sum
+                pathSum /= 10;
+            }
+        }
+        return sum;
+    }
+};
+
