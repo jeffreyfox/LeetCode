@@ -10,8 +10,9 @@ Here are few examples.
 [1,3,5,6], 0 → 0
 */
 
-// Binary search. If found, return index
-// If not found, return position lo, where A[0, .. lo-1] strictly smaller than target, and A[lo .. n] > target
+// Binary search. Loop invariant:
+// nums[0 .. lo-1] < target, nums[hi+1, n) > target, nums[lo, hi] TBD
+// If found, return index. If not found, return position lo, because when out of while loop we have lo=hi+1, and target is between nums[hi] and nums[lo].
 
 class Solution {
     
