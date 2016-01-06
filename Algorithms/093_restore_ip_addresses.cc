@@ -7,7 +7,38 @@ Given "25525511135",
 return ["255.255.11.135", "255.255.111.35"]. (Order does not matter) 
 */
 
-// recursive solution.
+// Recursive solution #1.
+class Solution {
+public:
+    vector<string> restoreIpAddresses(string s) {
+        vector<string> result;
+        if(s.empty()) return result;
+        string tmp;
+        dfs(s, 0, 0, tmp, result);
+        return result;
+    }
+    void dfs(const string& s, int i, int count, string tmp, vector<string>& result) {
+        int n = s.size();
+        if(i == n && count == 4) {
+            result.push_back(tmp);
+            return;
+        }
+        if(i == n || count == 4) return;
+        if(i != 0) tmp += '.';
+        if(s[i] == '0') {
+            dfs(s, i+1, count+1, tmp+'0', result);
+            return;
+        }
+        for(int k = i, val = 0; k < n; k++) {
+            val = val*10 + (s[k] - '0');
+            if(val >= 256) break;
+            tmp += s[k];
+            dfs(s, k+1, count+1, tmp, result);
+        }
+   }
+};
+
+// Recursive solution #2. 
 // Need to add 4 periods, last one has to be after last character.
 // store positions of periods (index of character right before newly added period), and reconstruct the string when valid solutions are found
 // Caveat: string::insert function argument is the index which the new character is inserted before.
