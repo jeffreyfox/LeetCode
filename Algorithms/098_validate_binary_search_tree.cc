@@ -1,3 +1,15 @@
+/*
+Given a binary tree, determine if it is a valid binary search tree (BST).
+
+Assume a BST is defined as follows:
+
+    The left subtree of a node contains only nodes with keys less than the node's key.
+    The right subtree of a node contains only nodes with keys greater than the node's key.
+    Both the left and right subtrees must also be binary search trees.
+
+confused what "{1,#,2,3}" means? > read more on how binary tree is serialized on OJ.
+*/
+
 /**
  * Definition for a binary tree node.
  * struct TreeNode {
@@ -15,12 +27,13 @@
 class Solution {
 public:
     bool isValidBST(TreeNode* root) {
-        return isValidBST(root, LONG_MIN, LONG_MAX);
+        return validate(root, LONG_MIN, LONG_MAX);
     }
-
-    bool isValidBST(TreeNode* root, long lo, long hi) {
-        if (root == NULL) return true;
-        if (root->val <= lo || root->val >= hi) return false;
-        return isValidBST(root->left, lo, root->val) && isValidBST(root->right, root->val, hi);
+    //make sure all tree values between (lo, hi)
+    bool validate(TreeNode* root, long lo, long hi) {
+        if(!root) return true;
+        int x = root->val;
+        if(x <= lo || x >= hi) return false;
+        return validate(root->left, lo, x) && validate(root->right, x, hi);
     }
 };
