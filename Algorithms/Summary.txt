@@ -48,6 +48,7 @@
 055_jump_game.cc
 056_merge_intervals.cc
 057_insert_interval.cc
+058_length_of_last_word.cc
 060_permutation_sequence.cc
 065_valid_number.cc
 066_plus_one.cc
@@ -80,6 +81,7 @@
 102_binary_tree_level_order_traversal.cc
 103_binary_tree_zigzag_level_order_traversal.cc
 104_maximum_depth_of_binary_tree.cc
+107_binary_tree_level_order_traversal_ii.cc
 110_balanced_binary_tree.cc
 111_minimum_depth_of_binary_tree.cc
 112_path_sum.cc
@@ -124,6 +126,8 @@
 179_largest_number.cc
 186_reverse_words_in_a_string_ii.cc
 188_best_time_to_buy_and_sell_stock_iv.cc
+190_reverse_bits.cc
+191_number_of_1_bits.cc
 200_number_of_islands.cc
 202_happy_number.cc
 203_remove_linked_list_elements.cc
