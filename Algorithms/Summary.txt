@@ -105,9 +105,12 @@
 138_copy_list_with_random_pointer.cc
 139_word_break.cc
 140_word_break_ii.cc
+143_reorder_list.cc
 144_binary_tree_preorder_traversal.cc
 145_binary_tree_postorder_traversal.cc
 146_lru_cache.cc
+147_insertion_sort_list.cc
+148_sort_list.cc
 149_max_points_on_a_line.cc
 151_reverse_words_in_a_string.cc
 152_maximum_product_subarray.cc
