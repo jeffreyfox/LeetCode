@@ -1,3 +1,10 @@
+/*
+Given a singly linked list, determine if it is a palindrome.
+
+Follow up:
+Could you do it in O(n) time and O(1) space?
+*/
+
 /**
  * Definition for singly-linked list.
  * struct ListNode {
@@ -7,43 +14,43 @@
  * };
  */
 
-/// 3 steps:
+/// 4 steps:
 // 1. Find middle element
 // 2. reverse second half of array
 // 3. compare second half with first half
+// 4. recover the original linked list (reverse second part again and connect to first part)
+
 /// O(n) time, O(1) space
 
 class Solution {
 public:
     bool isPalindrome(ListNode* head) {
-        if (head == NULL || head->next == NULL) return true;
-        ListNode *slow(head), *fast(head);
-        // find the middle element or end of first half segment
-        while (fast->next && fast->next->next) {
+        if(!head || !head->next) return true;
+        ListNode *slow = head, *fast = head;
+        while(fast->next && fast->next->next) {
             slow = slow->next;
             fast = fast->next->next;
         }
-        //move one step further
-        slow = slow->next;
-        //reverse second half segment
-        ListNode *newhead = reverseList(slow);
-        //compare second half with first half
-        while (newhead) {
-            if (newhead->val != head->val) return false;
-            head = head->next;
-            newhead = newhead->next;
+        ListNode *second = reverse(slow->next);
+        ListNode *p = head, *q = second;
+        bool result = true;
+        while(q) {
+            if(p->val != q->val) { result = false; break; }
+            p = p->next; q = q->next;
         }
-        return true;
+        slow->next = reverse(second);
+        return result;
     }
-    ListNode* reverseList(ListNode *head) {
-        ListNode *curr(head), *next(head->next), *nextnext(NULL);
-        while (next) {
-            nextnext = next->next;
-            next->next = curr;
-            curr = next;
-            next = nextnext;
+    ListNode* reverse(ListNode *head) {
+        if(!head || !head->next) return head;
+        ListNode *p = head, *q = head->next;
+        p->next = NULL;
+        while(q) {
+            ListNode *tmp = q->next;
+            q->next = p;
+            p = q; q = tmp;
         }
-        head->next = NULL; //need to seet tail as NULL!
-        return curr;
+        return p;
     }
 };
+

@@ -15,17 +15,15 @@ class Solution {
 public:
     int trailingZeroes(int n) {
         if(n <= 1) return 0;
-        int twos = numFactors(n, 2);
-        int fives = numFactors(n, 5);
-        return min(twos, fives);
+        return min(numFact(n, 2), numFact(n, 5));
     }
-    int numFactors(int n, int f) {
-        if(n <= 0) return 0;
-        int cnt = 0;
+    //how many factors k do numbers 1 .. n have in total?
+    int numFact(int n, int k) {
+        int count = 0;
         while(n) {
-            n /= f;
-            cnt += n;
+            n /= k;
+            count += n;
         }
-        return cnt;
+        return count;
     }
 };

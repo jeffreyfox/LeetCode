@@ -569,6 +569,25 @@ public:
 
 
 /**************************************************** 
+ ***    231,Easy,Power of Two 
+ ****************************************************/
+
+/*
+Given an integer, write a function to determine if it is a power of two.
+*/
+
+// use bit operations.
+// Caveat: need to check if larger than 0!
+
+class Solution {
+public:
+    bool isPowerOfTwo(int n) {
+        return n>0 && !(n&(n-1));
+	// return !n && !(n & 0x80000000) && !(n&(n-1))
+    }
+};
+
+/**************************************************** 
  ***    226,Easy,Invert Binary Tree 
  ****************************************************/
 
@@ -840,6 +859,33 @@ public:
 };
 
 /**************************************************** 
+ ***    191,Easy,Number of 1 Bits 
+ ****************************************************/
+
+/*
+Write a function that takes an unsigned integer and returns the number of ’1' bits it has (also known as the Hamming weight).
+
+For example, the 32-bit integer ’11' has binary representation 00000000000000000000000000001011, so the function should return 3.
+*/
+
+// Bit operation.
+//    n    = 1010101000
+//    n-1  = 1010100111
+// n&(n-1) = 1010100000 (removed last 1 digit!)
+
+class Solution {
+public:
+    int hammingWeight(uint32_t n) {
+        int count = 0;
+        while(n) {
+            n = n & (n-1);
+            count++;
+        }
+        return count;
+    }
+};
+
+/**************************************************** 
  ***    171,Easy,Excel Sheet Column Number 
  ****************************************************/
 
@@ -1081,6 +1127,72 @@ public:
 };
 
 /**************************************************** 
+ ***    112,Easy,Path Sum 
+ ****************************************************/
+
+/*
+Given a binary tree and a sum, determine if the tree has a root-to-leaf path such that adding up all the values along the path equals the given sum.
+For example:
+Given the below binary tree and sum = 22,
+
+              5
+             / \
+            4   8
+           /   / \
+          11  13  4
+         /  \      \
+        7    2      1
+
+return true, as there exist a root-to-leaf path 5->4->11->2 which sum is 22.
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+
+// Caveats: 
+// 1. empty root should return false.
+// 2. leaf node mean node with NO children
+// Several cases:
+// 1. If reaching an leaf node, check if it's value is equal to sum
+// 2. If an internal node, then check left or right subtree
+// 3. if root is empty return false
+
+class Solution {
+public:
+    bool hasPathSum(TreeNode* root, int sum) {
+        if(!root) return false;
+        if(!root->left && !root->right) return (sum == root->val);
+        sum -= root->val;
+        return hasPathSum(root->left, sum) || hasPathSum(root->right, sum);
+    }
+};
+
+//Solution 2.
+class Solution {
+public:
+    bool hasPathSum(TreeNode* root, int sum) {
+        if(!root) return false;
+        return dfs(root, sum);
+    }
+    bool dfs(TreeNode* root, int sum) {
+        int x = root->val;
+        //reaching leaf
+        if(!root->left && !root->right && sum == x) return true;
+        if(root->left && dfs(root->left, sum-x)) return true;
+        if(root->right && dfs(root->right, sum-x)) return true;
+        return false;
+    }
+};
+
+
+/**************************************************** 
  ***    111,Easy,Minimum Depth of Binary Tree 
  ****************************************************/
 
@@ -1207,6 +1319,68 @@ public:
     }
 };
 
+
+
+/**************************************************** 
+ ***    107,Easy,Binary Tree Level Order Traversal II 
+ ****************************************************/
+
+/*
+Given a binary tree, return the bottom-up level order traversal of its nodes' values. (ie, from left to right, level by level from leaf to root).
+
+For example:
+Given binary tree {3,9,20,#,#,15,7},
+
+    3
+   / \
+  9  20
+    /  \
+   15   7
+
+return its bottom-up level order traversal as:
+
+[
+  [15,7],
+  [9,20],
+  [3]
+]
+*/
+
+// Classical solution using BFS. Reverse result vector in the end.
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    struct Element {
+        TreeNode *node;
+        int level;
+        Element(TreeNode *n, int l) : node(n), level(l) {}
+    };
+    vector<vector<int>> levelOrderBottom(TreeNode* root) {
+        vector<vector<int> > ret;
+        if(!root) return ret;
+        deque<Element> q; //queue
+        q.push_back(Element(root, 0));
+        while(!q.empty()) {
+            TreeNode *node = q.front().node;
+            int level = q.front().level;
+            q.pop_front();
+            if(level == ret.size()) ret.push_back(vector<int>());
+            ret[level].push_back(node->val);
+            if(node->left) q.push_back(Element(node->left, level+1));
+            if(node->right) q.push_back(Element(node->right, level+1));
+        }
+        reverse(ret.begin(), ret.end()); //reverse result
+        return ret;
+    }
+};
 
 
 /**************************************************** 
@@ -1715,6 +1889,40 @@ public:
         }
         if(carry > 0) result.insert(result.begin(), 1); //add a leading 1
         return result;
+    }
+};
+
+/**************************************************** 
+ ***    058,Easy,Length of Last Word 
+ ****************************************************/
+
+/*
+Given a string s consists of upper/lower-case alphabets and empty space characters ' ', return the length of last word in the string.
+
+If the last word does not exist, return 0.
+
+Note: A word is defined as a character sequence consists of non-space characters only.
+
+For example,
+Given s = "Hello World",
+return 5. 
+*/
+
+// Two pointers, i and j. Scan from right to left
+// i is first non-space char, j is first space char after i (right -> left)
+
+class Solution {
+public:
+    int lengthOfLastWord(string s) {
+        int n = s.size();
+        //scan from right end to left, find first non-space character
+        int i = n-1;
+        while (i >= 0 && s[i] == ' ') i--;
+        if (i < 0) return 0;
+        //scan from i to left, find first space character
+        int j = i;
+        while(j >= 0 && s[j] != ' ') j--;
+        return i-j;
     }
 };
 

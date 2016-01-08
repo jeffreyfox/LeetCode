@@ -2606,6 +2606,105 @@ public:
 
 
 /**************************************************** 
+ ***    129,Medium,Sum Root to Leaf Numbers 
+ ****************************************************/
+
+/*
+Given a binary tree containing digits from 0-9 only, each root-to-leaf path could represent a number.
+
+An example is the root-to-leaf path 1->2->3 which represents the number 123.
+
+Find the total sum of all root-to-leaf numbers.
+
+For example,
+
+    1
+   / \
+  2   3
+
+The root-to-leaf path 1->2 represents the number 12.
+The root-to-leaf path 1->3 represents the number 13.
+
+Return the sum = 12 + 13 = 25. 
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+
+// Post-order traversal using a stack.
+// Keep a running partial sum, and when reaching a leaf, add the partial sum to total sum.
+// First time visiting a node, add value to partial sum. When finished processing left and right subtrees, remove the value from partial sum.
+// Caveats: avoid adding value to partial sum multiple times! Only do it when tag == 0.
+
+class Solution {
+public:
+    int sumNumbers(TreeNode* root) {
+        if(!root) return 0;
+        int partial_sum(0), total_sum(0);
+        deque<pair<TreeNode*, int> > s; //stack
+        s.push_back(make_pair(root, 0));
+        while(!s.empty()) {
+            TreeNode *node = s.back().first;
+            int tag = s.back().second;
+            if(tag == 0) { //first-time, push left subtree to stack
+                partial_sum = partial_sum*10 + node->val; //also calculate partial sum
+                s.back().second++;
+                if(node->left) s.push_back(make_pair(node->left, 0));
+            } else if(tag == 1) { //second-time, push right subtree to stack
+                s.back().second++;
+                if(node->right) s.push_back(make_pair(node->right, 0));
+            } else {  //third-time, process node
+                if(!node->left && !node->right) total_sum += partial_sum;
+                partial_sum /= 10; //revert to previous value without this node
+                s.pop_back();
+            }
+        }
+        return total_sum;
+    }
+};
+
+// Another solution. Similar, but add pathSums when node has been added.
+class Solution {
+public:
+    int sumNumbers(TreeNode* root) {
+        if(!root) return 0;
+        stack<pair<TreeNode*, int> > st;
+        st.push(make_pair(root, 0));
+        int sum = 0, pathSum = root->val;
+        while(!st.empty()) {
+            TreeNode* node = st.top().first;
+            int tag = st.top().second;
+            if(tag == 0) {
+                st.top().second++;
+                if(node->left) { 
+                    st.push(make_pair(node->left, 0));
+                    pathSum = pathSum*10 + node->left->val;
+                }
+            } else if(tag == 1) {
+                st.top().second++;
+                if(node->right) {
+                    st.push(make_pair(node->right, 0));
+                    pathSum = pathSum*10 + node->right->val;
+                }
+            } else {
+                st.pop();
+                if(!node->left && !node->right) sum += pathSum; //leaf node, add to sum
+                pathSum /= 10;
+            }
+        }
+        return sum;
+    }
+};
+
+
+/**************************************************** 
  ***    127,Medium,Word Ladder 
  ****************************************************/
 
@@ -2970,6 +3069,64 @@ public:
 };
 
 /**************************************************** 
+ ***    113,Medium,Path Sum II 
+ ****************************************************/
+
+/*
+Given a binary tree and a sum, find all root-to-leaf paths where each path's sum equals the given sum.
+For example:
+Given the below binary tree and sum = 22,
+
+              5
+             / \
+            4   8
+           /   / \
+          11  13  4
+         /  \    / \
+        7    2  5   1
+
+return
+
+[
+   [5,4,11,2],
+   [5,8,4,5]
+]
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+
+// DFS backtracking. Recursive solution.
+// Caveats: when reaching leaf, compare sum with x, not with zero!
+
+class Solution {
+public:
+    vector<vector<int>> pathSum(TreeNode* root, int sum) {
+        vector<vector<int> > result;
+        if(!root) return result;
+        vector<int> path;
+        dfs(root, sum, path, result);
+        return result;
+    }
+    void dfs(TreeNode* root, int sum, vector<int>& path, vector<vector<int> >& result) {
+        int x = root->val;
+        path.push_back(x);
+        //reaching leaf
+        if(!root->left && !root->right && sum == x) result.push_back(path);
+        if(root->left) dfs(root->left, sum-x, path, result);
+        if(root->right) dfs(root->right, sum-x, path, result);
+        path.pop_back();
+    }
+};
+
+/**************************************************** 
  ***    103,Medium,Binary Tree Zigzag Level Order Traversal 
  ****************************************************/
 
@@ -3099,6 +3256,151 @@ public:
         return ret;
     }
 };
+
+/**************************************************** 
+ ***    098,Medium,Validate Binary Search Tree 
+ ****************************************************/
+
+/*
+Given a binary tree, determine if it is a valid binary search tree (BST).
+
+Assume a BST is defined as follows:
+
+    The left subtree of a node contains only nodes with keys less than the node's key.
+    The right subtree of a node contains only nodes with keys greater than the node's key.
+    Both the left and right subtrees must also be binary search trees.
+
+confused what "{1,#,2,3}" means? > read more on how binary tree is serialized on OJ.
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+
+// Recursive solution.
+// store lower and upper bounds of each subtree, initially it is (-inf, inf)
+// One corner case is when INT_MIN and INT_MAX is part of the value, so use LONG_MIN and LONG_MAX instead.
+
+class Solution {
+public:
+    bool isValidBST(TreeNode* root) {
+        return validate(root, LONG_MIN, LONG_MAX);
+    }
+    //make sure all tree values between (lo, hi)
+    bool validate(TreeNode* root, long lo, long hi) {
+        if(!root) return true;
+        int x = root->val;
+        if(x <= lo || x >= hi) return false;
+        return validate(root->left, lo, x) && validate(root->right, x, hi);
+    }
+};
+
+/**************************************************** 
+ ***    096,Medium,Unique Binary Search Trees 
+ ****************************************************/
+
+/*
+Given n, how many structurally unique BST's (binary search trees) that store values 1...n?
+
+For example,
+Given n = 3, there are a total of 5 unique BST's.
+
+   1         3     3      2      1
+    \       /     /      / \      \
+     3     2     1      1   3      2
+    /     /       \                 \
+   2     1         2                 3
+
+*/
+
+// Dynamic programming. The ways of forming tree of size n can be found by choosing each of the n elements as root, which divides the others as left and right subtrees.
+
+class Solution {
+public:
+    int numTrees(int n) {
+        if(n < 0) return 0;
+        if(n == 0 || n == 1) return 1;
+        vector<int> count(n+1, 0); //store counts from i=0 to n
+        count[0] = count[1] = 1;
+        //calculate number of unique trees of size i
+        for(int i = 2; i <= n; ++i) {
+            //pick k-th number as root, then k elements as left-tree, i-k-1 elements as right-tree
+            for(int k = 0; k < i; ++k) {
+                count[i] += count[k]*count[i-k-1];
+            }
+        }
+        return count[n];
+    }
+};
+
+
+/**************************************************** 
+ ***    095,Medium,Unique Binary Search Trees II 
+ ****************************************************/
+
+/*
+Given n, generate all structurally unique BST's (binary search trees) that store values 1...n.
+
+For example,
+Given n = 3, your program should return all 5 unique BST's shown below.
+
+   1         3     3      2      1
+    \       /     /      / \      \
+     3     2     1      1   3      2
+    /     /       \                 \
+   2     1         2                 3
+
+confused what "{1,#,2,3}" means? > read more on how binary tree is serialized on OJ.
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+
+// Dynamic programming using a 2D array. The trick is to generate the right subtree by using a createNew function with a delta value.
+
+class Solution {
+public:
+    vector<TreeNode*> generateTrees(int n) {
+        if(n < 0) return vector<TreeNode*>();
+        if(n == 0) return vector<TreeNode*>();
+        vector<vector<TreeNode*> > dp(n+1); //dp[i]: solutions for tree of size i
+        dp[0].push_back(NULL);
+        for(int i = 1; i <= n; ++i) { //check tree of size i
+            for(int k = 1; k <= i; ++k) { //make k as root
+                for(auto l : dp[k-1]) { //construct left subtree
+                    for(auto r : dp[i-k]) { //construct right subtree
+                        TreeNode *root = new TreeNode(k);
+                        root->left = l;
+                        root->right = createNew(r, k);
+                        dp[i].push_back(root);
+                    }
+                }
+            }
+        }
+        return dp[n];
+    }
+    TreeNode* createNew(TreeNode* root, int delta) {
+        if(!root) return NULL;
+        TreeNode* nr = new TreeNode(root->val+delta); //new root
+        nr->left = createNew(root->left, delta);
+        nr->right = createNew(root->right, delta);
+        return nr;
+    }
+};
+
 
 /**************************************************** 
  ***    094,Medium,Binary Tree Inorder Traversal 
@@ -3254,6 +3556,92 @@ public:
     }
 };
 
+
+
+/**************************************************** 
+ ***    093,Medium,Restore IP Addresses 
+ ****************************************************/
+
+/*
+Given a string containing only digits, restore it by returning all possible valid IP address combinations.
+
+For example:
+Given "25525511135",
+
+return ["255.255.11.135", "255.255.111.35"]. (Order does not matter) 
+*/
+
+// Recursive solution #1.
+class Solution {
+public:
+    vector<string> restoreIpAddresses(string s) {
+        vector<string> result;
+        if(s.empty()) return result;
+        string tmp;
+        dfs(s, 0, 0, tmp, result);
+        return result;
+    }
+    void dfs(const string& s, int i, int count, string tmp, vector<string>& result) {
+        int n = s.size();
+        if(i == n && count == 4) {
+            result.push_back(tmp);
+            return;
+        }
+        if(i == n || count == 4) return;
+        if(i != 0) tmp += '.';
+        if(s[i] == '0') {
+            dfs(s, i+1, count+1, tmp+'0', result);
+            return;
+        }
+        for(int k = i, val = 0; k < n; k++) {
+            val = val*10 + (s[k] - '0');
+            if(val >= 256) break;
+            tmp += s[k];
+            dfs(s, k+1, count+1, tmp, result);
+        }
+   }
+};
+
+// Recursive solution #2. 
+// Need to add 4 periods, last one has to be after last character.
+// store positions of periods (index of character right before newly added period), and reconstruct the string when valid solutions are found
+// Caveat: string::insert function argument is the index which the new character is inserted before.
+// Another caveat: ip address segments cannot have leading zeros, except .0. case, others like .03. or .00. are illegal. Need to filter them out
+
+class Solution {
+public:
+    vector<string> restoreIpAddresses(string s) {
+        vector<string> ret;
+        vector<int> dotPos(4, -1); //dot positions in the s
+        restore(s, 0, 0, dotPos, ret);
+        return ret;
+    }
+    //checking substring starting at s[i] for dot number k (0-3), add values to dotPos
+    void restore(const string& s, int i, int k, vector<int>& dotPos, vector<string>& ret) {
+       if (k == 4) { //already placing 4 dots (one at the end)
+          //onlyd add when i reaches the end
+          if (i == s.size()) ret.push_back(construct(s, dotPos));
+          return;
+       }
+       if (i == s.size()) return;
+       int v = 0;
+       for (int j = i; j < s.size(); ++j) {
+          v = 10*v + s[j] - '0';
+          if(v >= 256) break;
+          dotPos[k] = j; //dot is after j's position
+          restore(s, j+1, k+1, dotPos, ret);
+          if(s[i] == '0') break; //if leading character is '0', do not continue loop ('.00.' is illegal IP segment)
+       }
+    }
+    string construct(const string& s, const vector<int>& dotPos) {
+        string ret = s;
+        ret.insert(dotPos[2]+1, 1, '.');
+        ret.insert(dotPos[1]+1, 1, '.');
+        ret.insert(dotPos[0]+1, 1, '.');
+        return ret;
+    }
+
+};
 
 
 /**************************************************** 
@@ -4184,6 +4572,163 @@ public:
 };
 
 /**************************************************** 
+ ***    049,Medium,Group Anagrams 
+ ****************************************************/
+
+// Simplest solution: maintain a map from string (sorted) to a vector of indices who is anagram to the string.
+// Process all strings, then check the map and add to result if the vector size is larger than 1
+
+class Solution {
+public:
+     vector<string> anagrams(vector<string>& strs) {
+        vector<string> ret;
+        if (strs.empty()) return ret;
+        int n = strs.size();
+        if (n == 1) return ret;
+        map<string, vector<int> > table;
+        for (int i = 0; i < n; ++i) {
+           string s = strs[i];
+           sort(s.begin(), s.end());
+           table[s].push_back(i);
+        }
+        for (map<string, vector<int> >::iterator it = table.begin(); it != table.end(); ++it) {
+            if (it->second.size() > 1) {
+               for (size_t i = 0; i < it->second.size(); ++i)
+                   ret.push_back(strs[it->second[i]]);
+            }
+        }
+        return ret;
+    }
+};
+/*
+Given an array of strings, group anagrams together.
+
+For example, given: ["eat", "tea", "tan", "ate", "nat", "bat"],
+Return:
+
+[
+  ["ate", "eat","tea"],
+  ["nat","tan"],
+  ["bat"]
+]
+
+Note:
+
+    For the return value, each inner list's elements must follow the lexicographic order.
+    All inputs will be in lower-case.
+*/
+
+// Solution 1. Using a hash table to store the already found anagrams. Use the sorted string as the key. 68ms.
+// For each string in strs, if found in table, then insert to approapriate positions, otherwise, add a new vector to the result, and push the string to that vector.
+// Finally, sort each sub-vector
+
+class Solution {
+public:
+    vector<vector<string>> groupAnagrams(vector<string>& strs) {
+        vector<vector<string>> result;
+        if(strs.empty()) return result;
+        unordered_map<string, int> dict;
+
+        for(int i = 0; i < strs.size(); ++i) {
+            string s = strs[i];
+            sort(s.begin(), s.end());
+            if(dict.count(s)) { //found anagrams
+                result[dict[s]].push_back(strs[i]);
+            } else { //new entry
+                dict[s] = result.size();
+                result.push_back(vector<string>(1, strs[i]));
+            }
+        }
+        for(int i = 0; i < result.size(); ++i) {
+            sort(result[i].begin(), result[i].end());
+        }
+        return result;
+    }
+};
+
+// Solution 2. 400ms. Not a very efficient solution.
+// First sort the strs array by a customized compare function (compare each string's sorted forms). After this step all anagrams are ajacent to each other. Next step scan the array and group anagrams using the isAnagram function. Still need to sort each group in the end.
+
+bool compare(const string& s, const string& t) {
+    string ss = s, tt = t;
+    sort(ss.begin(), ss.end());
+    sort(tt.begin(), tt.end());
+    return ss < tt;
+}
+
+class Solution {
+public:
+    vector<vector<string>> groupAnagrams(vector<string>& strs) {
+        vector<vector<string>> result;
+        if(strs.empty()) return result;
+        sort(strs.begin(), strs.end(), compare);
+
+        for(int i = 0; i < strs.size(); ++i) {
+            if(i == 0 || !isAnagram(strs[i], strs[i-1]))
+                result.push_back(vector<string>());
+            result.back().push_back(strs[i]);
+        }
+        for(int i = 0; i < result.size(); ++i) {
+            sort(result[i].begin(), result[i].end());
+        }
+        return result;
+    }
+    bool isAnagram(const string& s, const string& t) {
+        if(s.size() != t.size()) return false;
+        int n = s.size();
+        if(n == 0) return true;
+        if(n == 1) return s == t;
+        vector<int> dict(26, 0);
+        for(auto c : s) dict[c-'a']++;
+        for(auto c : t) {
+            if(--dict[c-'a'] < 0) return false;
+        }
+        return true;
+    }
+};
+
+// Solution 3. TLE. Brute force solution, very inefficient.
+// One pass. Construct result as we scan strs, for each string, linearly scan all anagram groups in results. Compare the string with the first entry of the anagram group. If found equal, insert to this group. Otherwise, append a new group to end of results and insert the string to this group.
+
+class Solution {
+public:
+    vector<vector<string>> groupAnagrams(vector<string>& strs) {
+        vector<vector<string>> result;
+        if(strs.empty()) return result;
+        for(auto s : strs) {
+            bool hasAnagram = false;
+            for(int i = 0; i < result.size(); ++i) {
+                if(isAnagram(result[i][0], s)) {
+                    result[i].push_back(s);
+                    hasAnagram = true;
+                    break;
+                }
+            }
+            if(!hasAnagram) result.push_back(vector<string>(1, s));
+        }
+        for(auto s : result) {
+            sort(s.begin(), s.end());
+        }
+        return result;
+    }
+    bool isAnagram(const string& s, const string& t) {
+        if(s.size() != t.size()) return false;
+        int n = s.size();
+        if(n == 0) return true;
+        if(n == 1) return s == t;
+        vector<int> dict(26, 0);
+        for(auto c : s) dict[c-'a']++;
+        for(auto c : t) {
+            if(--dict[c-'a'] < 0) return false;
+        }
+        return true;
+    }
+};
+
+
+
+
+/**************************************************** 
  ***    047,Medium,Permutations II 
  ****************************************************/
 
@@ -4803,6 +5348,42 @@ public:
 	}
 };
 
+
+/**************************************************** 
+ ***    035,Medium,Search Insert Position 
+ ****************************************************/
+
+/*
+Given a sorted array and a target value, return the index if the target is found. If not, return the index where it would be if it were inserted in order.
+
+You may assume no duplicates in the array.
+
+Here are few examples.
+[1,3,5,6], 5 → 2
+[1,3,5,6], 2 → 1
+[1,3,5,6], 7 → 4
+[1,3,5,6], 0 → 0
+*/
+
+// Binary search. Loop invariant:
+// nums[0 .. lo-1] < target, nums[hi+1, n) > target, nums[lo, hi] TBD
+// If found, return index. If not found, return position lo, because when out of while loop we have lo=hi+1, and target is between nums[hi] and nums[lo].
+
+class Solution {
+    
+public:
+    int searchInsert(vector<int>& nums, int target) {
+        int n = nums.size();
+        int lo(0), hi(n-1), mid(0);
+        while(lo <= hi) {
+            mid = lo + (hi-lo)/2;
+            if(target == nums[mid]) return mid;
+            if(target < nums[mid]) hi = mid-1;
+            else lo = mid+1;
+        }
+        return lo;
+    }
+}; 
 
 /**************************************************** 
  ***    031,Medium,Next Permutation 
