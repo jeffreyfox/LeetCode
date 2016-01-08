@@ -90,6 +90,8 @@
 115_distinct_subsequences.cc
 116_populating_next_right_pointers.cc
 117_populating_next_right_pointers_ii.cc
+118_pascals_triangle.cc
+119_pascals_triangle_ii.cc
 121_best_time_to_buy_and_sell_stock.cc
 122_best_time_to_buy_and_sell_stock_ii.cc
 123_best_time_to_buy_and_sell_stock_iii.cc
