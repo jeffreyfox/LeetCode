@@ -1,6 +1,6 @@
 /*
-Given a singly linked list L: L0→L1→…→Ln-1→Ln,
-reorder it to: L0→Ln→L1→Ln-1→L2→Ln-2→…
+Given a singly linked list L: L0->L1->...->Ln-1->Ln,
+reorder it to: L0->Ln->L1->Ln-1->L2->Ln-2->...
 
 You must do this in-place without altering the nodes' values.
 
@@ -24,33 +24,40 @@ Given {1,2,3,4}, reorder it to {1,4,2,3}.
 
 class Solution {
 public:
-   void reorderList(ListNode* head) {
-        if(head == NULL || head->next == NULL) return;
-
-        ListNode *fast(head), *slow(head);
-        //slow points to middle element
+    void reorderList(ListNode* head) {
+        if(!head || !head->next || !head->next->next) return;
+        ListNode* slow = head, *fast = head;
         while(fast->next && fast->next->next) {
-           slow = slow->next;
-           fast = fast->next->next;
+            slow = slow->next;
+            fast = fast->next->next;
         }
-        //now reverse sub-list headed at slow->next
-        ListNode *p1(head), *p2 = reverseList(slow->next);
-        slow->next = NULL; //set first list's tail properly
-        //patch two sub-lists together:
-        while(p2) {
-            ListNode *tmp = p2->next;
-            p2->next = p1->next;
-            p1->next = p2;
-            p1 = p2->next; //move forward p1
-            p2 = tmp; //move forward p2
-        }
+        ListNode *p = head;
+        ListNode *q = reverse(slow->next);
+        slow->next = NULL;
+        merge(p, q);
     }
-    ListNode* reverseList(ListNode *head) {
-        if(head == NULL || head->next == NULL) return head;
-        ListNode *tmp = head->next;
+
+    ListNode* reverse(ListNode *head) {
+        if(!head || !head->next) return head;
+        ListNode *p = head, *q = p->next;
+        //p is head of new list
+        while(q) {
+            ListNode *tmp = q->next;
+            q->next = p;
+            p = q; q = tmp; //move forward
+        }
         head->next = NULL;
-        ListNode *newhead = reverseList(tmp);
-        tmp->next = head;
-        return newhead;
+        return p;
+    }
+
+    void merge(ListNode* p, ListNode *q) {
+        ListNode *r = p;
+        while(q) {
+            ListNode *tmp = q->next;
+            q->next = r->next;
+            r->next = q;
+            r = q->next; q = tmp; //move forward
+        }
     }
 };
+

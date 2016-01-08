@@ -12,44 +12,37 @@ Sort a linked list using insertion sort.
  */
 
 /// Start from head, track the tail of already sorted list
-/// If the element to be added is larger than the tail of sorted list, simply append it to the tail and move on (makes the code more efficient)
+/// If the element to be added is larger than the tail of sorted list, simply append it to the tail and move on (makes the code more efficient, 92ms => 28ms reduction!)
 /// Otherwise scan from head of list and find the position to insert
-/// Remember to set the next pointer of list's tail to NULL.
+/// Remember to set the next pointer of list's tail to NULL in the beginning.
 
-/**
- * Definition for singly-linked list.
- * struct ListNode {
- *     int val;
- *     ListNode *next;
- *     ListNode(int x) : val(x), next(NULL) {}
- * };
- */
 class Solution {
 public:
     ListNode* insertionSortList(ListNode* head) {
         if(!head || !head->next) return head;
+        ListNode* dummy = new ListNode(0);
+        dummy->next = head;
 
-        ListNode dum(0), *p(&dum);
-        p->next = head;
-        ListNode *tail = head; //tracks the tail of already sorted part
-        ListNode *node = tail->next; //node to be inserted
-        while (node) {
-            int x = node->val;
-            if (x >= tail->val) { tail = tail->next = node; node = node->next; continue; }
-
-            //scan sorted part to find insertion position
-            ListNode *prev = p;
-            while(prev != tail && prev->next->val <= x) {
-                prev = prev->next;
+        ListNode *tail = head, *q = head->next;
+        tail->next = NULL; //set tail's next to NULL
+        while(q) {
+            ListNode *next = q->next;
+            //insert q to list from dummy to tail
+            if(q->val >= tail->val) {
+                tail = tail->next = q;  //update tail!
+		q->next = NULL;
+            } else { //search insert position from beginning
+                ListNode *curr = dummy->next, *prev = dummy;
+                while(curr && curr->val <= q->val) {
+                    prev = curr; curr = curr->next;
+                }
+                prev->next = q; q->next = curr; //insert to list
             }
-            //insert element after prev
-            ListNode *tmp = node->next; //save to tmp
-            node->next = prev->next;
-            prev->next = node;
-            if(prev == tail) tail = node; //update tail only when reaching end!
-            node = tmp;
+            q = next; //move forward
         }
-        tail->next = NULL; //set tail's next to NULL!
-        return p->next;
+
+        head = dummy->next;
+        delete dummy;
+        return head;
     }
 };
