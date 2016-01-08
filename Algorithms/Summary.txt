@@ -24,6 +24,7 @@
 026_remove_duplicates_sorted_array.cc
 027_remove_element.cc
 028_implement_strstr.cc
+029_divide_two_integers.cc
 030_substr_concat_all_words.cc
 031_next_permutation.cc
 032_longest_valid_parentheses.cc
@@ -93,6 +94,7 @@
 122_best_time_to_buy_and_sell_stock_ii.cc
 123_best_time_to_buy_and_sell_stock_iii.cc
 124_binary_tree_maximum_path_sum.cc
+125_valid_palindrome.cc
 126_word_ladder_ii.cc
 127_word_ladder.cc
 128_longest_consecutive_sequence.cc
@@ -121,6 +123,7 @@
 168_excel_sheet_column_title.cc
 170_two_sum_iii.cc
 171_excel_sheet_column_number.cc
+172_factorial_trailing_zeroes.cc
 173_binary_search_tree_iterator.cc
 174_dungeon_game.cc
 179_largest_number.cc
@@ -131,6 +134,7 @@
 200_number_of_islands.cc
 202_happy_number.cc
 203_remove_linked_list_elements.cc
+204_count_primes.cc
 205_isomorphic_strings.cc
 206_reverse_linked_list.cc
 208_implement_trie.cc
@@ -138,12 +142,17 @@
 212_word_search_ii.cc
 214_shortest_palindrome.cc
 216_combination_sum_iii.cc
+217_contains_duplicate.cc
 218_the_skyline_problem.cc
+219_contains_duplicate_ii.cc
 221_maximal_square.cc
 223_rectangle_area.cc
+225_implement_stack_using_queues.cc
 226_invert_binary_tree.cc
 230_kth_smallest_element_in_bst.cc
 231_power_of_two.cc
+232_implement_queue_using_stacks.cc
+234_palindrome_linked_list.cc
 235_lowest_common_ancestor_of_binary_search_tree.cc
 236_lowest_common_ancestor_of_binary_tree.cc
 237_delete_node_in_linked_list.cc
