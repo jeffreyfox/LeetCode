@@ -45,3 +45,25 @@ public:
         return result;
     }
 };
+
+// A O(k*n) solution.
+// For each new number, look further and predict the maximum for the next k steps
+
+class Solution {
+public:
+    vector<int> maxSlidingWindow(vector<int>& nums, int k) {
+       int n = nums.size();
+       vector<int> ret;
+       if(k == 0 || n < k) return ret;
+       int m = n-k+1;
+       ret.resize(m, INT_MIN);
+       //predict the possible maximums according to nums[i]
+       for(int i = 0; i < n; ++i) {
+          for(int j = max(0, i-k+1); j <= min(i, m-1); ++j) {
+             ret[j] = max(ret[j], nums[i]);
+          }
+       }
+       return ret;
+    }
+};
+
