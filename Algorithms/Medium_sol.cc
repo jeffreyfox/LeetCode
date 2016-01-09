@@ -2358,6 +2358,325 @@ public:
 };
 
 /**************************************************** 
+ ***    148,Medium,Sort List 
+ ****************************************************/
+
+/*
+Sort a linked list in O(n log n) time using constant space complexity.
+*/
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+
+// bottom-up merge sort, using a queue
+// Sort is unstable if number of nodes are not power of 2!
+
+class Solution {
+public:
+    ListNode* sortList(ListNode* head) {
+        if(!head || !head->next) return head;
+        deque<ListNode*> q;
+        ListNode *p = head;
+        //push nodes into queue, also set next to NULL (break into many single-node lists)
+        while(p) {
+            q.push_back(p);
+            ListNode *next = p->next;
+            p->next = NULL;
+            p = next;
+        }
+        ListNode dum(0);
+        p = &dum; //dummy node
+        while(!q.empty()) {
+            ListNode* n1 = q.front(); q.pop_front();
+            if(q.empty()) return n1;
+            ListNode *n2 = q.front(); q.pop_front();
+            q.push_back(merge(n1, n2));
+        }
+        return NULL; //something wrong
+    }
+    //merge two sorted, non-empty lists
+    ListNode* merge(ListNode *head1, ListNode *head2) {
+        ListNode dum(0), *p(&dum), *tail(p);
+        while(head1 && head2) {
+            if(head1->val <= head2->val) {
+                tail->next = head1;
+                head1 = head1->next;
+            } else {
+                tail->next = head2;
+                head2 = head2->next;
+            }
+            tail = tail->next;
+        }
+        tail->next = head1 ? head1 : head2;
+        return p->next;
+    }
+};
+/*
+Sort a linked list in O(n log n) time using constant space complexity.
+*/
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+
+// Solution 1. Top-down merge sort (not really constant space, because of stack space)
+// when finding the middle element, fast is initialized as head->next, not head, to avoid infinite loop in corner cases (only two nodes).
+
+class Solution {
+public:
+    ListNode* sortList(ListNode* head) {
+        if(!head || !head->next) return head;
+        ListNode* p = head, *q = head;
+        while(q->next && q->next->next) {
+            p = p->next;
+            q = q->next->next;
+        }
+        //merge head and p->next
+        q = p->next;
+        p->next = NULL;
+        head = sortList(head);
+        q = sortList(q);
+        return merge(head, q);
+    }
+
+    ListNode *merge(ListNode* left, ListNode *right) {
+        ListNode* dummy = new ListNode(0);
+        ListNode *p = left, *q = right, *tail = dummy;
+        while(p && q) {
+            if(p->val <= q->val) {
+                tail->next = p; p = p->next;
+            } else {
+                tail->next = q; q = q->next;
+            }
+            tail = tail->next;
+        }
+        tail->next = p ? p : q;
+
+        p = dummy->next;
+        delete dummy;
+        return p;
+    }
+};
+
+// Solution 2. Bottom-up merge sort with O(1) space, by using an elegant split function.
+// Maintain the length of sub lists to be sorted, starting form 1, and then 2, 4 ...
+// Split(head, len), cuts break the list at position len, and returns the head of the second part, e.g.
+// head = 1 -> 2 -> 3 -> 4, len = 2, then after second = split(head, 2), we have head = 1->2,  second = 3->4.
+// Merge merges to linked lists and attach them to the head, and then returns the tail of the merged list.
+
+class Solution {
+public:
+    ListNode* sortList(ListNode* head) {
+        if(!head || !head->next) return head;
+        ListNode* dummy = new ListNode(0);
+        dummy->next = head;
+        int count = 0;
+        ListNode *p = dummy->next;
+        while(p) {
+            count++;
+            p = p->next;
+        }
+        for(int len = 1; len < count; len *= 2) { //len: merge length
+            ListNode *tail = dummy, *left = dummy->next;
+            while(left) {
+                ListNode *right = split(left, len);
+                ListNode *next = split(right, len);
+                tail = merge(left, right, tail);
+                left = next;
+            }
+        }
+        head = dummy->next;
+        delete dummy;
+        return head;
+    }
+
+    ListNode* split(ListNode *head, int len) {
+        while(head && len > 1) {
+           head = head->next; len--;
+        }
+        if(!head) return NULL;
+        ListNode *second = head->next;
+        head->next = NULL;
+        return second;
+    }
+    //merge two lists and attach to head (head serves similar to the dummy head), and return the tail of the merged list
+    ListNode *merge(ListNode* left, ListNode *right, ListNode *head) {
+        ListNode *p = left, *q = right, *tail = head;
+        while(p && q) {
+            if(p->val < q->val) {
+                tail->next = p; p = p->next;
+            } else {
+                tail->next = q; q = q->next;
+            }
+            tail = tail->next;
+        }
+        tail->next = p ? p : q;
+        while(tail->next) tail = tail->next;
+        return tail;
+    }
+};
+
+// Solution 3. 3-way quick-sort, with the first element as the pivot. Maintain three sub lists, one < x, one == x, one > x. Then attach them ogether in the end. Not really O(1) space, due to recursive calls.
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* sortList(ListNode* head) {
+        if(!head || !head->next) return head;
+        return sortList(head, NULL);
+    }
+    //sort list and connect it to next, return new head
+    ListNode* sortList(ListNode *head, ListNode *next) {
+        ListNode* dummy = new ListNode(0);
+        //use head as pivot. p : <x, q : >x, r : =x
+        ListNode *phead = NULL, *qhead = NULL, *rhead = NULL;
+        ListNode *p = NULL, *q = NULL, *r = head;
+        ListNode *curr = head->next;
+        while(curr) {
+            if(curr->val < head->val) {
+                if(!p) p = phead = curr;
+                else p = p->next = curr;
+            } else if(curr->val > head->val) {
+                if(!q) q = qhead = curr;
+                else q = q->next = curr;
+            } else {
+                r = r->next = curr;
+            }
+            curr = curr->next;
+        }
+        //work on first part (<x)
+        if(phead) {
+            p->next = NULL; //p is tail
+            dummy->next = sortList(phead, head);
+        } else dummy->next = head;
+        //work on second part (>x)
+        if(qhead) {
+            q->next = NULL; //q is tail
+            r->next = sortList(qhead, next);
+        } else r->next = next;
+        head = dummy->next;
+        delete dummy;
+        return head;
+    }
+};
+
+// Solution 4. Bottom-up merge sort, using a queue. O(n) space!
+// Sort is unstable if number of nodes are not power of 2!
+
+class Solution {
+public:
+    ListNode* sortList(ListNode* head) {
+        if(!head || !head->next) return head;
+        deque<ListNode*> q;
+        ListNode *p = head;
+        //push nodes into queue, also set next to NULL (break into many single-node lists)
+        while(p) {
+            q.push_back(p);
+            ListNode *next = p->next;
+            p->next = NULL;
+            p = next;
+        }
+        ListNode dum(0);
+        p = &dum; //dummy node
+        while(!q.empty()) {
+            ListNode* n1 = q.front(); q.pop_front();
+            if(q.empty()) return n1;
+            ListNode *n2 = q.front(); q.pop_front();
+            q.push_back(merge(n1, n2));
+        }
+        return NULL; //something wrong
+    }
+    //merge two sorted, non-empty lists
+    ListNode* merge(ListNode *head1, ListNode *head2) {
+        ListNode dum(0), *p(&dum), *tail(p);
+        while(head1 && head2) {
+            if(head1->val <= head2->val) {
+                tail->next = head1;
+                head1 = head1->next;
+            } else {
+                tail->next = head2;
+                head2 = head2->next;
+            }
+            tail = tail->next;
+        }
+        tail->next = head1 ? head1 : head2;
+        return p->next;
+    }
+};
+
+
+/**************************************************** 
+ ***    147,Medium,Insertion Sort List 
+ ****************************************************/
+
+/*
+Sort a linked list using insertion sort.
+*/
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+
+/// Start from head, track the tail of already sorted list
+/// If the element to be added is larger than the tail of sorted list, simply append it to the tail and move on (makes the code more efficient, 92ms => 28ms reduction!)
+/// Otherwise scan from head of list and find the position to insert
+/// Remember to set the next pointer of list's tail to NULL in the beginning.
+
+class Solution {
+public:
+    ListNode* insertionSortList(ListNode* head) {
+        if(!head || !head->next) return head;
+        ListNode* dummy = new ListNode(0);
+        dummy->next = head;
+
+        ListNode *tail = head, *q = head->next;
+        tail->next = NULL; //set tail's next to NULL
+        while(q) {
+            ListNode *next = q->next;
+            //insert q to list from dummy to tail
+            if(q->val >= tail->val) {
+                tail = tail->next = q;  //update tail!
+		q->next = NULL;
+            } else { //search insert position from beginning
+                ListNode *curr = dummy->next, *prev = dummy;
+                while(curr && curr->val <= q->val) {
+                    prev = curr; curr = curr->next;
+                }
+                prev->next = q; q->next = curr; //insert to list
+            }
+            q = next; //move forward
+        }
+
+        head = dummy->next;
+        delete dummy;
+        return head;
+    }
+};
+
+/**************************************************** 
  ***    144,Medium,Binary Tree Preorder Traversal 
  ****************************************************/
 
@@ -2424,6 +2743,74 @@ public:
         return ret;
     }
 };
+
+/**************************************************** 
+ ***    143,Medium,Reorder List 
+ ****************************************************/
+
+/*
+Given a singly linked list L: L0->L1->...->Ln-1->Ln,
+reorder it to: L0->Ln->L1->Ln-1->L2->Ln-2->...
+
+You must do this in-place without altering the nodes' values.
+
+For example,
+Given {1,2,3,4}, reorder it to {1,4,2,3}. 
+*/
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+
+// 1. Traverse list using a slow and a fast pointer, find the middle element
+// 2. Reverse the second half of list and return its head
+// 3. start from head of first half, insert elements of second half one-by-one to first half.
+// 4. set the next pointer of combined graph's tail as NULL
+
+class Solution {
+public:
+    void reorderList(ListNode* head) {
+        if(!head || !head->next || !head->next->next) return;
+        ListNode* slow = head, *fast = head;
+        while(fast->next && fast->next->next) {
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+        ListNode *p = head;
+        ListNode *q = reverse(slow->next);
+        slow->next = NULL;
+        merge(p, q);
+    }
+
+    ListNode* reverse(ListNode *head) {
+        if(!head || !head->next) return head;
+        ListNode *p = head, *q = p->next;
+        //p is head of new list
+        while(q) {
+            ListNode *tmp = q->next;
+            q->next = p;
+            p = q; q = tmp; //move forward
+        }
+        head->next = NULL;
+        return p;
+    }
+
+    void merge(ListNode* p, ListNode *q) {
+        ListNode *r = p;
+        while(q) {
+            ListNode *tmp = q->next;
+            q->next = r->next;
+            r->next = q;
+            r = q->next; q = tmp; //move forward
+        }
+    }
+};
+
 
 /**************************************************** 
  ***    139,Medium,Word Break 
@@ -5446,6 +5833,72 @@ public:
     }
 };
 
+
+/**************************************************** 
+ ***    029,Medium,Divide Two Integers 
+ ****************************************************/
+
+/*
+Divide two integers without using multiplication, division and mod operator.
+
+If it is overflow, return MAX_INT. 
+*/
+
+// Solution 1. Subtract and bit-wise shift (*2).
+// Need to consider overflow cases.
+class Solution {
+public:
+    int divide(int dividend, int divisor) {
+        if(divisor == 0) return INT_MAX;
+        if(dividend == 0) return 0;
+        if(dividend == INT_MIN) {
+            if(divisor == -1) return INT_MAX;
+            else if(divisor == 1) return INT_MIN;
+        }
+        long a = dividend, b = divisor;
+        bool neg = (a > 0) ^ (b > 0);
+        a = abs(a); b = abs(b);
+        int result = 0;
+        while(a >= b) {
+            long x = b, y = 1;
+            while(a >= (x << 1)) {
+              x <<= 1; y <<= 1;
+            }
+            a -= x;
+            result += y;
+        }
+        //result <= INT_MAX
+        if(neg) result = -result;
+        return result;
+    }
+};
+
+// Solution 2. Similar one.
+class Solution {
+public:
+    int divide(int dividend, int divisor) {
+        long a = dividend, b = divisor;
+        a = abs(a); b = abs(b);
+        bool negative = (dividend < 0) ^ (divisor < 0);
+        // a/b
+        long x(b), n(1), ret(0);
+        while (x <= a) {
+            x <<= 1; n <<= 1;
+        }
+        //x = n*b and > a
+        while (a > 0) {
+            while(n > 0 && x > a) { x >>=1; n>>=1; }
+            // x <= a or n == 1
+            if (n == 0)  break;
+            else {
+                ret += n;
+                a -= x;
+            }
+        }
+        if(negative) return (ret <= long(INT_MAX)+1) ? -ret : INT_MAX;
+        else return ret <= INT_MAX ? ret : INT_MAX;
+    }
+};
 
 /**************************************************** 
  ***    024,Medium,Swap Nodes in Pairs 

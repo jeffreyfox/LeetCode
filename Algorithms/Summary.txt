@@ -2,6 +2,7 @@
 002_add_two_numbers.cc
 003_longest_substr_wo_repeating_char.cc
 004_median_of_two_sorted_arrays.cc
+006_zigzag_conversion.cc
 007_reverse_integer.cc
 008_string_to_integer.cc
 009_palindrome_number.cc
@@ -118,6 +119,7 @@
 152_maximum_product_subarray.cc
 153_find_minimum_in_rotated_sorted_array.cc
 154_find_minimum_in_rotated_sorted_array_ii.cc
+155_min_stack.cc
 157_read_n_characters_given_read4.cc
 158_read_n_characters_given_read4_ii.cc
 159_longest_substr_at_most_two_distinct_char.cc
@@ -134,8 +136,10 @@
 179_largest_number.cc
 186_reverse_words_in_a_string_ii.cc
 188_best_time_to_buy_and_sell_stock_iv.cc
+189_rotate_array.cc
 190_reverse_bits.cc
 191_number_of_1_bits.cc
+198_house_robber.cc
 200_number_of_islands.cc
 202_happy_number.cc
 203_remove_linked_list_elements.cc
@@ -145,6 +149,7 @@
 208_implement_trie.cc
 209_minimum_size_subarray_sum.cc
 212_word_search_ii.cc
+213_house_robber_ii.cc
 214_shortest_palindrome.cc
 216_combination_sum_iii.cc
 217_contains_duplicate.cc
@@ -154,6 +159,7 @@
 223_rectangle_area.cc
 225_implement_stack_using_queues.cc
 226_invert_binary_tree.cc
+228_summary_ranges.cc
 230_kth_smallest_element_in_bst.cc
 231_power_of_two.cc
 232_implement_queue_using_stacks.cc
@@ -168,12 +174,14 @@
 246_strobogrammatic_number.cc
 247_strobogrammatic_number_ii.cc
 248_strobogrammatic_number_iii.cc
+249_group_shifted_strings.cc
 251_flatten_2d_vector.cc
 252_meeting_rooms.cc
 253_meeting_rooms_ii.cc
 254_factor_combinations.cc
 256_paint_house.cc
 257_binary_tree_paths.cc
+258_add_digits.cc
 259_3sum_smaller.cc
 260_single_number_iii.cc
 263_ugly_number.cc
@@ -182,6 +190,7 @@
 266_palindrome_permutation.cc
 267_palindrome_permutation_ii.cc
 269_alien_dictionary.cc
+270_closest_binary_search_tree_value.cc
 272_closest_binary_search_tree_value_ii.cc
 276_paint_fence.cc
 278_first_bad_version.cc
@@ -192,10 +201,13 @@
 284_peeking_iterator.cc
 285_inorder_successor_in_bst.cc
 287_find_the_duplicate_number.cc
+290_word_pattern.cc
 291_word_pattern_ii.cc
 292_nim_game.cc
+293_flip_game.cc
 295_find_median_from_data_stream.cc
 296_best_meeting_point.cc
+299_bulls_and_cows.cc
 302_smallest_rectangle_enclosing_black_pixels.cc
 303_range_sum_query_immutable.cc
 304_range_sum_query_2d_immutable.cc

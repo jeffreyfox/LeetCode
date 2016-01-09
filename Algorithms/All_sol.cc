@@ -3185,6 +3185,126 @@ public:
 
 
 /**************************************************** 
+ ***    234,Easy,Palindrome Linked List 
+ ****************************************************/
+
+/*
+Given a singly linked list, determine if it is a palindrome.
+
+Follow up:
+Could you do it in O(n) time and O(1) space?
+*/
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+
+/// 4 steps:
+// 1. Find middle element
+// 2. reverse second half of array
+// 3. compare second half with first half
+// 4. recover the original linked list (reverse second part again and connect to first part)
+
+/// O(n) time, O(1) space
+
+class Solution {
+public:
+    bool isPalindrome(ListNode* head) {
+        if(!head || !head->next) return true;
+        ListNode *slow = head, *fast = head;
+        while(fast->next && fast->next->next) {
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+        ListNode *second = reverse(slow->next);
+        ListNode *p = head, *q = second;
+        bool result = true;
+        while(q) {
+            if(p->val != q->val) { result = false; break; }
+            p = p->next; q = q->next;
+        }
+        slow->next = reverse(second);
+        return result;
+    }
+    ListNode* reverse(ListNode *head) {
+        if(!head || !head->next) return head;
+        ListNode *p = head, *q = head->next;
+        p->next = NULL;
+        while(q) {
+            ListNode *tmp = q->next;
+            q->next = p;
+            p = q; q = tmp;
+        }
+        return p;
+    }
+};
+
+
+/**************************************************** 
+ ***    232,Easy,Implement Queue using Stacks 
+ ****************************************************/
+
+/*
+Implement the following operations of a queue using stacks.
+
+    push(x) -- Push element x to the back of queue.
+    pop() -- Removes the element from in front of queue.
+    peek() -- Get the front element.
+    empty() -- Return whether the queue is empty.
+
+Notes:
+
+    You must use only standard operations of a stack -- which means only push to top, peek/pop from top, size, and is empty operations are valid.
+    Depending on your language, stack may not be supported natively. You may simulate a stack by using a list or deque (double-ended queue), as long as you use only standard operations of a stack.
+    You may assume that all operations are valid (for example, no pop or peek operations will be called on an empty queue).
+
+*/
+
+/// Use two stacks
+/// Lazy push (into secondary stack), when pop/peek for the first time (primary stack s1 is empty), dump s2's elements into s1 in reverse order, then later pop/peek is O(1).
+
+class Queue {
+public:
+    // Push element x to the back of queue.
+    void push(int x) {
+        s2.push(x);
+    }
+
+    // Removes the element from in front of queue.
+    void pop(void) {
+        if(s1.empty()) {
+            while(!s2.empty()) {
+                s1.push(s2.top()); s2.pop();
+            }
+        }
+        s1.pop();
+    }
+
+    // Get the front element.
+    int peek(void) {
+        if(s1.empty()) {
+            while(!s2.empty()) {
+                s1.push(s2.top()); s2.pop();
+            }
+        }
+        return s1.top();
+    }
+
+    // Return whether the queue is empty.
+    bool empty(void) {
+        return s1.empty() && s2.empty();
+    }
+private:
+    stack<int> s1, s2;
+};
+
+
+/**************************************************** 
  ***    231,Easy,Power of Two 
  ****************************************************/
 
@@ -3312,6 +3432,128 @@ public:
 
 
 /**************************************************** 
+ ***    225,Easy,Implement Stack using Queues 
+ ****************************************************/
+
+/*
+Implement the following operations of a stack using queues.
+
+    push(x) -- Push element x onto stack.
+    pop() -- Removes the element on top of the stack.
+    top() -- Get the top element.
+    empty() -- Return whether the stack is empty.
+
+Notes:
+
+    You must use only standard operations of a queue -- which means only push to back, peek/pop from front, size, and is empty operations are valid.
+    Depending on your language, queue may not be supported natively. You may simulate a queue by using a list or deque (double-ended queue), as long as you use only standard operations of a queue.
+    You may assume that all operations are valid (for example, no pop or top operations will be called on an empty stack).
+*/
+
+// Solution 1. Use only one queue! Push O(n), others O(1). For push, the idea is to add the new element to end of queue, and then move front of queue to back of the new elemenet one by one.
+class Stack {
+public:
+    // Push element x onto stack.
+    void push(int x) {
+        int n = q.size();
+        q.push(x);
+        for(int i = 0; i < n; ++i) {
+            q.push(q.front());
+            q.pop();
+        }
+    }
+
+    // Removes the element on top of the stack.
+    void pop() {
+        q.pop();
+    }
+
+    // Get the top element.
+    int top() {
+        return q.front();
+    }
+
+    // Return whether the stack is empty.
+    bool empty() {
+        return q.empty();
+    }
+    queue<int> q;
+};
+
+// Solution 2. Use two queues. Push O(n), others O(1). The primary queue is ordered like a stack. The second queue serves like a loading area. When adding an element, first push to secondary queue, and then move elements from primary to secondary, and then swap primary and secondary.
+// primary: 3 2 1, secondary add 4
+// Migration: primary : empty, secondary 4 3 2 1
+// swap the two: primary: 4 3 2 1, secondary empty.
+
+class Stack {
+public:
+    // Push element x onto stack.
+    void push(int x) {
+        q2.push(x);
+        while(!q1.empty()) {
+            q2.push(q1.front());
+            q1.pop();
+        }
+        swap(q1, q2);
+    }
+
+    // Removes the element on top of the stack.
+    void pop() {
+        q1.pop();
+    }
+
+    // Get the top element.
+    int top() {
+        return q1.front();
+    }
+
+    // Return whether the stack is empty.
+    bool empty() {
+        return q1.empty();
+    }
+private:
+    queue<int> q1, q2;
+};
+
+// Solution 3. Push O(1), pop and top O(n).
+class Stack {
+public:
+    // Push element x onto stack.
+    void push(int x) {
+        q1.push(x);
+    }
+
+    // Removes the element on top of the stack.
+    void pop() {
+        while(!q1.empty()) {
+            int x = q1.front(); q1.pop();
+            if(!q1.empty()) q2.push(x);
+        }
+        swap(q1, q2);
+    }
+
+    // Get the top element.
+    int top() {
+        int x = 0;
+        while(!q1.empty()) {
+            x = q1.front(); q1.pop();
+            q2.push(x);
+        }
+        swap(q1, q2);
+        return x;
+    }
+
+    // Return whether the stack is empty.
+    bool empty() {
+        return q1.empty();
+    }
+private:
+    queue<int> q1, q2;
+};
+
+
+
+/**************************************************** 
  ***    223,Easy,Rectangle Area 
  ****************************************************/
 
@@ -3394,6 +3636,48 @@ public:
         return max_area;
     }
 };
+
+/**************************************************** 
+ ***    219,Easy,Contains Duplicate II 
+ ****************************************************/
+
+/*
+Given an array of integers and an integer k, find out whether there are two distinct indices i and j in the array such that nums[i] = nums[j] and the difference between i and j is at most k. 
+*/
+
+// Solution 1. use a set to store the already seen elements. Maintain a sliding window of side k+1, when seeing a new element, remove the one that falls out of the window from the set. O(k) space. 28ms.
+class Solution {
+public:
+    bool containsNearbyDuplicate(vector<int>& nums, int k) {
+        unordered_set<int> dict;
+        int n = nums.size();
+        for(int i = 0; i < n; ++i) {
+            if(i > k) dict.erase(nums[i-k-1]);
+            if(dict.count(nums[i])) return true;
+            dict.insert(nums[i]);
+        }
+        return false;
+    }
+};
+
+// Solution 2. Use a map to store the elements and its position. O(n) space. 32ms.
+
+class Solution {
+public:
+    bool containsNearbyDuplicate(vector<int>& nums, int k) {
+        unordered_map<int, int> dict;
+        int n = nums.size();
+        for (int i = 0; i < n; ++i) {
+            int v = nums[i];
+            unordered_map<int, int>::iterator it = dict.find(v);
+            if (it == dict.end()) dict[v] = i; //init last position
+            else if (i - it->second <= k) return true; //found!
+            else it->second = i; //update last position
+        }
+        return false;
+    }
+};
+
 
 /**************************************************** 
  ***    218,Hard,The Skyline Problem 
@@ -3539,6 +3823,44 @@ public:
             }
         }
         return ret;
+    }
+};
+
+/**************************************************** 
+ ***    217,Easy,Contains Duplicate 
+ ****************************************************/
+
+/*
+Given an array of integers, find if the array contains any duplicates. Your function should return true if any value appears at least twice in the array, and it should return false if every element is distinct. 
+*/
+
+// Solution 1. Use a set to store elements seen so far. O(n) space. O(n) time amortized.
+
+class Solution {
+public:
+    bool containsDuplicate(vector<int>& nums) {
+        unordered_set<int> dict;
+        int n = nums.size();
+        for(int i = 0; i < n; ++i) {
+            if(dict.count(nums[i])) return true;
+            dict.insert(nums[i]);
+        }
+        return false;
+    }
+};
+
+
+// Solution 2. Presort the array, then do a linear search. O(1) space, O(nlgn) time. 
+
+class Solution {
+public:
+    bool containsDuplicate(vector<int>& nums) {
+        sort(nums.begin(), nums.end());
+        int n = nums.size();
+        for(int i = 0; i < n-1; ++i) {
+            if(nums[i] == nums[i+1]) return true;
+        }
+        return false;
     }
 };
 
@@ -4316,6 +4638,56 @@ public:
 
 
 /**************************************************** 
+ ***    204,Easy,Count Primes 
+ ****************************************************/
+
+/*
+Description:
+
+Count the number of prime numbers less than a non-negative number, n.
+*/
+
+// Sieve of Eratosthenes
+
+// Solution 1. Not optimized solution.
+class Solution {
+public:
+    int countPrimes(int n) {
+        if(n < 2) return 0;
+        vector<bool> prime(n, true); //is prime: [0, n-1]
+        for(int i = 2; i*i < n; ++i) {
+            for(int j = i; i*j < n; ++j) {
+                prime[i*j] = false;
+            }
+        }
+        int count = 0;
+        for(int i = 2; i < n; ++i)  count += prime[i];
+        return count;
+    }
+};
+
+// Solution 2. Optimize solution.
+class Solution {
+public:
+    int countPrimes(int n) {
+        if(n < 2) return 0;
+        vector<bool> prime(n, true); //is prime: [0, n-1]
+        for(int i = 2; i*i < n; ++i) {
+            if(!prime[i]) continue; //don't need to visit non-prime numbers again!
+            for(int j = i*i; j < n; j += i) { // use j as index rather than i*j
+                prime[j] = false;
+            }
+        }
+        int count = 0;
+        for(int i = 2; i < n; ++i)
+            if(prime[i]) count ++;
+        return count;
+    }
+};
+
+
+
+/**************************************************** 
  ***    203,Easy,Remove Linked List Elements 
  ****************************************************/
 
@@ -4587,6 +4959,77 @@ public:
         return count;
     }
 };
+
+/**************************************************** 
+ ***    190,Easy,Reverse Bits 
+ ****************************************************/
+
+/*
+Reverse bits of a given 32 bits unsigned integer.
+
+For example, given input 43261596 (represented in binary as 00000010100101000001111010011100), return 964176192 (represented in binary as 00111001011110000010100101000000).
+
+Follow up:
+If this function is called many times, how would you optimize it?
+
+Related problem: Reverse Integer
+*/
+
+// Solution 1. Similar to reverse integer. Get last digit and shift the original number to right, and new number left:
+// 123, 0 => 3, 12 => 32, 1 => 321, 0
+// Optimization: when the original number is zero, stop the for loop and shift the number by the proper amount.
+
+class Solution {
+public:
+    uint32_t reverseBits(uint32_t n) {
+        if(n == 0) return 0;
+        uint32_t m = 0;
+        for(int i = 0; i < 32; ++i) {
+            m = (m << 1) | (n & 1);
+            n >>= 1;
+            if(n == 0) return m << (31-i);
+        }
+        return m;
+    }
+};
+
+// Solution 2 using exclusive or.
+
+class Solution {
+public:
+    uint32_t reverseBits(uint32_t n) {
+        uint32_t lo = 0x00000001, hi = 0x80000000, XOR = 0;
+        uint32_t d = 31;//distance between two bits to be swapped
+        while(lo < hi) { //swap two bits
+            //XOR has value only at the two bits, other bits are 0
+            XOR = (((n & lo ) << d) ^ (n & hi)) | (((n & hi ) >> d) ^ (n & lo));
+            n = n ^ XOR; //only two bits are affected, as A ^ 0 = A
+            lo = lo << 1;
+            hi = hi >> 1;
+            d -= 2;
+        }
+        return n;
+    }
+};
+
+// Solution 3. Swap in groups.
+// For 8 bit number, need 3 passes. For 32 bit, 5 passes.
+// [1 2 3 4]-[5 6 7 8] => 5 6 7 8 1 2 3 4
+// [5 6]-[7 8] [1 2]-[3 4] => 7 8 5 6 3 4 1 2
+// [7]-[8] [5]-[6] [3]-[4] [1]-[2] => 8 7 6 5 4 3 2 1
+
+class Solution {
+public:
+    uint32_t reverseBits(uint32_t n) {
+        n = ((n & 0xFFFF0000) >> 16) | ((n & 0x0000FFFF) << 16);
+        n = ((n & 0xFF00FF00) >>  8) | ((n & 0x00FF00FF) <<  8);
+        n = ((n & 0xF0F0F0F0) >>  4) | ((n & 0x0F0F0F0F) <<  4);
+        n = ((n & 0xCCCCCCCC) >>  2) | ((n & 0x33333333) <<  2);
+        n = ((n & 0xAAAAAAAA) >>  1) | ((n & 0x55555555) <<  1);
+        return n;
+    }
+};
+
 
 /**************************************************** 
  ***    188,Hard,Best Time to Buy and Sell Stock IV 
@@ -4929,6 +5372,40 @@ private:
     deque<TreeNode*> s; //stack
 };
 
+
+/**************************************************** 
+ ***    172,Easy,Factorial Trailing Zeroes 
+ ****************************************************/
+
+/*
+Given an integer n, return the number of trailing zeroes in n!.
+
+Note: Your solution should be in logarithmic time complexity.
+*/
+
+// Check how many factors (2 or 5) are contained from 1 to n.
+// e.g. n = 100, f = 5
+// 5 appears 20 times as 1x5, 2x5 ... 20x5. 
+// Then another 4 times from 1 to 20 (when we divide n by 5): 1x5, 2x5, 3x5, 4x5
+// Then zero times from 1 to 4(when we divide n by 5).
+
+// Number of trailing zeroes is the minimum of counts of 2s and 5s.
+class Solution {
+public:
+    int trailingZeroes(int n) {
+        if(n <= 1) return 0;
+        return min(numFact(n, 2), numFact(n, 5));
+    }
+    //how many factors k do numbers 1 .. n have in total?
+    int numFact(int n, int k) {
+        int count = 0;
+        while(n) {
+            n /= k;
+            count += n;
+        }
+        return count;
+    }
+};
 
 /**************************************************** 
  ***    171,Easy,Excel Sheet Column Number 
@@ -5796,6 +6273,325 @@ public:
 
 
 /**************************************************** 
+ ***    148,Medium,Sort List 
+ ****************************************************/
+
+/*
+Sort a linked list in O(n log n) time using constant space complexity.
+*/
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+
+// bottom-up merge sort, using a queue
+// Sort is unstable if number of nodes are not power of 2!
+
+class Solution {
+public:
+    ListNode* sortList(ListNode* head) {
+        if(!head || !head->next) return head;
+        deque<ListNode*> q;
+        ListNode *p = head;
+        //push nodes into queue, also set next to NULL (break into many single-node lists)
+        while(p) {
+            q.push_back(p);
+            ListNode *next = p->next;
+            p->next = NULL;
+            p = next;
+        }
+        ListNode dum(0);
+        p = &dum; //dummy node
+        while(!q.empty()) {
+            ListNode* n1 = q.front(); q.pop_front();
+            if(q.empty()) return n1;
+            ListNode *n2 = q.front(); q.pop_front();
+            q.push_back(merge(n1, n2));
+        }
+        return NULL; //something wrong
+    }
+    //merge two sorted, non-empty lists
+    ListNode* merge(ListNode *head1, ListNode *head2) {
+        ListNode dum(0), *p(&dum), *tail(p);
+        while(head1 && head2) {
+            if(head1->val <= head2->val) {
+                tail->next = head1;
+                head1 = head1->next;
+            } else {
+                tail->next = head2;
+                head2 = head2->next;
+            }
+            tail = tail->next;
+        }
+        tail->next = head1 ? head1 : head2;
+        return p->next;
+    }
+};
+/*
+Sort a linked list in O(n log n) time using constant space complexity.
+*/
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+
+// Solution 1. Top-down merge sort (not really constant space, because of stack space)
+// when finding the middle element, fast is initialized as head->next, not head, to avoid infinite loop in corner cases (only two nodes).
+
+class Solution {
+public:
+    ListNode* sortList(ListNode* head) {
+        if(!head || !head->next) return head;
+        ListNode* p = head, *q = head;
+        while(q->next && q->next->next) {
+            p = p->next;
+            q = q->next->next;
+        }
+        //merge head and p->next
+        q = p->next;
+        p->next = NULL;
+        head = sortList(head);
+        q = sortList(q);
+        return merge(head, q);
+    }
+
+    ListNode *merge(ListNode* left, ListNode *right) {
+        ListNode* dummy = new ListNode(0);
+        ListNode *p = left, *q = right, *tail = dummy;
+        while(p && q) {
+            if(p->val <= q->val) {
+                tail->next = p; p = p->next;
+            } else {
+                tail->next = q; q = q->next;
+            }
+            tail = tail->next;
+        }
+        tail->next = p ? p : q;
+
+        p = dummy->next;
+        delete dummy;
+        return p;
+    }
+};
+
+// Solution 2. Bottom-up merge sort with O(1) space, by using an elegant split function.
+// Maintain the length of sub lists to be sorted, starting form 1, and then 2, 4 ...
+// Split(head, len), cuts break the list at position len, and returns the head of the second part, e.g.
+// head = 1 -> 2 -> 3 -> 4, len = 2, then after second = split(head, 2), we have head = 1->2,  second = 3->4.
+// Merge merges to linked lists and attach them to the head, and then returns the tail of the merged list.
+
+class Solution {
+public:
+    ListNode* sortList(ListNode* head) {
+        if(!head || !head->next) return head;
+        ListNode* dummy = new ListNode(0);
+        dummy->next = head;
+        int count = 0;
+        ListNode *p = dummy->next;
+        while(p) {
+            count++;
+            p = p->next;
+        }
+        for(int len = 1; len < count; len *= 2) { //len: merge length
+            ListNode *tail = dummy, *left = dummy->next;
+            while(left) {
+                ListNode *right = split(left, len);
+                ListNode *next = split(right, len);
+                tail = merge(left, right, tail);
+                left = next;
+            }
+        }
+        head = dummy->next;
+        delete dummy;
+        return head;
+    }
+
+    ListNode* split(ListNode *head, int len) {
+        while(head && len > 1) {
+           head = head->next; len--;
+        }
+        if(!head) return NULL;
+        ListNode *second = head->next;
+        head->next = NULL;
+        return second;
+    }
+    //merge two lists and attach to head (head serves similar to the dummy head), and return the tail of the merged list
+    ListNode *merge(ListNode* left, ListNode *right, ListNode *head) {
+        ListNode *p = left, *q = right, *tail = head;
+        while(p && q) {
+            if(p->val < q->val) {
+                tail->next = p; p = p->next;
+            } else {
+                tail->next = q; q = q->next;
+            }
+            tail = tail->next;
+        }
+        tail->next = p ? p : q;
+        while(tail->next) tail = tail->next;
+        return tail;
+    }
+};
+
+// Solution 3. 3-way quick-sort, with the first element as the pivot. Maintain three sub lists, one < x, one == x, one > x. Then attach them ogether in the end. Not really O(1) space, due to recursive calls.
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* sortList(ListNode* head) {
+        if(!head || !head->next) return head;
+        return sortList(head, NULL);
+    }
+    //sort list and connect it to next, return new head
+    ListNode* sortList(ListNode *head, ListNode *next) {
+        ListNode* dummy = new ListNode(0);
+        //use head as pivot. p : <x, q : >x, r : =x
+        ListNode *phead = NULL, *qhead = NULL, *rhead = NULL;
+        ListNode *p = NULL, *q = NULL, *r = head;
+        ListNode *curr = head->next;
+        while(curr) {
+            if(curr->val < head->val) {
+                if(!p) p = phead = curr;
+                else p = p->next = curr;
+            } else if(curr->val > head->val) {
+                if(!q) q = qhead = curr;
+                else q = q->next = curr;
+            } else {
+                r = r->next = curr;
+            }
+            curr = curr->next;
+        }
+        //work on first part (<x)
+        if(phead) {
+            p->next = NULL; //p is tail
+            dummy->next = sortList(phead, head);
+        } else dummy->next = head;
+        //work on second part (>x)
+        if(qhead) {
+            q->next = NULL; //q is tail
+            r->next = sortList(qhead, next);
+        } else r->next = next;
+        head = dummy->next;
+        delete dummy;
+        return head;
+    }
+};
+
+// Solution 4. Bottom-up merge sort, using a queue. O(n) space!
+// Sort is unstable if number of nodes are not power of 2!
+
+class Solution {
+public:
+    ListNode* sortList(ListNode* head) {
+        if(!head || !head->next) return head;
+        deque<ListNode*> q;
+        ListNode *p = head;
+        //push nodes into queue, also set next to NULL (break into many single-node lists)
+        while(p) {
+            q.push_back(p);
+            ListNode *next = p->next;
+            p->next = NULL;
+            p = next;
+        }
+        ListNode dum(0);
+        p = &dum; //dummy node
+        while(!q.empty()) {
+            ListNode* n1 = q.front(); q.pop_front();
+            if(q.empty()) return n1;
+            ListNode *n2 = q.front(); q.pop_front();
+            q.push_back(merge(n1, n2));
+        }
+        return NULL; //something wrong
+    }
+    //merge two sorted, non-empty lists
+    ListNode* merge(ListNode *head1, ListNode *head2) {
+        ListNode dum(0), *p(&dum), *tail(p);
+        while(head1 && head2) {
+            if(head1->val <= head2->val) {
+                tail->next = head1;
+                head1 = head1->next;
+            } else {
+                tail->next = head2;
+                head2 = head2->next;
+            }
+            tail = tail->next;
+        }
+        tail->next = head1 ? head1 : head2;
+        return p->next;
+    }
+};
+
+
+/**************************************************** 
+ ***    147,Medium,Insertion Sort List 
+ ****************************************************/
+
+/*
+Sort a linked list using insertion sort.
+*/
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+
+/// Start from head, track the tail of already sorted list
+/// If the element to be added is larger than the tail of sorted list, simply append it to the tail and move on (makes the code more efficient, 92ms => 28ms reduction!)
+/// Otherwise scan from head of list and find the position to insert
+/// Remember to set the next pointer of list's tail to NULL in the beginning.
+
+class Solution {
+public:
+    ListNode* insertionSortList(ListNode* head) {
+        if(!head || !head->next) return head;
+        ListNode* dummy = new ListNode(0);
+        dummy->next = head;
+
+        ListNode *tail = head, *q = head->next;
+        tail->next = NULL; //set tail's next to NULL
+        while(q) {
+            ListNode *next = q->next;
+            //insert q to list from dummy to tail
+            if(q->val >= tail->val) {
+                tail = tail->next = q;  //update tail!
+		q->next = NULL;
+            } else { //search insert position from beginning
+                ListNode *curr = dummy->next, *prev = dummy;
+                while(curr && curr->val <= q->val) {
+                    prev = curr; curr = curr->next;
+                }
+                prev->next = q; q->next = curr; //insert to list
+            }
+            q = next; //move forward
+        }
+
+        head = dummy->next;
+        delete dummy;
+        return head;
+    }
+};
+
+/**************************************************** 
  ***    146,Hard,LRU Cache 
  ****************************************************/
 
@@ -6090,6 +6886,74 @@ public:
         return ret;
     }
 };
+
+/**************************************************** 
+ ***    143,Medium,Reorder List 
+ ****************************************************/
+
+/*
+Given a singly linked list L: L0->L1->...->Ln-1->Ln,
+reorder it to: L0->Ln->L1->Ln-1->L2->Ln-2->...
+
+You must do this in-place without altering the nodes' values.
+
+For example,
+Given {1,2,3,4}, reorder it to {1,4,2,3}. 
+*/
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+
+// 1. Traverse list using a slow and a fast pointer, find the middle element
+// 2. Reverse the second half of list and return its head
+// 3. start from head of first half, insert elements of second half one-by-one to first half.
+// 4. set the next pointer of combined graph's tail as NULL
+
+class Solution {
+public:
+    void reorderList(ListNode* head) {
+        if(!head || !head->next || !head->next->next) return;
+        ListNode* slow = head, *fast = head;
+        while(fast->next && fast->next->next) {
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+        ListNode *p = head;
+        ListNode *q = reverse(slow->next);
+        slow->next = NULL;
+        merge(p, q);
+    }
+
+    ListNode* reverse(ListNode *head) {
+        if(!head || !head->next) return head;
+        ListNode *p = head, *q = p->next;
+        //p is head of new list
+        while(q) {
+            ListNode *tmp = q->next;
+            q->next = p;
+            p = q; q = tmp; //move forward
+        }
+        head->next = NULL;
+        return p;
+    }
+
+    void merge(ListNode* p, ListNode *q) {
+        ListNode *r = p;
+        while(q) {
+            ListNode *tmp = q->next;
+            q->next = r->next;
+            r->next = q;
+            r = q->next; q = tmp; //move forward
+        }
+    }
+};
+
 
 /**************************************************** 
  ***    140,Hard,Word Break II 
@@ -7339,6 +8203,80 @@ public:
         path.pop_back();
     }
 };
+
+/**************************************************** 
+ ***    125,Easy,Valid Palindrome 
+ ****************************************************/
+
+/*
+Given a string, determine if it is a palindrome, considering only alphanumeric characters and ignoring cases.
+
+For example,
+"A man, a plan, a canal: Panama" is a palindrome.
+"race a car" is not a palindrome.
+
+Note:
+Have you consider that the string might be empty? This is a good question to ask during an interview.
+
+For the purpose of this problem, we define empty string as valid palindrome. 
+*/
+
+// Solution 1. Two pointers, O(n).
+// ignore cases, so use toLower to convert to lower case
+// isAlphaNumeric checks whether character is alpha-numeric
+
+class Solution {
+public:
+    bool isPalindrome(string s) {
+        if(s.empty()) return true;
+        int n = s.size();
+        int i(0), j(n-1);
+        while (i < j) {
+            if (!isAlphaNumeric(s[i])) i++;
+            else if (!isAlphaNumeric(s[j])) j--;
+            else if(toLower(s[i]) != toLower(s[j])) return false;
+            else {i++; j--; } //equal, move on
+        }
+        return true;
+    }
+    bool isAlphaNumeric(char c) {
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9');
+    }
+    char toLower(char c) {
+        if(c >= 'A' && c <= 'Z') return c-'A'+'a';
+        else return c;
+    }
+};
+
+// Solution 2. Use another while loop inside, similar to quick-sort implementation.
+// Note the ++i in isAphaNumeric, not i++
+// If put two sentinels at front and end (s = 'a' + s + 'a';), then can save the boundary checks in the two inner while loop.
+
+class Solution {
+public:
+    bool isPalindrome(string s) {
+        if(s.empty()) return true;
+        int n = s.size();
+        int i(-1), j(n);
+        while (i < j) {
+            while (!isAlphaNumeric(s[++i])) if (i == j) return true;
+            while (!isAlphaNumeric(s[--j])) if (j == i) return true;
+            
+            // i and j point to first meaningful characeter
+            if (!isSame(s[i], s[j])) return false;
+        }
+        return true;
+    }
+    bool isAlphaNumeric(char c) {
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9');
+    }
+    bool isSame(char c1, char c2) {
+        if (c1 == c2) return true;
+        if (c1 >= 'A' && c1 <= 'Z') return c2 == c1 + 32;
+        if (c1 >= 'a' && c1 <= 'z') return c2 == c1 - 32;
+    }
+};
+
 
 /**************************************************** 
  ***    124,Hard,Binary Tree Maximum Path Sum 
@@ -13432,6 +14370,72 @@ public:
     }
 };
 
+
+/**************************************************** 
+ ***    029,Medium,Divide Two Integers 
+ ****************************************************/
+
+/*
+Divide two integers without using multiplication, division and mod operator.
+
+If it is overflow, return MAX_INT. 
+*/
+
+// Solution 1. Subtract and bit-wise shift (*2).
+// Need to consider overflow cases.
+class Solution {
+public:
+    int divide(int dividend, int divisor) {
+        if(divisor == 0) return INT_MAX;
+        if(dividend == 0) return 0;
+        if(dividend == INT_MIN) {
+            if(divisor == -1) return INT_MAX;
+            else if(divisor == 1) return INT_MIN;
+        }
+        long a = dividend, b = divisor;
+        bool neg = (a > 0) ^ (b > 0);
+        a = abs(a); b = abs(b);
+        int result = 0;
+        while(a >= b) {
+            long x = b, y = 1;
+            while(a >= (x << 1)) {
+              x <<= 1; y <<= 1;
+            }
+            a -= x;
+            result += y;
+        }
+        //result <= INT_MAX
+        if(neg) result = -result;
+        return result;
+    }
+};
+
+// Solution 2. Similar one.
+class Solution {
+public:
+    int divide(int dividend, int divisor) {
+        long a = dividend, b = divisor;
+        a = abs(a); b = abs(b);
+        bool negative = (dividend < 0) ^ (divisor < 0);
+        // a/b
+        long x(b), n(1), ret(0);
+        while (x <= a) {
+            x <<= 1; n <<= 1;
+        }
+        //x = n*b and > a
+        while (a > 0) {
+            while(n > 0 && x > a) { x >>=1; n>>=1; }
+            // x <= a or n == 1
+            if (n == 0)  break;
+            else {
+                ret += n;
+                a -= x;
+            }
+        }
+        if(negative) return (ret <= long(INT_MAX)+1) ? -ret : INT_MAX;
+        else return ret <= INT_MAX ? ret : INT_MAX;
+    }
+};
 
 /**************************************************** 
  ***    028,Easy,Implement strStr() 
