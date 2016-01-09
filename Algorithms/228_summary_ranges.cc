@@ -1,3 +1,9 @@
+/*
+Given a sorted integer array without duplicates, return the summary of its ranges.
+
+For example, given [0,1,2,4,5,7], return ["0->2","4->5","7"]. 
+*/
+
 // two pointers
 // be careful of overflow when converting from number to string (use unsigned int to store absolute value of an int is ok)
 
@@ -19,8 +25,8 @@ public:
         return ret;
     }
     string num2str(int n) {
-        int sign = (n >= 0) ? 1 : -1;
         if (n == 0) return "0";
+        int sign = (n > 0) ? 1 : -1;
         unsigned u = abs(n);
         string s;
         while (u) {
@@ -29,6 +35,42 @@ public:
             u = u / 10;
         }
         if (sign < 0) s = '-' + s;
+        return s;
+    }
+};
+
+//Another solution using one while loop.
+class Solution {
+public:
+    vector<string> summaryRanges(vector<int>& nums) {
+        vector<string> result;
+        if(nums.empty()) return result;
+        int l = nums[0];
+        int i = 0, n = nums.size();
+        while(i < n) {
+            if(i+1 == n || nums[i+1] > nums[i]+1)  { // nums[i] is the boundary
+                result.push_back(getRange(l, nums[i]));
+                if(i+1 < n) l = nums[i+1];
+            }
+            i++;
+        }
+        return result;
+    }
+
+    string getRange(int l, int r) {
+        if(l == r) return num2str(l);
+        else return num2str(l) + "->" + num2str(r);
+    }
+    string num2str(long n) {
+        if(n == 0) return "0";
+        bool neg = (n < 0);
+        n = abs(n);
+        string s;
+        while(n) {
+            s = char(n % 10 + '0') + s;
+            n /= 10;
+        }
+        if(neg) s = "-" + s;
         return s;
     }
 };

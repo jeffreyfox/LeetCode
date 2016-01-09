@@ -1,26 +1,38 @@
+/*
+The string "PAYPALISHIRING" is written in a zigzag pattern on a given number of rows like this: (you may want to display this pattern in a fixed font for better legibility)
+
+P   A   H   N
+A P L S I I G
+Y   I   R
+
+And then read line by line: "PAHNAPLSIIGYIR"
+
+Write the code that will take a string and make this conversion given a number of rows:
+
+string convert(string text, int nRows);
+
+convert("PAYPALISHIRING", 3) should return "PAHNAPLSIIGYIR". 
+*/
+
 // period is 2*numRows-2
 // when numRows = 1, the resulting string is the same as original one.
 class Solution {
 public:
     string convert(string s, int numRows) {
         if(numRows == 1) return s;
-        int n = s.size();
-        int T = numRows + numRows - 2; //period
-        string str(n, '0');
-        int k = 0;
-        // line 1
-        for (int i = 0; i < n; i += T)  str[k++] = s[i];
-        // line 2 to line numRows-1
-        for (int j = 1; j < numRows-1; ++j) { //j is offset
-            for (int i = j; i < n; i += T) {
-                str[k++] = s[i];
-                int u = i+T-2*j;
-                if (u < n) str[k++] = s[u]; //need to check if u is within bound!
+        string result = s;
+        int p= 2*numRows-2;
+        int k = 0, n = s.size();
+        for(int ir = 0; ir < numRows; ++ir) {
+            for(int j = ir; j < n; j += p) {
+                result[k++] = s[j];
+                if(ir > 0 && ir < numRows-1) { //not first or last row
+                    int idx = j+p-2*ir;
+                    if(idx < n) result[k++] = s[idx]; //need to check if idx < n!
+                }
             }
         }
-        //line numRows
-        for (int i = numRows-1; i < n; i += T) str[k++] = s[i];
-        return str;
+        return result;
     }
-
 };
+

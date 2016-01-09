@@ -12,23 +12,23 @@
 class MinStack {
 public:
     void push(int x) {
-        s.push_back(x);
-        if(ms.empty() || x <= ms.back()) ms.push_back(x);
+        s.push(x);
+        if(ms.empty() || x <= ms.top()) ms.push(x);
     }
 
     void pop() {
-        if(s.back() == ms.back()) ms.pop_back();
-        s.pop_back();
+        int x = s.top(); s.pop();
+        if(x <= ms.top()) ms.pop();
     }
 
     int top() {
-        return s.back();
+        return s.top();
     }
 
     int getMin() {
-        return ms.back();
+        return ms.top();
     }
 private:
-    deque<int> s; //normal stack
-    deque<int> ms; //stack for minimum elements at the time
+    stack<int> s, ms;
 };
+
