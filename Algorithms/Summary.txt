@@ -58,6 +58,7 @@
 068_text_justification.cc
 070_climbing_stairs.cc
 072_edit_distance.cc
+074_search_a_2d_matrix.cc
 076_minimum_window_substring.cc
 077_combinations.cc
 078_subsets.cc
@@ -173,12 +174,14 @@
 237_delete_node_in_linked_list.cc
 238_product_of_array_except_self.cc
 239_sliding_window_maximum.cc
+240_search_a_2d_matrix_ii.cc
 241_different_ways_to_add_parentheses.cc
 242_valid_anagram.cc
 246_strobogrammatic_number.cc
 247_strobogrammatic_number_ii.cc
 248_strobogrammatic_number_iii.cc
 249_group_shifted_strings.cc
+250_count_univalue_subtrees.cc
 251_flatten_2d_vector.cc
 252_meeting_rooms.cc
 253_meeting_rooms_ii.cc
@@ -198,7 +201,9 @@
 270_closest_binary_search_tree_value.cc
 272_closest_binary_search_tree_value_ii.cc
 276_paint_fence.cc
+277_find_the_celebrity.cc
 278_first_bad_version.cc
+279_perfect_squares.cc
 280_wiggle_sort.cc
 281_zigzag_iterator.cc
 282_expression_add_operators.cc
