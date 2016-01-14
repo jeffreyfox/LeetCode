@@ -456,6 +456,38 @@ public:
 };
 
 /**************************************************** 
+ ***    268,Medium,Missing Number 
+ ****************************************************/
+
+/*
+ Given an array containing n distinct numbers taken from 0, 1, 2, ..., n, find the one that is missing from the array.
+
+For example,
+Given nums = [0, 1, 3] return 2.
+
+Note:
+Your algorithm should run in linear runtime complexity. Could you implement it using only constant extra space complexity? 
+*/
+
+// solution by swapping. Since numbers are distinct, don't need to worry about infinite while loops due to duplicate entries.
+
+class Solution {
+public:
+    int missingNumber(vector<int>& nums) {
+        int n = nums.size();
+        for(int i = 0; i < n; ++i) {
+            while(nums[i] != i && nums[i] != n) {
+                swap(nums[i], nums[nums[i]]);
+            }
+        }
+        for(int i = 0; i < n; ++i)
+            if(nums[i] != i) return i;
+        return n;
+    }
+};
+
+
+/**************************************************** 
  ***    267,Medium,Palindrome Permutation II 
  ****************************************************/
 
@@ -1517,6 +1549,73 @@ public:
 
 
 /**************************************************** 
+ ***    213,Medium,House Robber II 
+ ****************************************************/
+
+/*
+Note: This is an extension of House Robber.
+
+After robbing those houses on that street, the thief has found himself a new place for his thievery so that he will not get too much attention. This time, all houses at this place are arranged in a circle. That means the first house is the neighbor of the last one. Meanwhile, the security system for these houses remain the same as for those in the previous street.
+
+Given a list of non-negative integers representing the amount of money of each house, determine the maximum amount of money you can rob tonight without alerting the police.
+*/
+
+// One pass DP solution. Use two variables, one meaning maximum including first house, second meaning maximum excluding first house.
+// Special treatment for the last house.
+
+class Solution {
+public:
+    int rob(vector<int>& nums) {
+        if(nums.empty()) return 0;
+        int n = nums.size();
+        if(n == 1) return nums[0];
+        if(n == 2) return max(nums[0], nums[1]);
+        //dp1: maximum including first house, dp2: maximum excluding first house
+        vector<int> dp1(n, 0), dp2(n, 0);
+        dp1[0] = nums[0]; dp1[1] = nums[0];
+        dp2[0] = 0; dp2[1] = nums[1];
+        for (int i = 2; i < n-1; ++i) {
+            dp1[i] = max(dp1[i-2] + nums[i], dp1[i-1]); 
+            dp2[i] = max(dp2[i-2] + nums[i], dp2[i-1]); 
+        }
+        //last one
+        dp1[n-1] = dp1[n-2];
+        dp2[n-1] = max(dp2[n-3] + nums[n-1], dp2[n-2]); 
+        return max(dp1[n-1], dp2[n-1]);
+    }
+};
+
+/// Two pass DP solution. Each pass calls original rob, once excluding nums[0] and once excluding nums[n-1]. Compare the two and return the maximum
+/// robLin is the original rob function on a linear street.
+
+class Solution {
+public:
+    int rob(vector<int>& nums) {
+        int n = nums.size();
+        if(n == 0) return 0;
+        if(n == 1) return nums[0];
+        if(n == 2) return max(nums[0], nums[1]);
+        return max(robLin(nums.begin(), nums.end()-1), robLin(nums.begin()+1, nums.end()));
+    }
+    int robLin(vector<int>::const_iterator beg, vector<int>::const_iterator end) {
+        int n = end - beg;
+        if(n == 0) return 0;
+        if(n == 1) return *beg;
+        if(n == 2) return max(*beg, *(beg+1));
+        int last = max(*beg, *(beg+1));
+        int lastlast = *beg;
+        int curr = 0;
+        for(vector<int>::const_iterator it = beg+2; it != end; it++) {
+            curr = max(lastlast + *it, last);
+            lastlast = last;
+            last = curr;
+        }
+        return curr;
+    }
+};
+
+
+/**************************************************** 
  ***    209,Medium,Minimum Size Subarray Sum 
  ****************************************************/
 
@@ -1895,6 +1994,118 @@ public:
 
 
 /**************************************************** 
+ ***    187,Medium,Repeated DNA Sequences 
+ ****************************************************/
+
+/// Similar approach to solution 1, except we use 2-digit code for each character, thus resulting in 20-bit hash code for 
+/// the substring, represented by an integer (32 bits). 
+/// Use a function to return the hash code for the 4 characters, we only requires 2 bits
+/// First calculate the hash code for the first 9 digit, when we add a new digit, we multiply by 4 (radix-4 hash code), or
+/// equivalently, << 2. How to strip off the highest character when moving to next? Notice that we only have 20 bits, and 
+/// we simply turn off the highest 12 bits, so we mask with Ox000FFFFF.
+
+class Solution {
+public:
+    vector<string> findRepeatedDnaSequences(string s) {
+        vector<string> ret;
+        int n = s.size();
+        if(n < 10) return ret;
+        map<int, int> count;
+        int hash = 0;
+        for(int i = 0; i < 9; ++i) {
+            int v = char2num(s[i]);
+            hash = (hash << 2) | v;
+        }
+        for(int i = 9; i < n; ++i) {
+            int v = char2num(s[i]);
+            hash = (hash << 2) & 0x000FFFFF | v;
+            count[hash]++;
+            if(count[hash] == 2) ret.push_back(s.substr(i-9, 10));
+        }
+        return ret;
+    }
+    
+    int char2num(char c) {
+        if      (c == 'A') return 0;
+        else if (c == 'C') return 1;
+        else if (c == 'G') return 2;
+        else               return 3;
+    }
+};
+/*
+All DNA is composed of a series of nucleotides abbreviated as A, C, G, and T, for example: "ACGAATTCCG". When studying DNA, it is sometimes useful to identify repeated sequences within the DNA.
+
+Write a function to find all the 10-letter-long sequences (substrings) that occur more than once in a DNA molecule.
+
+For example,
+
+Given s = "AAAAACCCCCAAAAACCCCCCAAAAAGGGTTT",
+
+Return:
+["AAAAACCCCC", "CCCCCAAAAA"].
+*/
+
+/// Use a hash code for the length-10 substring. 3 digit code for each character, so that a total of 30 digits, 
+/// which can be represented by an integer (32 bits). 
+/// Only 4 characters occuring, 'A', 'C', 'G', 'T' has different last three digits, thus use last three digits (c & 0b111)
+/// First calculate the hash code for the first 9 digit, when we add a new digit, we multiply by 8 (radix-8 hash code), or
+/// equivalently, << 3. How to strip off the highest character when moving to next? Notice that we only have 30 bits, and 
+/// we simply turn off the highest 2 bits, so that we mask with Ox3FFFFFFF.
+
+class Solution {
+public:
+    vector<string> findRepeatedDnaSequences(string s) {
+        vector<string> ret;
+        int n = s.size();
+        if(n < 10) return ret;
+        map<int, int> count;
+        int hash = 0;
+        for(int i = 0; i < 9; ++i) {
+            hash = (hash << 3) | (s[i] & 7);
+        }
+        for(int i = 9; i < n; ++i) {
+            hash = ((hash << 3) & 0x3FFFFFFF) | (s[i] & 7);
+            count[hash]++;
+            if(count[hash] == 2) ret.push_back(s.substr(i-9, 10));
+        }
+        return ret;
+    }
+};
+
+/// Similar approach to solution 1, except we use 2-digit code for each character, thus resulting in 20-bit hash code for 
+/// the substring, represented by an integer (32 bits). 
+/// Use a function to return the hash code for the 4 characters, we only requires 2 bits. We can use a trick to return the hash value:
+/// hash = (s[i] - 'A' + 1) % 5. This way, ACGT returns 1 3 2 0 respectively.
+
+/// First calculate the hash code for the first 9 digit, when we add a new digit, we multiply by 4 (radix-4 hash code), or
+/// equivalently, << 2. How to strip off the highest character when moving to next? Notice that we only have 20 bits, and 
+/// we simply turn off the highest 12 bits, so we mask with Ox000FFFFF.
+
+// Another optimization is to use an array to store the hash table (can use char if counts are less than 256 to save space). Note that using vector<int> increases runtime from 20 ms to 100 ms. But using vector<char> is only 12 ms.
+
+class Solution {
+public:
+    vector<string> findRepeatedDnaSequences(string s) {
+        vector<string> result;
+        char dict[1048576] = {0}; //hash => counts (assume counts < 256).
+        int n = s.size();
+        const int LEN = 10;
+        if(n <= LEN) return result;
+        int hashval = 0;
+        for(int i = 0; i < LEN-1; ++i) {
+            hashval = (hashval << 2) | (s[i] - 'A' + 1) % 5;
+        }
+        for(int i = LEN-1; i < n; ++i) {
+            //remove two leading bits, and shift to right by two and add next hash value
+            hashval = ((hashval << 2) & 0x000FFFFF) | (s[i] - 'A' + 1) % 5;
+            if(dict[hashval]++ == 1) result.push_back(s.substr(i-LEN+1, LEN));
+        }
+        return result;
+    }
+};
+
+
+/**************************************************** 
  ***    186,Medium,Reverse Words in a String II 
  ****************************************************/
 
@@ -2092,6 +2303,65 @@ public:
       return ret;
     }
 };
+
+/**************************************************** 
+ ***    162,Medium,Find Peak Element 
+ ****************************************************/
+
+/*
+A peak element is an element that is greater than its neighbors.
+
+Given an input array where num[i] ≠ num[i+1], find a peak element and return its index.
+
+The array may contain multiple peaks, in that case return the index to any one of the peaks is fine.
+
+You may imagine that num[-1] = num[n] = -∞.
+
+For example, in array [1, 2, 3, 1], 3 is a peak element and your function should return the index number 2.
+
+click to show spoilers.
+Note:
+
+Your solution should be in logarithmic complexity.
+*/
+
+// Solution 1. Simple binary search. compare mid with mid+1. break when lo == hi.
+
+class Solution {
+public:
+    int findPeakElement(vector<int>& nums) {
+        int n = nums.size();
+        int lo = 0, hi = n-1;
+        while(lo < hi) {
+            int mid = lo + (hi - lo) / 2;
+            if(nums[mid] < nums[mid+1]) lo = mid+1;
+            else hi = mid;
+        }
+        return lo;
+    }
+};
+
+// Solution 2. Variant of solution 1. Slightly more complicated. Need to compare mid with mid-1 and mid+1.
+
+class Solution {
+public:
+    int findPeakElement(vector<int>& nums) {
+        if(nums.empty()) return -1;
+        int n = nums.size();
+        if(n == 1) return 0;
+        if(nums[0] > nums[1]) return 0;
+        if(nums[n-1] > nums[n-2]) return n-1;
+        int lo = 1, hi = n-2;
+        while(lo < hi) {
+            int mid = lo + (hi-lo)/2;
+            if(nums[mid] > nums[mid-1] && nums[mid] > nums[mid+1]) return mid;
+            else if(nums[mid] < nums[mid-1]) hi = mid-1;
+            else lo = mid+1;
+        }
+        return lo;
+    }
+};
+
 
 /**************************************************** 
  ***    161,Medium,One Edit Distance 
@@ -2361,62 +2631,6 @@ public:
  ***    148,Medium,Sort List 
  ****************************************************/
 
-/*
-Sort a linked list in O(n log n) time using constant space complexity.
-*/
-
-/**
- * Definition for singly-linked list.
- * struct ListNode {
- *     int val;
- *     ListNode *next;
- *     ListNode(int x) : val(x), next(NULL) {}
- * };
- */
-
-// bottom-up merge sort, using a queue
-// Sort is unstable if number of nodes are not power of 2!
-
-class Solution {
-public:
-    ListNode* sortList(ListNode* head) {
-        if(!head || !head->next) return head;
-        deque<ListNode*> q;
-        ListNode *p = head;
-        //push nodes into queue, also set next to NULL (break into many single-node lists)
-        while(p) {
-            q.push_back(p);
-            ListNode *next = p->next;
-            p->next = NULL;
-            p = next;
-        }
-        ListNode dum(0);
-        p = &dum; //dummy node
-        while(!q.empty()) {
-            ListNode* n1 = q.front(); q.pop_front();
-            if(q.empty()) return n1;
-            ListNode *n2 = q.front(); q.pop_front();
-            q.push_back(merge(n1, n2));
-        }
-        return NULL; //something wrong
-    }
-    //merge two sorted, non-empty lists
-    ListNode* merge(ListNode *head1, ListNode *head2) {
-        ListNode dum(0), *p(&dum), *tail(p);
-        while(head1 && head2) {
-            if(head1->val <= head2->val) {
-                tail->next = head1;
-                head1 = head1->next;
-            } else {
-                tail->next = head2;
-                head2 = head2->next;
-            }
-            tail = tail->next;
-        }
-        tail->next = head1 ? head1 : head2;
-        return p->next;
-    }
-};
 /*
 Sort a linked list in O(n log n) time using constant space complexity.
 */
@@ -3512,6 +3726,113 @@ public:
         path.pop_back();
     }
 };
+
+/**************************************************** 
+ ***    109,Medium,Convert Sorted List to Binary Search Tree 
+ ****************************************************/
+
+/*
+Given a singly linked list where elements are sorted in ascending order, convert it to a height balanced BST.
+*/
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+
+// Recursive solution. First find middle element, then use that element as root of tree node, recursively build tree for the list segments before and after middle element, and attach as left and right child of root.
+
+class Solution {
+public:
+    TreeNode* sortedListToBST(ListNode* head) {
+        return helper(head, NULL);
+    }
+    //construct from head (inclusive) to tail (exclusive)
+    TreeNode *helper(ListNode* head, ListNode *tail) {
+        if(head == tail) return NULL;
+        ListNode *slow = head, *fast = head;
+        while(fast->next != tail && fast->next->next != tail) { //this approach returns middle of element, or the first among the two middle ones.
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+        //make slow the root
+        TreeNode *root = new TreeNode(slow->val);
+        root->left = helper(head, slow);
+        root->right = helper(slow->next, tail);
+        return root;
+    }
+};
+
+
+/**************************************************** 
+ ***    108,Medium,Convert Sorted Array to Binary Search Tree 
+ ****************************************************/
+
+/*
+Given an array where elements are sorted in ascending order, convert it to a height balanced BST.
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+
+// Recursive solution
+
+class Solution {
+public:
+    TreeNode* sortedArrayToBST(vector<int>& nums) {
+        if(nums.empty()) return NULL;
+        int n = nums.size();
+        return convert(nums, 0, n-1);
+    }
+    
+    TreeNode* convert(vector<int>& nums, int lo, int hi) {
+        if(lo > hi) return NULL;
+        int mid = (lo+hi)/2;
+        TreeNode* root = new TreeNode(nums[mid]);
+        root->left = convert(nums, lo, mid-1);
+        root->right = convert(nums, mid+1, hi);
+        return root;
+    }
+};
+
+// A variant. Range is [beg, end)
+
+class Solution {
+public:
+    TreeNode* sortedArrayToBST(vector<int>& nums) {
+        return helper(nums, 0, nums.size());
+    }
+
+    TreeNode* helper(vector<int>& nums, int beg, int end) {
+        if(beg >= end) return NULL;
+        int mid = (beg+end)/2;
+        TreeNode *root = new TreeNode(nums[mid]);
+        root->left = helper(nums, beg, mid);
+        root->right = helper(nums, mid+1, end);
+        return root;
+    }
+};
+
 
 /**************************************************** 
  ***    103,Medium,Binary Tree Zigzag Level Order Traversal 
@@ -4962,31 +5283,6 @@ public:
  ***    049,Medium,Group Anagrams 
  ****************************************************/
 
-// Simplest solution: maintain a map from string (sorted) to a vector of indices who is anagram to the string.
-// Process all strings, then check the map and add to result if the vector size is larger than 1
-
-class Solution {
-public:
-     vector<string> anagrams(vector<string>& strs) {
-        vector<string> ret;
-        if (strs.empty()) return ret;
-        int n = strs.size();
-        if (n == 1) return ret;
-        map<string, vector<int> > table;
-        for (int i = 0; i < n; ++i) {
-           string s = strs[i];
-           sort(s.begin(), s.end());
-           table[s].push_back(i);
-        }
-        for (map<string, vector<int> >::iterator it = table.begin(); it != table.end(); ++it) {
-            if (it->second.size() > 1) {
-               for (size_t i = 0; i < it->second.size(); ++i)
-                   ret.push_back(strs[it->second[i]]);
-            }
-        }
-        return ret;
-    }
-};
 /*
 Given an array of strings, group anagrams together.
 

@@ -69,6 +69,102 @@ public:
 
 
 /**************************************************** 
+ ***    299,Easy,Bulls and Cows 
+ ****************************************************/
+
+/*
+You are playing the following Bulls and Cows game with your friend: You write down a number and ask your friend to guess what the number is. Each time your friend makes a guess, you provide a hint that indicates how many digits in said guess match your secret number exactly in both digit and position (called "bulls") and how many digits match the secret number but locate in the wrong position (called "cows"). Your friend will use successive guesses and hints to eventually derive the secret number.
+
+For example:
+
+Secret number:  "1807"
+Friend's guess: "7810"
+
+Hint: 1 bull and 3 cows. (The bull is 8, the cows are 0, 1 and 7.)
+
+Write a function to return a hint according to the secret number and friend's guess, use A to indicate the bulls and B to indicate the cows. In the above example, your function should return "1A3B".
+
+Please note that both secret number and friend's guess may contain duplicate digits, for example:
+
+Secret number:  "1123"
+Friend's guess: "0111"
+
+In this case, the 1st 1 in friend's guess is a bull, the 2nd or 3rd 1 is a cow, and your function should return "1A1B".
+
+You may assume that the secret number and your friend's guess only contain digits, and their lengths are always equal.
+*/
+
+// Solution using several counters.
+
+class Solution {
+public:
+    string getHint(string secret, string guess) {
+        int n = secret.size();
+        vector<int> count_secret(10, 0), count_guess(10, 0), count_bull(10, 0);
+        for(int i = 0; i < n; ++i) {
+            int d1 = secret[i]-'0', d2 = guess[i]-'0';
+            if(d1 == d2) count_bull[d1]++;
+            count_secret[d1]++;
+            count_guess[d2]++;
+        }
+        int bull(0), cow(0);
+        for(int d = 0; d < 10; ++d) {
+            bull += count_bull[d];
+            cow += min(count_secret[d], count_guess[d]) - count_bull[d];
+        }
+        return num2str(bull) + "A" + num2str(cow) + "B";
+    }
+    string num2str(int n) {
+        if(n == 0) return "0";
+        string s;
+        while(n) {
+           s = char(n%10+'0') + s;
+           n /= 10;
+        }
+        return s;
+    }
+};
+
+
+/**************************************************** 
+ ***    293,Easy,Flip Game 
+ ****************************************************/
+
+/*
+You are playing the following Flip Game with your friend: Given a string that contains only these two characters: + and -, you and your friend take turns to flip two consecutive "++" into "--". The game ends when a person can no longer make a move and therefore the other person will be the winner.
+
+Write a function to compute all possible states of the string after one valid move.
+
+For example, given s = "++++", after one move, it may become one of the following states:
+
+[
+  "--++",
+  "+--+",
+  "++--"
+]
+
+If there is no valid move, return an empty list [].
+*/
+
+// Search for two consecutive '+'s, and modify them to '-'.
+
+class Solution {
+public:
+    vector<string> generatePossibleNextMoves(string s) {
+        vector<string> ret;
+        int n = s.size();
+        for(int i = 0; i < n-1; i++) {
+            if(s[i] == '+' && s[i+1] == '+') {
+               ret.push_back(s);
+               ret.back()[i] = ret.back()[i+1] = '-';
+            }
+        }
+        return ret;
+    }
+};
+
+
+/**************************************************** 
  ***    292,Easy,Nim Game 
  ****************************************************/
 
@@ -92,6 +188,182 @@ public:
         return n % 4;
     }
 };
+
+/**************************************************** 
+ ***    290,Easy,Word Pattern 
+ ****************************************************/
+
+/*
+Given a pattern and a string str, find if str follows the same pattern.
+
+Here follow means a full match, such that there is a bijection between a letter in pattern and a non-empty word in str.
+
+Examples:
+
+    pattern = "abba", str = "dog cat cat dog" should return true.
+    pattern = "abba", str = "dog cat cat fish" should return false.
+    pattern = "aaaa", str = "dog cat cat dog" should return false.
+    pattern = "abba", str = "dog dog dog dog" should return false.
+
+Notes:
+You may assume pattern contains only lowercase letters, and str contains lowercase letters separated by a single space. 
+*/
+
+// Use two dictionaries to record the bijection relation between pattern (char) and words (string). Standard DFS.
+// Caveats: be careful of the index bounds for exiting dfs. Should be i >= m, not i == m.
+class Solution {
+public:
+    bool wordPattern(string pattern, string str) {
+        return dfs(pattern, str, 0, 0);
+    }
+    bool dfs(const string& pattern, const string& str, int i, int j) {
+        int m = pattern.size(), n = str.size();
+        if(i >= m && j >= n) return true; //both reaches end at the same time
+        if(i >= m || j >= n) return false; //only one reaches end
+        char c = pattern[i];
+        int k = j;
+        while(k < n && str[k] != ' ') k++;
+        string s = str.substr(j, k-j);
+        unordered_map<char, string>::iterator it1 = pat2word.find(c);
+        unordered_map<string, char>::iterator it2 = word2pat.find(s);
+        if(it1 == pat2word.end() && it2 == word2pat.end()) { //not found
+            pat2word[c] = s; word2pat[s] = c; //insert
+            return dfs(pattern, str, i+1, k+1);
+        } else if(it1 == pat2word.end() || it2 == word2pat.end()) { //not bijection
+            return false;
+        } else if(it1->second == s && it2->second == c) {
+            return dfs(pattern, str, i+1, k+1);
+        } else return false;
+    }
+    unordered_map<char, string> pat2word;
+    unordered_map<string, char> word2pat;
+};
+
+
+/**************************************************** 
+ ***    288,Easy,Unique Word Abbreviation 
+ ****************************************************/
+
+/*
+An abbreviation of a word follows the form <first letter><number><last letter>. Below are some examples of word abbreviations:
+
+a) it                      --> it    (no abbreviation)
+
+     1
+b) d|o|g                   --> d1g
+
+              1    1  1
+     1---5----0----5--8
+c) i|nternationalizatio|n  --> i18n
+
+              1
+     1---5----0
+d) l|ocalizatio|n          --> l10n
+
+Assume you have a dictionary and given a word, find whether its abbreviation is unique in the dictionary. A word's abbreviation is unique if no other word from the dictionary has the same abbreviation.
+
+Example:
+
+Given dictionary = [ "deer", "door", "cake", "card" ]
+
+isUnique("dear") -> false
+isUnique("cart") -> true
+isUnique("cane") -> false
+isUnique("make") -> true
+*/
+
+// Your ValidWordAbbr object will be instantiated and called as such:
+// ValidWordAbbr vwa(dictionary);
+// vwa.isUnique("hello");
+// vwa.isUnique("anotherWord");
+
+// Solution 1. Use a map from abbreviated string to the set of original strings (260ms).
+// e.g. dictionary = [ "deer", "door", "cake", "card" ]
+// dict = 
+//  d2r => (deer, door)
+//  c2e => (cake)
+//  c2d => (card)
+// To check the new word, return unique if either of the two cases:
+// 1. the abbreviated form does not exist in the map (e.g. candy).
+// 2. the abbreviated form exists, but its set contains only the original word (e.g. cake).
+	
+class ValidWordAbbr {
+public:
+    ValidWordAbbr(vector<string> &dictionary) {
+        for(auto s : dictionary) {
+            dict[getAbbr(s)].insert(s);
+        }
+    }
+
+    bool isUnique(string word) {
+        auto it = dict.find(getAbbr(word));
+        return it == dict.end() || (it->second.size() == 1 && it->second.count(word));
+    }
+    string getAbbr(string s) {
+        int n = s.size();
+        if(n <= 2) return s;
+        else return s[0] + num2str(n-2) + s[n-1];
+    }
+    //n is positive integer
+    string num2str(unsigned n) {
+        if(n == 0) return "0";
+        string s;
+        while(n) {
+            char c = n % 10 + '0';
+            s = c + s;
+            n /= 10;
+        }
+        return s;
+    }
+    unordered_map<string, unordered_set<string> > dict;
+};
+
+// Solution 2. Optimized, do not store the string as the key, but the hashed value (200ms).
+class ValidWordAbbr {
+public:
+    ValidWordAbbr(vector<string> &dictionary) {
+        for(auto s : dictionary) {
+            dict[hash(s)].insert(s);
+        }
+    }
+
+    bool isUnique(string word) {
+        auto it = dict.find(hash(word));
+        return it == dict.end() || (it->second.size() == 1 && it->second.count(word));
+    }
+    int hash(string s) {
+        int n = s.size();
+        if(n == 0) return -1;
+        if(n == 1) return s[0]-'a';
+        return s[0]+s[n-1]*26+n*676;
+    }
+
+    unordered_map<int, unordered_set<string> > dict;
+};
+
+// Solution 3. Further optimized, do not store the set of strings matching the hash value. Just store a single string. If a hash is associated with two different strings, then for sure there is no unique abbr. for this entry. Use empty string to represent this case.
+class ValidWordAbbr {
+public:
+    ValidWordAbbr(vector<string> &dictionary) {
+        for(auto s : dictionary) {
+            int t = hash(s);
+            if(!dict.count(t)) dict[t] = s;
+            else if(dict[t] != s) dict[t] = "";
+        }
+    }
+
+    bool isUnique(string word) {
+        if(word == "") return true;
+        auto it = dict.find(hash(word));
+        return it == dict.end() || (it->second == word);
+    }
+    int hash(string s) {
+        return s.front()+s.back()*26+s.size()*676;
+    }
+
+    unordered_map<int, string> dict;
+};
+
 
 /**************************************************** 
  ***    283,Easy,Move Zeroes 
@@ -210,6 +482,51 @@ public:
 };
 
 /**************************************************** 
+ ***    270,Easy,Closest Binary Search Tree Value 
+ ****************************************************/
+
+/*
+Given a non-empty binary search tree and a target value, find the value in the BST that is closest to the target.
+
+Note:
+
+    Given target value is a floating point.
+    You are guaranteed to have only one unique value in the BST that is closest to the target.
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+
+// Iterative solution. Search down the tree.
+// Caveat: Do not initialize mind as MAX_INT.
+class Solution {
+public:
+    int closestValue(TreeNode* root, double target) {
+        double mind = fabs(target - root->val);
+        int result = root->val;
+        while(root) {
+            double diff = fabs(target - root->val);
+            if(diff == 0.0) return target;
+            if(diff < mind) {
+                result = root->val;
+                mind = diff;
+            }
+            if(target > root->val) root = root->right;
+            else root = root->left;
+        }
+        return result;
+    }
+};
+
+
+/**************************************************** 
  ***    266,Easy,Palindrome Permutation 
  ****************************************************/
 
@@ -285,6 +602,34 @@ public:
         return num == 1;
     }
 };
+
+/**************************************************** 
+ ***    258,Easy,Add Digits 
+ ****************************************************/
+
+/*
+Given a non-negative integer num, repeatedly add all its digits until the result has only one digit.
+
+For example:
+
+Given num = 38, the process is like: 3 + 8 = 11, 1 + 1 = 2. Since 2 has only one digit, return it.
+
+Follow up:
+Could you do it without any loop/recursion in O(1) runtime? 
+*/
+
+// Simple elementary school mathematics.
+// Caveats: result is not simply num % 9, because it never gives the value 9.
+// Only 0 return 0, positive integers always return 1 - 9.
+
+class Solution {
+public:
+    int addDigits(int num) {
+        if(num == 0) return 0;
+        return (num-1) % 9 + 1;
+    }
+};
+
 
 /**************************************************** 
  ***    257,Easy,Binary Tree Paths 
@@ -396,6 +741,65 @@ public:
         return true;
     }
 };
+
+/**************************************************** 
+ ***    249,Easy,Group Shifted Strings 
+ ****************************************************/
+
+/*
+Given a string, we can "shift" each of its letter to its successive letter, for example: "abc" -> "bcd". We can keep "shifting" which forms the sequence:
+
+"abc" -> "bcd" -> ... -> "xyz"
+
+Given a list of strings which contains only lowercase alphabets, group all strings that belong to the same shifting sequence.
+
+For example, given: ["abc", "bcd", "acef", "xyz", "az", "ba", "a", "z"],
+Return:
+
+[
+  ["abc","bcd","xyz"],
+  ["az","ba"],
+  ["acef"],
+  ["a","z"]
+]
+
+Note: For the return value, each inner list's elements must follow the lexicographic order.
+*/
+
+// Convert each string to its "canonical form", which is shifted form such that first letter is 'a'. Use a dictionary to store the canonical form and associated entries in result vector. When seeing a new word, search in the map. If found, simply insert to the correct places, otherwise, insert to map, and append the new entry to the result vector.
+// Caveats: when doing shifts, better shift towards 'a', not 'z', because 'z' is lying close to the end 127, and addition 'z' + 'z' can cause overflow (if char is implmemented as signed int in the machine). On the other hand 'a' is far from the left end 0 or -127, so it is safe.
+
+class Solution {
+public:
+    vector<vector<string>> groupStrings(vector<string>& strings) {
+        vector<vector<string> > result;
+        unordered_map<string, int> dict;
+        for(auto c : strings) {
+            string s = convert(c);
+            if(!dict.count(s)) { //not found
+                dict[s] = result.size();
+                result.push_back(vector<string>(1, c));
+            } else { //found
+                result[dict[s]].push_back(c);
+            }
+        }
+        for(int i = 0; i < result.size(); ++i)
+            sort(result[i].begin(), result[i].end());
+        return result;
+    }
+    string convert(const string& s) {
+        if(s.empty() || s[0] == 'a') return s;
+        string t = s;
+        int os = s[0] - 'a'; //offset
+        for(int i = 0; i < t.size(); ++i) {
+            t[i] -= os;
+            if(t[i] < 'a') t[i] += 26;
+        }
+        return t;
+    }
+};
+
+
 
 /**************************************************** 
  ***    246,Easy,Strobogrammatic Number 
@@ -706,6 +1110,88 @@ public:
 	// return !n && !(n & 0x80000000) && !(n&(n-1))
     }
 };
+
+/**************************************************** 
+ ***    228,Easy,Summary Ranges 
+ ****************************************************/
+
+/*
+Given a sorted integer array without duplicates, return the summary of its ranges.
+
+For example, given [0,1,2,4,5,7], return ["0->2","4->5","7"]. 
+*/
+
+// two pointers
+// be careful of overflow when converting from number to string (use unsigned int to store absolute value of an int is ok)
+
+class Solution {
+public:
+    vector<string> summaryRanges(vector<int>& nums) {
+        vector<string> ret;
+        int n = nums.size();
+        int i(0), j(0);
+        
+        while (i < n && j < n) {
+            j = i+1;
+            while (j < n && nums[j] == nums[j-1]+1) j++;
+            //j stops at one past end
+            if (j-1 == i) ret.push_back(num2str(nums[i]));
+            else ret.push_back(num2str(nums[i]) + "->" + num2str(nums[j-1]));
+            i = j;
+        }
+        return ret;
+    }
+    string num2str(int n) {
+        if (n == 0) return "0";
+        int sign = (n > 0) ? 1 : -1;
+        unsigned u = abs(n);
+        string s;
+        while (u) {
+            char c = u % 10 + '0';
+            s = c + s;
+            u = u / 10;
+        }
+        if (sign < 0) s = '-' + s;
+        return s;
+    }
+};
+
+//Another solution using one while loop.
+class Solution {
+public:
+    vector<string> summaryRanges(vector<int>& nums) {
+        vector<string> result;
+        if(nums.empty()) return result;
+        int l = nums[0];
+        int i = 0, n = nums.size();
+        while(i < n) {
+            if(i+1 == n || nums[i+1] > nums[i]+1)  { // nums[i] is the boundary
+                result.push_back(getRange(l, nums[i]));
+                if(i+1 < n) l = nums[i+1];
+            }
+            i++;
+        }
+        return result;
+    }
+
+    string getRange(int l, int r) {
+        if(l == r) return num2str(l);
+        else return num2str(l) + "->" + num2str(r);
+    }
+    string num2str(long n) {
+        if(n == 0) return "0";
+        bool neg = (n < 0);
+        n = abs(n);
+        string s;
+        while(n) {
+            s = char(n % 10 + '0') + s;
+            n /= 10;
+        }
+        if(neg) s = "-" + s;
+        return s;
+    }
+};
+
 
 /**************************************************** 
  ***    226,Easy,Invert Binary Tree 
@@ -1231,6 +1717,77 @@ public:
 };
 
 /**************************************************** 
+ ***    198,Easy,House Robber 
+ ****************************************************/
+
+/*
+You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed, the only constraint stopping you from robbing each of them is that adjacent houses have security system connected and it will automatically contact the police if two adjacent houses were broken into on the same night.
+
+Given a list of non-negative integers representing the amount of money of each house, determine the maximum amount of money you can rob tonight without alerting the police.
+*/
+
+// DP solution, use one vector max_all, whose i-th entry means the maximum amount for robbing houses 0 to i.
+// Recursive formula:
+// max_all[i] = max of the following two cases:
+// including i-th house, then i-1 should be excluded, thus: max_all[i-2] + nums[i]
+// excluding i-th house, then no requirements on i-1, thus: max_all[i-1]
+
+class Solution {
+public:
+    int rob(vector<int>& nums) {
+        if(nums.empty()) return 0;
+        int n = nums.size();
+        if(n == 1) return nums[0];
+        vector<int> max_all(n, 0); //maximum value from nums[0..i]
+        max_all[0] = nums[0];
+        max_all[1] = max(nums[0], nums[1]);
+        for (int i = 2; i < n; ++i) {
+            max_all[i] = max(max_all[i-2] + nums[i], max_all[i-1]);
+        }
+        return max_all[n-1];
+    }
+};
+
+// Optimized solution, since we only need the last two values for max_all, we can save the space by using two variables
+class Solution {
+public:
+    int rob(vector<int>& nums) {
+        if(nums.empty()) return 0;
+        int n = nums.size();
+        if(n == 1) return nums[0];
+        if(n == 2) return max(nums[0], nums[1]);
+        int lastlast = nums[0];
+        int last = max(nums[0], nums[1]);
+        int curr = 0;
+        for (int i = 2; i < n; ++i) {
+            curr = max(lastlast + nums[i], last);
+            lastlast = last; last = curr;
+        }
+        return curr;
+    }
+};
+
+// Old DP solution. Use two variables to track max_include and max_all
+
+class Solution {
+public:
+    int rob(vector<int>& nums) {
+        if(nums.empty()) return 0;
+        int n = nums.size();
+        if(n == 1) return nums[0];
+        vector<int> max_inc(n, 0); //maximum value from nums[0..i] including nums[i]
+        vector<int> max_all(n, 0); //maximum value from nums[0..i] whether or not including nums[i]
+        max_inc[0] = max_all[0] = nums[0];
+        max_inc[1] = nums[1]; max_all[1] = max(nums[0], nums[1]);
+        for (int i = 2; i < n; ++i) {
+            max_inc[i] = nums[i] + max_all[i-2];
+            max_all[i] = max(max_inc[i], max_all[i-1]);
+        }
+        return max_all[n-1];
+    }
+};
+
+/**************************************************** 
  ***    191,Easy,Number of 1 Bits 
  ****************************************************/
 
@@ -1324,6 +1881,158 @@ public:
         n = ((n & 0xCCCCCCCC) >>  2) | ((n & 0x33333333) <<  2);
         n = ((n & 0xAAAAAAAA) >>  1) | ((n & 0x55555555) <<  1);
         return n;
+    }
+};
+
+
+/**************************************************** 
+ ***    189,Easy,Rotate Array 
+ ****************************************************/
+
+/*
+Rotate an array of n elements to the right by k steps.
+
+For example, with n = 7 and k = 3, the array [1,2,3,4,5,6,7] is rotated to [5,6,7,1,2,3,4].
+
+Note:
+Try to come up as many solutions as you can, there are at least 3 different ways to solve this problem.
+
+[show hint]
+Hint:
+Could you do it in-place with O(1) extra space?
+
+Related problem: Reverse Words in a String II
+*/
+
+// Solution 1. Three reverse passes.
+
+class Solution {
+public:
+    void rotate(vector<int>& nums, int k) {
+        if(nums.empty()) return;
+        int n = nums.size();
+        k = k % n;
+        if(k == 0) return;
+        reverse(nums, 0, n);
+        reverse(nums, 0, k);
+        reverse(nums, k, n);
+    }
+    //reverse nums[beg, end). excluding end.
+    void reverse(vector<int>& nums, int beg, int end) {
+        int i = beg, j = end-1;
+        while(i < j)  swap(nums[i++], nums[j--]);
+    }
+};
+
+// Solution 2. Juggling method (do-while loop). Need to get gcd of two numbers
+
+class Solution {
+public:
+    void rotate(vector<int>& nums, int k) {
+        if(nums.empty()) return;
+        int n = nums.size();
+        k = k % n;
+        if(k == 0) return;
+        int tmp = 0;
+        for(int i = 0; i < gcd(k, n); ++i) {
+            int j = i;
+            tmp = nums[j];
+            do {
+                //copy nums[i] to nums[j]
+                j = (j+k) % n;
+                swap(tmp, nums[j]);
+            } while(j != i);
+        }
+    }
+    int gcd(int a, int b) {
+        if(a == 0) return b;
+        if(b == 0) return a;
+        if(a > b) return gcd(b, a);
+        return gcd(b-a, a);
+    }
+};
+
+// Solution 3. Improved version of solution 2. Use shift insteaad of swapping, only swap once (similar idea to insertion sort).
+// Also a simpler gcd algorithm (Euclid).
+// If b == 0, return a,
+// If b != 0, then return gcd(b, a%b). Two cases:
+// if (b > a), then it goes to gcd(b, a), effectively swapping the two
+// if (b == a), then it goes to gcd(b, 0), and it immediately returns b
+// if (b < a), then it goes to gcd(b, a%b), and we effectively reduces the first argument from a to b.
+// So the algorithm always decreases the first argument for each gcd run.
+
+class Solution {
+public:
+    void rotate(vector<int>& nums, int k) {
+        if(nums.empty()) return;
+        int n = nums.size();
+        k = k % n;
+        if(k == 0) return;
+        for(int i = 0; i < gcd(k, n); ++i) {
+            int j = i;
+            int tmp = nums[j];
+            while(1) {
+                //copy nums[i] to nums[j]
+                int l = (j-k+n) % n;
+                if(l == i) break;
+                nums[j] = nums[l];
+                j = l;
+            } 
+            nums[j] = tmp;
+        }
+    }
+    int gcd(int a, int b) {
+        if(b == 0) return a;
+        return gcd(b, a%b);
+    }
+/*  //iterative gcd, same idea as recursive one
+    int gcd(int a, int b) {
+        while(b) {
+            int tmp = b;
+            b = a % b;
+            a = tmp;
+        }
+        return a;
+    }        
+*/
+};
+
+// Solution 4. Use a temp vector. O(n) space.
+
+class Solution {
+public:
+    void rotate(vector<int>& nums, int k) {
+        if(nums.empty()) return;
+        int n = nums.size();
+        k = k % n;
+        if(k == 0) return;
+        vector<int> tmp(n, 0);
+        for(int i = 0; i < n; ++i) 
+            tmp[(i+k)%n] = nums[i];
+        nums = tmp;
+    }
+};
+
+// Solution 5. Shift one by one, will cause TLE. O(nk) time.
+class Solution {
+public:
+    void rotate(vector<int>& nums, int k) {
+        if(nums.empty()) return;
+        int n = nums.size();
+        k = k % n;
+        if(k == 0) return;
+        for (int i = 0; i < k; ++i) {
+            rotateByOne(nums);
+        }
+    }
+    //reverse nums[beg, end)
+    void rotateByOne(vector<int>& nums) {
+        int reg = nums.back();
+        for (int i = 0; i < nums.size(); ++i) {
+            int tmp = nums[i];
+            nums[i] = reg;
+            reg = tmp;
+        }
     }
 };
 
@@ -1604,6 +2313,45 @@ public:
 };
 
 /**************************************************** 
+ ***    155,Easy,Min Stack 
+ ****************************************************/
+
+/*
+ Design a stack that supports push, pop, top, and retrieving the minimum element in constant time.
+
+    push(x) -- Push element x onto stack.
+    pop() -- Removes the element on top of the stack.
+    top() -- Get the top element.
+    getMin() -- Retrieve the minimum element in the stack.
+*/
+
+// Use two stacks, one is normal, the other tracks the minimum element at the time of insertion
+
+class MinStack {
+public:
+    void push(int x) {
+        s.push(x);
+        if(ms.empty() || x <= ms.top()) ms.push(x);
+    }
+
+    void pop() {
+        int x = s.top(); s.pop();
+        if(x <= ms.top()) ms.pop();
+    }
+
+    int top() {
+        return s.top();
+    }
+
+    int getMin() {
+        return ms.top();
+    }
+private:
+    stack<int> s, ms;
+};
+
+
+/**************************************************** 
  ***    125,Easy,Valid Palindrome 
  ****************************************************/
 
@@ -1673,6 +2421,132 @@ public:
         if (c1 == c2) return true;
         if (c1 >= 'A' && c1 <= 'Z') return c2 == c1 + 32;
         if (c1 >= 'a' && c1 <= 'z') return c2 == c1 - 32;
+    }
+};
+
+
+/**************************************************** 
+ ***    119,Easy,Pascal's Triangle II 
+ ****************************************************/
+
+/*
+Given an index k, return the kth row of the Pascal's triangle.
+
+For example, given k = 3,
+Return [1,3,3,1].
+
+Note:
+Could you optimize your algorithm to use only O(k) extra space? 
+*/
+
+// DP solution using only one vector. And avoided uncessary checks. Use an "old" variable to store the old value of current index, to be used for getting sum for the next element.
+
+class Solution {
+public:
+    vector<int> getRow(int rowIndex) {
+        vector<int> result(rowIndex+1, 1); //initialize as 1        
+        for(int r = 2; r <= rowIndex; ++r) {
+            int tmp = 0, old = 1;
+            for(int i = 1; i < r; ++i) {
+                tmp = result[i]; //store old value in temporary
+                result[i] += old;
+                old = tmp; //update old value
+            }
+        }
+        return result;
+    }
+};
+
+// Same as above. With additional unecessary checks.
+class Solution {
+public:
+    vector<int> getRow(int rowIndex) {
+        if(rowIndex == 0) return vector<int>(1, 1);
+        if(rowIndex == 1) return vector<int>(2, 1);
+        vector<int> result(rowIndex+1, 0); //initialize as 0
+        result[0] = result[1] = 1; 
+
+        for(int r = 2; r <= rowIndex; ++r) {
+            int n = r + 1;
+            int tmp = 0, old = 1;
+            for(int i = 1; i < n-1; ++i) {
+                tmp = result[i]; //store old value in temporary
+                result[i] += old;
+                old = tmp; //update old value
+            }
+            result[n-1] = 1;
+        }
+        return result;
+    }
+};
+
+// DP solution using two vectors. swapping.
+
+class Solution {
+public:
+    vector<int> getRow(int rowIndex) {
+        vector<int> currRow(rowIndex+1, 1);
+        vector<int> nextRow(rowIndex+1, 1);
+        currRow[0] = 1;
+        for(int ir = 1; ir <= rowIndex; ++ir) { //ir has ir+1 elments [0 .. ir]
+            nextRow[0] = nextRow[ir] = 1;
+            for (int j = 1; j < ir; ++j)
+                nextRow[j] = currRow[j-1] + currRow[j];
+            currRow.swap(nextRow);
+        }
+        return currRow;
+    }
+};
+
+/**************************************************** 
+ ***    118,Easy,Pascal's Triangle 
+ ****************************************************/
+
+/*
+Given numRows, generate the first numRows of Pascal's triangle.
+
+For example, given numRows = 5,
+Return
+
+[
+     [1],
+    [1,1],
+   [1,2,1],
+  [1,3,3,1],
+ [1,4,6,4,1]
+]
+*/
+
+// Straightforward solution. Commented unecessary checks for better efficiency. 0ms.
+
+class Solution {
+public:
+    vector<vector<int>> generate(int numRows) {
+        vector<vector<int> > result;
+        result.resize(numRows);
+        for(int r = 0; r < numRows; ++r) {
+            int n = r+1; //number of elements in this row
+            result[r].resize(n, 1); //initialize as 1
+            for(int i = 1; i < n-1; ++i)  result[r][i] = result[r-1][i-1] + result[r-1][i];
+        }
+        return result;
+    }
+};
+
+// Solution 2, with unecessary checks. 4ms.
+class Solution {
+public:
+    vector<vector<int>> generate(int numRows) {
+        vector<vector<int> > result;
+        if(numRows == 0) return result;
+        result.resize(numRows);
+        result[0] = vector<int>(1, 1);
+        for(int r = 1; r < numRows; ++r) {
+            int n = r+1; //number of elements in this row
+            result[r].resize(n, 1); //initialize as 1
+            for(int i = 1; i < n-1; ++i)  result[r][i] = result[r-1][i-1] + result[r-1][i];
+        }
+        return result;
     }
 };
 
@@ -3420,4 +4294,47 @@ public:
         return y;
     }
 };
+
+/**************************************************** 
+ ***    006,Easy,ZigZag Conversion 
+ ****************************************************/
+
+/*
+The string "PAYPALISHIRING" is written in a zigzag pattern on a given number of rows like this: (you may want to display this pattern in a fixed font for better legibility)
+
+P   A   H   N
+A P L S I I G
+Y   I   R
+
+And then read line by line: "PAHNAPLSIIGYIR"
+
+Write the code that will take a string and make this conversion given a number of rows:
+
+string convert(string text, int nRows);
+
+convert("PAYPALISHIRING", 3) should return "PAHNAPLSIIGYIR". 
+*/
+
+// period is 2*numRows-2
+// when numRows = 1, the resulting string is the same as original one.
+class Solution {
+public:
+    string convert(string s, int numRows) {
+        if(numRows == 1) return s;
+        string result = s;
+        int p= 2*numRows-2;
+        int k = 0, n = s.size();
+        for(int ir = 0; ir < numRows; ++ir) {
+            for(int j = ir; j < n; j += p) {
+                result[k++] = s[j];
+                if(ir > 0 && ir < numRows-1) { //not first or last row
+                    int idx = j+p-2*ir;
+                    if(idx < n) result[k++] = s[idx]; //need to check if idx < n!
+                }
+            }
+        }
+        return result;
+    }
+};
+
 
