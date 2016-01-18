@@ -456,6 +456,149 @@ public:
 };
 
 /**************************************************** 
+ ***    279,Medium,Perfect Squares 
+ ****************************************************/
+
+/*
+Given a positive integer n, find the least number of perfect square numbers (for example, 1, 4, 9, 16, ...) which sum to n.
+
+For example, given n = 12, return 3 because 12 = 4 + 4 + 4; given n = 13, return 2 because 13 = 4 + 9. 
+*/
+
+// Top down dynamic programming with memoization. Use an auxiliary array to store the answers. Using an unordered_map takes much longer time!
+// For each number, start with 2*2, subtract as many squares as possible (e.g. 13, subtract 3 times and get 1). Then try 3*3, 4*4 ...
+// Record already solved solutions in the array for later fast retrieval.
+
+class Solution {
+public:
+    int numSquares(int n) {
+        if(n == 0) return 1;
+        if(n <= 3) return n;
+        dict.resize(n+1, -1);
+        dict[1] = 1;
+        dict[2] = 2;
+        dict[3] = 3;
+        return helper(n);
+    }
+    int helper(int n) {
+        if(dict[n] >= 0) return dict[n];
+        int count = n;
+        for(int i = 2; i <= n/i; ++i) {
+             count = min(count, helper(n%(i*i)) + n/(i*i));
+        }
+        dict[n] = count;
+        return count;
+    }
+
+    vector<int> dict;
+};
+
+
+/**************************************************** 
+ ***    277,Medium,Find the Celebrity 
+ ****************************************************/
+
+/*
+Suppose you are at a party with n people (labeled from 0 to n - 1) and among them, there may exist one celebrity. The definition of a celebrity is that all the other n - 1 people know him/her but he/she does not know any of them.
+
+Now you want to find out who the celebrity is or verify that there is not one. The only thing you are allowed to do is to ask questions like: "Hi, A. Do you know B?" to get information of whether A knows B. You need to find out the celebrity (or verify there is not one) by asking as few questions as possible (in the asymptotic sense).
+
+You are given a helper function bool knows(a, b) which tells you whether A knows B. Implement a function int findCelebrity(n), your function should minimize the number of calls to knows.
+
+Note: There will be exactly one celebrity if he/she is in the party. Return the celebrity's label if there is a celebrity in the party. If there is no celebrity, return -1.
+*/
+
+// Forward declaration of the knows API.
+bool knows(int a, int b);
+
+
+/* Solution 1. Linear time solution O(n).
+For two person i and j, check knows(i, j). Two outcomes:
+1. if i knows j, then for sure i is not celebrity
+2. if i does not know j, then for sure j is not celebrity.
+Thus for each comparison, we can rule out one person.
+
+We can do a linear run, each time compare the next person with the current celebrity candidate. In the end, we will have one candidate x. Then we simply check if everyone knows x, and x does not know anyone.
+
+One optimization is that in the first pass, we already checked that x does not know every one after x. So the second loop only checks people before x.
+*/
+
+class Solution {
+public:
+    int findCelebrity(int n) {
+        int x = 0;
+        for(int i = 0; i < n; ++i)
+            if(knows(x, i))  x = i;
+        for(int i = 0; i < x; ++i)
+            if(knows(x, i)) return -1;
+        for(int i = 0; i < n; ++i)
+            if(!knows(i, x)) return -1;
+// the last two loops can be combined into one
+//         for(int i = 0; i < n; ++i)
+//            if((i < x && knows(x, i)) || !knows(i, x) ) return -1;
+        return x;
+    }
+};
+
+// Solution 2. Divide and conquer solution O(nlgn) time. O(lgn) space for the recursive calls.
+
+class Solution {
+public:
+    int findCelebrity(int n) {
+        int x = helper(0, n-1);
+        if(x == -1) return -1;
+        for(int i = 0; i < n; ++i)  {
+            if(x == i) continue;
+            if(knows(x, i) || !knows(i, x) ) return -1;
+        }
+        return x;
+    }
+    //check possible celebrity among [i .. j]
+    int helper(int i, int j) {
+        if(j == i) return i;
+        int mid = (i+j)/2;
+        int x1 = helper(i, mid);
+        int x2 = helper(mid+1, j);
+        if(x1 == -1) return x2;
+        if(x2 == -1) return x1;
+        if(knows(x1, x2)) return x2;
+        else return x1;
+    }
+};
+
+// Solution 3. similar to divide and conquer, but use auxiliary vector, O(n) space.
+
+class Solution {
+public:
+    int findCelebrity(int n) {
+        vector<int> curr(n, 0), next;
+        for(int i = 0; i < n; ++i) curr[i] = i;
+        while(curr.size() > 1) {
+            for(int i = 0; i+1 < curr.size(); i += 2) {
+                bool fwd = knows(curr[i], curr[i+1]);
+                bool bwd = knows(curr[i+1], curr[i]);
+                if(fwd ^ bwd) {
+                    if(fwd) next.push_back(curr[i+1]);
+                    else next.push_back(curr[i]);
+                }
+            }
+            if(curr.size() & 1) next.push_back(curr.back());
+            curr.swap(next);
+            next.clear();
+        }
+        //finally check the only possible candidate
+        if(curr.empty()) return -1;
+        int j = curr[0];
+        for(int k = 0; k < n; ++k) {
+            if(k == j) continue;
+            if(!knows(k, j) || knows(j, k)) return -1;
+        }
+        return j;
+    }
+};
+
+
+/**************************************************** 
  ***    268,Medium,Missing Number 
  ****************************************************/
 
@@ -994,6 +1137,65 @@ private:
 
 
 /**************************************************** 
+ ***    250,Medium,Count Univalue Subtrees 
+ ****************************************************/
+
+/*
+Given a binary tree, count the number of uni-value subtrees.
+
+A Uni-value subtree means all nodes of the subtree have the same value.
+
+For example:
+Given binary tree,
+
+              5
+             / \
+            1   5
+           / \   \
+          5   5   5
+
+return 4. 
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+
+// Recursive solution. Use a helper function to count the univalue subtrees and also return whether the tree itself is univalue.
+// An empty tree is defined to be univalue.
+// A tree is univalue iff:
+// 1. left and right tree are both univalue
+// 2. if left/right child is not empty, the node value of left/right child should be equal to root value.
+
+class Solution {
+public:
+    int countUnivalSubtrees(TreeNode* root) {
+        int count = 0;
+        helper(root, count);
+        return count;
+    }
+    bool helper(TreeNode* root, int& count) {
+        if(!root) { count = 0; return true; }
+        int cl(0), cr(0);
+        TreeNode *l = root->left, *r = root->right;
+        bool uniVal_l = helper(l, cl);
+        bool uniVal_r = helper(r, cr);
+        count = cl + cr;
+        if((uniVal_l && (!l || l->val == root->val)) && (uniVal_r && (!r || r->val == root->val))) {
+            count += 1;
+            return true; //root is univalue tree
+        } else return false; //root is not univalue tree
+    }
+};
+
+
+/**************************************************** 
  ***    247,Medium,Strobogrammatic Number II 
  ****************************************************/
 
@@ -1211,6 +1413,74 @@ public:
         }
     }
 };
+
+/**************************************************** 
+ ***    240,Medium,Search a 2D Matrix II 
+ ****************************************************/
+
+/*
+Write an efficient algorithm that searches for a value in an m x n matrix. This matrix has the following properties:
+
+    Integers in each row are sorted in ascending from left to right.
+    Integers in each column are sorted in ascending from top to bottom.
+
+For example,
+
+Consider the following matrix:
+
+[
+  [1,   4,  7, 11, 15],
+  [2,   5,  8, 12, 19],
+  [3,   6,  9, 16, 22],
+  [10, 13, 14, 17, 24],
+  [18, 21, 23, 26, 30]
+]
+
+Given target = 5, return true.
+
+Given target = 20, return false.
+*/
+
+//O(m+n) solution. Two pointers, one at left top corner, other at bottom right corner. Compare value at top right corner with target.
+// If smaller than target, then the top row can be excluded (left top corner can be moved down by one step).
+// If larger than target, then the rightmost row can be excluded (right bottom corner can be moved left by one step).
+
+class Solution {
+public:
+    bool searchMatrix(vector<vector<int>>& matrix, int target) {
+        if(matrix.empty() || matrix[0].empty()) return false;
+        int m = matrix.size(), n = matrix[0].size();
+        int xlo = 0, ylo = 0, xhi = m-1, yhi = n-1;
+        while(xlo <= xhi && ylo <= yhi) {
+            int val = matrix[xlo][yhi];
+            if(target == val) return true;
+            else if(target > val) xlo++; 
+            else yhi--;
+        }
+        return false;
+    }
+};
+
+// Solution 2. Divide and conquer. Longer than Solution 1.
+
+class Solution {
+public:
+    bool searchMatrix(vector<vector<int>>& matrix, int target) {
+        if (matrix.empty() || matrix[0].empty()) return false;
+        int m = matrix.size(), n = matrix[0].size();
+        return search(matrix, 0, 0, m-1, n-1, target);
+    }
+    bool search(vector<vector<int> >& matrix, int xl, int yl, int xh, int yh, int target) {
+        if (xl > xh || yl > yh) return false;
+        int xm = xl + (xh - xl) / 2;
+        int ym = yl + (yh - yl) / 2;
+        int v = matrix[xm][ym];
+        if (target < v) return search(matrix, xl, yl, xh, ym-1, target) || search(matrix, xl, ym, xm-1, yh, target);
+        else if (target > v) return search(matrix, xl, ym+1, xh, yh, target) || search(matrix, xm+1, yl, xh, ym, target);
+        else return true;
+    }
+};
+
 
 /**************************************************** 
  ***    238,Medium,Product of Array Except Self 
@@ -4978,6 +5248,54 @@ public:
     }
 };
 
+
+/**************************************************** 
+ ***    074,Medium,Search a 2D Matrix 
+ ****************************************************/
+
+/*
+Write an efficient algorithm that searches for a value in an m x n matrix. This matrix has the following properties:
+
+    Integers in each row are sorted from left to right.
+    The first integer of each row is greater than the last integer of the previous row.
+
+For example,
+
+Consider the following matrix:
+
+[
+  [1,   3,  5,  7],
+  [10, 11, 16, 20],
+  [23, 30, 34, 50]
+]
+
+Given target = 3, return true.
+*/
+
+//binary search. Convert 1D index to 2D index
+
+class Solution {
+public:
+    bool searchMatrix(vector<vector<int>>& matrix, int target) {
+        int m = matrix.size();
+        if (m == 0) return false;
+        int n = matrix[0].size();
+        if (n == 0) return false;
+        int lo = 0, hi = m*n-1, mid = 0;
+        // invariant:
+        // [0 .. lo-1] < target
+        // [lo .. hi] to be checked
+        // [hi+1 .. m*n-1] > target
+        while (lo <= hi) {
+            mid = lo + (hi - lo) / 2;
+            int v = matrix[mid/n][mid%n];
+            if (v < target) lo = mid + 1;
+            else if (v > target) hi = mid - 1;
+            else return true;
+        }
+        return false;
+    }
+};
 
 /**************************************************** 
  ***    060,Medium,Permutation Sequence 
