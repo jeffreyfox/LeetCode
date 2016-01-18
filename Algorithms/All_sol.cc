@@ -2441,6 +2441,120 @@ public:
 };
 
 /**************************************************** 
+ ***    261,Medium,Graph Valid Tree 
+ ****************************************************/
+
+/*
+Given n nodes labeled from 0 to n - 1 and a list of undirected edges (each edge is a pair of nodes), write a function to check whether these edges make up a valid tree.
+
+For example:
+
+Given n = 5 and edges = [[0, 1], [0, 2], [0, 3], [1, 4]], return true.
+
+Given n = 5 and edges = [[0, 1], [1, 2], [2, 3], [1, 3], [1, 4]], return false.
+
+Hint:
+
+    Given n = 5 and edges = [[0, 1], [1, 2], [3, 4]], what should your return? Is this case a valid tree?
+    According to the definition of tree on Wikipedia: “a tree is an undirected graph in which any two vertices are connected by exactly one path. In other words, any connected graph without simple cycles is a tree.”
+
+Note: you can assume that no duplicate edges will appear in edges. Since all edges are undirected, [0, 1] is the same as [1, 0] and thus will not appear together in edges. 
+*/
+
+// Solution 1. Union find with weighted quick-union and path compression by halving. For a graph to be a tree, it has to make sure:
+// no cycles
+// no disconnected components
+class UnionFind {
+public:
+    UnionFind(int N) : n(N) {
+        id.resize(N, 0);
+        for(int i = 0; i < N; ++i) id[i] = i;
+        size.resize(N, 1);
+    }
+    bool unite(int i, int j) {
+        while(id[i] != i) { id[i] = id[id[i]]; i = id[i]; }
+        while(id[j] != j) { id[j] = id[id[j]]; j = id[j]; }
+        if(i != j) {
+            if(size[i] < size[j]) { id[i] = j; size[j] += size[i]; }
+            else { id[j] = i; size[i] += size[j]; }
+            n--;
+            return true;
+        } else return false; //already connected
+    }
+    int count() const { return n; }
+
+private:
+    vector<int> id;
+    vector<int> size;
+    int n;
+};
+
+class Solution {
+public:
+    bool validTree(int n, vector<pair<int, int>>& edges) {
+         UnionFind uf(n);
+         for(auto it : edges)
+             if(!uf.unite(it.first, it.second)) return false;
+         return uf.count() == 1;
+    }
+};
+
+// Solution 2 using DFS cycle detection
+class Graph {
+public:
+    Graph(int n) : N(n) {
+       adj.resize(n);
+    }
+    int NV() const { return N; }
+    void addEdge(int i, int j) {
+        adj[i].push_back(j);
+        adj[j].push_back(i);
+    }
+    int N;
+    vector<vector<int> > adj; //adjacency list
+};
+
+class GraphValidTree {
+public:
+    GraphValidTree(const Graph& graph) : g(graph) {
+        int nv = g.NV();
+        state.resize(nv, 0);
+    }
+    bool isValidTree() {
+        if(!dfs(0, -1)) return false;
+        // check if there are still unvisited nodes (g is a forest)
+        for(int i = 0; i < g.NV(); ++i) {
+            if(state[i] == 0) return false;
+        }
+        return true;
+    }
+    bool dfs(int v, int p) {
+        state[v] = 1;
+        for(int w : g.adj[v]) {
+            if(w == p) continue; //its parent
+            if(state[w] != 0 || !dfs(w, v)) return false;
+        }
+        return true;
+    }
+    const Graph& g;
+    vector<int> state;
+};
+
+class Solution {
+public:
+    bool validTree(int n, vector<pair<int, int>>& edges) {
+         if(n == 0) return true;
+         Graph g(n);
+         for(auto it : edges)
+             g.addEdge(it.first, it.second);
+
+         GraphValidTree gvt(g);
+         return gvt.isValidTree();
+    }
+};
+
+
+/**************************************************** 
  ***    260,Medium,Single Number III 
  ****************************************************/
 
@@ -11661,6 +11775,85 @@ public:
 
 
 /**************************************************** 
+ ***    091,Medium,Decode Ways 
+ ****************************************************/
+
+/*
+A message containing letters from A-Z is being encoded to numbers using the following mapping:
+
+'A' -> 1
+'B' -> 2
+...
+'Z' -> 26
+
+Given an encoded message containing digits, determine the total number of ways to decode it.
+
+For example,
+Given encoded message "12", it could be decoded as "AB" (1 2) or "L" (12).
+
+The number of ways decoding "12" is 2. 
+*/
+
+// use two helper functions: 
+// num(c): whether c itself is legal (1) or not (0)
+// num(c1, c2): whether c1c2 together is legal (1) or not (0). e.g. 15 => 1, 56 => 0
+// Dynamic programming, when checking s[i], see if we can form s[0..i-1] + s[i] or s[0..i-2] + s[i-1]s[i]
+// Only use two variables storing last and lastlast, instead of a vector
+
+class Solution {
+public:
+    int numDecodings(string s) {
+        int val(0);
+        int n = s.size();
+        if (n == 0) return 0;
+        if (n == 1) return num(s[0]);
+        if (n == 2) return num(s[0])*num(s[1]) + num(s[0], s[1]);
+        int lastlast = num(s[0]), last = num(s[0])*num(s[1]) + num(s[0], s[1]);
+        for (int i = 2; i < n; ++i) {
+            val = lastlast*num(s[i-1],s[i]) + last*num(s[i]);
+            lastlast = last;
+            last = val;
+        }
+        return val;
+    }
+
+    int num(char c) {
+       return c == '0' ? 0 : 1;
+    }
+    int num(char c1, char c2) {
+        if (c1 == '0') return 0;
+        else if (c2 == '0') return (c1 == '1' || c1 == '2') ? 1 : 0;
+        else {
+            int v = 10*(c1-'0')+(c2-'0');
+            return v <= 26 ? 1 : 0;
+        }
+    }
+};
+
+// Solution 2. Shorter one.
+class Solution {
+public:
+    int numDecodings(string s) {
+       if(s.empty()) return 0;
+       int n = s.size();
+       if(s[0] == '0') return 0;
+       if(n == 1) return 1;
+       int last_last = 1, last = 1, curr = 0;
+       for(int i = 1; i < n; ++i) {
+           int v1 = s[i] - '0';
+           int v2 = (s[i-1] - '0')*10 + v1;
+           curr = 0;
+           if(v1 != 0) curr += last;
+           if(v2 >= 10 && v2 <= 26) curr += last_last;
+           last_last = last;
+           last = curr;
+       }
+       return curr;
+    }
+};
+
+
+/**************************************************** 
  ***    090,Medium,Subsets II 
  ****************************************************/
 
@@ -14179,6 +14372,78 @@ public:
 		return ret;
 	}
 };
+
+/**************************************************** 
+ ***    050,Medium,"Pow(x, n) "
+ ****************************************************/
+
+/*
+Implement pow(x, n)
+*/
+
+// O(lgn) iterative solution, decode n into binary digits, and calculate x^1, x^2, x^4 procedingly. When the digit is set, add it into the factor.
+// e.g:
+// n = 13 =   1     1    0     1
+//   x^13 = x^8 + x^4 + .. + x^1
+// 1. when n is negative, replace n by -n, and x by 1/x
+// 2. To avoid overflow, use long instead of int
+// 3. shift n towards right one by one.
+
+class Solution {
+public:
+    double myPow(double x, int n) {
+        if(x == 0.0) return 0.0;
+        if(n == 0) return 1;
+        long m = n;
+        if(m < 0) {
+            m = -m; x = 1/x;
+        }
+        //n > 0
+        double y = x;
+        double res = 1.0;
+        while(m) {
+            if(m & 1) res *= y;
+            m >>= 1;
+            y *= y;
+        }
+        return res;
+    }
+};
+
+// Solution 2. Similar to above solution, except shift the power of two towards left (avoid overflow!).
+class Solution {
+public:
+    double myPow(double x, int n) {
+        if(x == 0.0) return 0.0;
+        if(n == 0) return 1;
+        bool rev = (n < 0);
+        long nn = abs(n);
+        double result = 1.0;
+        long m = 1;
+        double y = x;
+        while(m <= nn) {
+            if(nn & m) result *= y;
+            y *= y; m <<= 1;
+        }
+        if(rev) result = 1.0/result;
+        return result;
+    }
+};
+
+// Solution 3. Recursive solution. Three cases: n is even, n is positive odd, n is negative odd.
+class Solution {
+public:
+    double myPow(double x, int n) {
+        if(n == 0) return 1;
+        if(n == 1) return x;
+        if(n == -1) return 1/x;
+        double y = myPow(x, n/2);
+        if(n % 2 == 0) return y*y;
+        else if(n > 0) return y*y*x;
+        else return y*y/x;
+    }
+};
+
 
 /**************************************************** 
  ***    049,Medium,Group Anagrams 

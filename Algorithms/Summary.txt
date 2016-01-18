@@ -44,6 +44,7 @@
 046_permutations.cc
 047_permutations_ii.cc
 049_group_anagrams.cc
+050_pow_x_n.cc
 051_n_queens.cc
 052_n_queens_ii.cc
 053_maximum_subarray.cc
@@ -72,6 +73,7 @@
 087_scramble_string.cc
 088_merge_sorted_array.cc
 090_subsets_ii.cc
+091_decode_ways.cc
 093_restore_ip_addresses.cc
 094_binary_tree_inorder_traversal.cc
 095_unique_binary_search_trees_ii.cc
@@ -191,6 +193,7 @@
 258_add_digits.cc
 259_3sum_smaller.cc
 260_single_number_iii.cc
+261_graph_valid_tree.cc
 263_ugly_number.cc
 264_ugly_number_ii.cc
 265_paint_house_ii.cc
