@@ -48,5 +48,27 @@ public:
             return v <= 26 ? 1 : 0;
         }
     }
-
 };
+
+// Solution 2. Shorter one.
+class Solution {
+public:
+    int numDecodings(string s) {
+       if(s.empty()) return 0;
+       int n = s.size();
+       if(s[0] == '0') return 0;
+       if(n == 1) return 1;
+       int last_last = 1, last = 1, curr = 0;
+       for(int i = 1; i < n; ++i) {
+           int v1 = s[i] - '0';
+           int v2 = (s[i-1] - '0')*10 + v1;
+           curr = 0;
+           if(v1 != 0) curr += last;
+           if(v2 >= 10 && v2 <= 26) curr += last_last;
+           last_last = last;
+           last = curr;
+       }
+       return curr;
+    }
+};
+
