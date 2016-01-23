@@ -59,6 +59,26 @@ public:
     }
 };
 
+// Solution 2. avoid multiplications, but have additional variables. Can be extended to super ugly case
+class Solution {
+public:
+    int nthUglyNumber(int n) {
+        if(n == 1) return 1;
+        vector<int> ugly(n, 0);
+        vector<int> idx(3, 0); //indices in ugly for numbers being multiplied by 2, 3, 5
+        vector<int> val(3, 1); //next values for 2, 3, 5
+        int next = 1;
+        for(int i = 0; i < n; ++i) {
+            ugly[i] = next; 
+            if(val[0] == ugly[i]) val[0] = ugly[idx[0]++] * 2;
+            if(val[1] == ugly[i]) val[1] = ugly[idx[1]++] * 3;
+            if(val[2] == ugly[i]) val[2] = ugly[idx[2]++] * 5;
+            next = min(min(val[0], val[1]), val[2]);
+        }
+        return ugly[n-1];
+    }
+};
+
 // A solution using priority queue
 struct Element {
     int val;
