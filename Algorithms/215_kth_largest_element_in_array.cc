@@ -75,3 +75,23 @@ public:
         return pq.deleteMin();
     }
 };
+
+// Solution 2. Same idea but using STL priority_queue class
+
+class Solution {
+public:
+    int findKthLargest(vector<int>& nums, int k) {
+        int n = nums.size();
+        // min-queue of k numbers
+        std::priority_queue<int, std::vector<int>, std::greater<int> > pq;
+        //build the heap from first k numbers
+        for(int i = 0; i < k; i++) pq.push(nums[i]);
+        //add one and remove min
+        for(int i = k; i < n; i++) {
+            pq.push(nums[i]);
+            pq.pop();
+        }
+        return pq.top();
+    }
+};
+
