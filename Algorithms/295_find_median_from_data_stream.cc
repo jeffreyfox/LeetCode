@@ -21,45 +21,45 @@ findMedian() -> 2
 
 */
 
-// Solution: use two priority queues, one max-queue and the other min-queue. Store first half of data in max-queue and second half of data in min-queue. Has to take care of corner cases (count == 0)
+// Solution: use two priority queues, one max-queue and the other min-queue. Store first half of data in max-queue and second half of data in min-queue.
+// Need to take care of corner cases (count == 0)
 
 class MedianFinder {
 public:
-    MedianFinder() : count(0) {}
+    MedianFinder() : N(0) {}
 
     // Adds a number into the data structure.
     void addNum(int num) {
-        if(count == 0) maxHeap.push(num);
-        else if(count % 2 == 0) { //even number of elements
-            if(num <= maxHeap.top()) maxHeap.push(num);
+        if(N == 0)   max_queue.push(num); //corner case, min_queue is still empty
+        else if(N % 2 == 0) { //evenly distributed among min and max queues
+            if(num <= min_queue.top()) max_queue.push(num);
             else {
-                minHeap.push(num);
-                maxHeap.push(minHeap.top()); //put smallest in minHeap to maxHeap
-                minHeap.pop();
+                min_queue.push(num);
+                max_queue.push(min_queue.top());
+                min_queue.pop();
             }
-        } else { //odd number of elements, maxHeap has the extra one
-            if(num >= maxHeap.top()) minHeap.push(num);
+        } else { //max_queue has one more element
+            if(num >= max_queue.top()) min_queue.push(num);
             else {
-                maxHeap.push(num);
-                minHeap.push(maxHeap.top());
-                maxHeap.pop();
+                max_queue.push(num);
+                min_queue.push(max_queue.top());
+                max_queue.pop();
             }
         }
-        count++;
+        N++;
     }
 
     // Returns the median of current data stream
     double findMedian() {
-        if(count == 0) return 0;
-        else if(count % 2 == 1) return maxHeap.top();
-        else return (maxHeap.top() + minHeap.top())/2.0;
+        if(N % 2 == 1) return max_queue.top();
+        else return (max_queue.top() + min_queue.top()) / 2.0;
     }
-
-private:    
-    priority_queue<int> maxHeap;
-    priority_queue<int, vector<int>, greater<int> > minHeap;
-    int count;
+private:
+    int N;
+    priority_queue<int> max_queue; //storing smallest ceil(N/2) elements
+    priority_queue<int, vector<int>, greater<int> > min_queue; //storing largest floor(N/2) elements
 };
+
 
 // Your MedianFinder object will be instantiated and called as such:
 // MedianFinder mf;
