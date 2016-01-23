@@ -59,7 +59,7 @@ public:
     }
 };
 
-// Solution 2. avoid multiplications, but have additional variables. Can be extended to super ugly case
+// Solution 2. avoid multiplications, but have additional variables. Can be extended to super ugly case. Also loop starts at 0.
 class Solution {
 public:
     int nthUglyNumber(int n) {
