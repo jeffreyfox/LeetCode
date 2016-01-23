@@ -58,3 +58,44 @@ public:
         return ugly[n-1];
     }
 };
+
+// A solution using priority queue
+struct Element {
+    int val;
+    int prime;
+    int index;
+    Element() : val(0), prime(0), index(0) {}
+    Element(int v, int p, int i) : val(v), prime(p), index(i) {}
+};
+
+class isGreater
+{
+public:
+    bool operator() (const Element& e1, const Element &e2) {
+        return e1.val > e2.val;    
+    }
+};
+
+
+class Solution {
+public:
+    int nthUglyNumber(int n) {
+        if(n == 1) return 1;
+        vector<int> ugly(n, 1);
+        priority_queue<Element, vector<Element>, isGreater> min_queue;
+        min_queue.push(Element(2, 2, 0));
+        min_queue.push(Element(3, 3, 0));
+        min_queue.push(Element(5, 5, 0));
+        for(int i = 1; i < n; ++i) {
+            int val = min_queue.top().val;
+            while(min_queue.top().val == val) { //remove all duplicates
+                Element next = min_queue.top();
+                min_queue.pop();
+                ugly[i] = next.val;
+                next.val = ugly[++next.index]*next.prime;
+                min_queue.push(next);
+            }
+        }
+        return ugly[n-1];
+    }
+};
