@@ -95,3 +95,47 @@ public:
     }
 };
 
+// Solution 3. Use quick selection. Iterative or recursive findKthHelper. Since looking for k-th largest, need to revert implementatino of traditional partition function.
+class Solution {
+public:
+    int findKthLargest(vector<int>& nums, int k) {
+        int n = nums.size();
+        return findKthHelper(nums, 0, n-1, k);
+    }
+    int findKthHelper(vector<int>& nums, int l, int r, int k) {
+        while(l < r) {
+            //if(l == r) return nums[l];
+            int i = partition(nums, l, r);
+            int cnt = i-l+1; //number of elements between [l, i]
+            if(k == cnt) return nums[i];
+            else if(k < cnt) r = i-1; 
+            else { l = i+1; k -= cnt; }
+        }
+        return nums[l];
+    }
+    /* 
+    //recursive findKthHelper
+    int findKthHelper(vector<int>& nums, int l, int r, int k) {
+        if(l == r) return nums[l];
+        int i = partition(nums, l, r);
+        int cnt = i-l+1; //number of elements between [l, i]
+        if(k == cnt) return nums[i];
+        else if(k < cnt) return findKthHelper(nums, l, i-1, k);
+        else return findKthHelper(nums, i+1, r, k-cnt);
+    }
+    */
+    //no need to check l, r bounds because calling function guards against it. 
+    //opposite to traditional paritition (larger ones to the left, smaller ones to the right)
+    int partition(vector<int>& nums, int l, int r) {
+        int x = nums[r]; //pivot is last one
+        int i = l-1, j = r;
+        while(1) {
+            while(nums[++i] > x) ;
+            while(nums[--j] < x) if(j == l) break;
+            if(i < j) swap(nums[i], nums[j]);
+            else break;
+        }
+        swap(nums[i], nums[r]);
+        return i;
+    }
+};
