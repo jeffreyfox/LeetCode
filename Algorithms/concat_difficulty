@@ -10,7 +10,8 @@ file=$1
 echo "Generating solutions for $file ..."
 
 #reverse
-tac ${file}.txt > tmp.txt
+#tac ${file}.txt > tmp.txt
+cat ${file}.txt > tmp.txt
 
 fname=${file}_sol.cc
 rm -f $fname
