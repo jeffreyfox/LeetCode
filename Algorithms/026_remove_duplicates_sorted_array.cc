@@ -9,25 +9,22 @@ Given input array nums = [1,1,2],
 Your function should return length = 2, with the first two elements of nums being 1 and 2 respectively. It doesn't matter what you leave beyond the new length. 
 */
 
-// Two pointers
+// Solution with one loop, two pointers
 class Solution {
 public:
     int removeDuplicates(vector<int>& nums) {
         int n = nums.size();
         if(n <= 1) return n;
-        int len = 0;
-        int i = 0, j = 0;
-        while(i < n) {
-            j = i+1;
-            while(j < n && nums[j] == nums[i]) j++;
-            nums[len++] = nums[i];
-            i = j;
+        int i = 0, j = 1;
+        while(j < n) {
+            if(nums[j] != nums[i])  nums[++i] = nums[j];
+            j++;
         }
-        return len;
+        return i+1;
     }
 };
 
-// A slightly different solution (no len variable)
+// A slightly different solution (nested while loops)
 class Solution {
 public:
     int removeDuplicates(vector<int>& nums) {
