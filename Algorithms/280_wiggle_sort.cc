@@ -20,18 +20,13 @@ class Solution {
 public:
     void wiggleSort(vector<int>& nums) {
         int n = nums.size();
-        if(n <= 1) return;
-        for(int i = 0; i+1 < n; i+=2) {
-            if(nums[i] > nums[i+1]) swap(nums, i, i+1);
+        if(n == 1) return;
+        for(int i = 0; i+1 < n; i += 2) {
+            if(nums[i] > nums[i+1])  swap(nums[i], nums[i+1]);
         }
-        for(int i = 1; i+1 < n; i+=2) {
-            if(nums[i] < nums[i+1]) swap(nums, i, i+1);
+        for(int i = 1; i+1 < n; i += 2) {
+            if(nums[i] < nums[i+1])  swap(nums[i], nums[i+1]);
         }
-    }
-    void swap(vector<int>& nums, int i, int j) {
-        int t = nums[i];
-        nums[i] = nums[j];
-        nums[j] = t;
     }
 };
 
@@ -42,14 +37,9 @@ public:
         int n = nums.size();
         if(n <= 1) return;
         for(int i = 0; i+1 < n; i++) {
-            if(!(i & 1) && nums[i] > nums[i+1]) swap(nums, i, i+1);
-            if((i & 1) && nums[i] < nums[i+1]) swap(nums, i, i+1);
+            if(!(i & 1) && nums[i] > nums[i+1]) swap(nums[i], nums[i+1]);
+            if((i & 1) && nums[i] < nums[i+1]) swap(nums[i], nums[i+1]);
         }
-    }
-    void swap(vector<int>& nums, int i, int j) {
-        int t = nums[i];
-        nums[i] = nums[j];
-        nums[j] = t;
     }
 };
 
@@ -61,9 +51,7 @@ public:
         if(n <= 1) return;
         sort(nums.begin(), nums.end());
         for(int i = 1; i+1 < n; i+=2) {
-            int tmp = nums[i];
-            nums[i] = nums[i+1];
-            nums[i+1] = tmp;
+            swap(nums[i] nums[i+1]);
         }
     }
 };
