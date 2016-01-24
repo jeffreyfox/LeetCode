@@ -30,40 +30,36 @@ public:
     int maximumGap(vector<int>& nums) {
         int n = nums.size();
         if(n < 2) return 0;
-        if(n == 2) return abs(nums[0] - nums[1]);
-        int minimum = INT_MAX, maximum = INT_MIN;
-        for(int i = 0; i < n; ++i) {
-            if(nums[i] > maximum) maximum = nums[i];
-            if(nums[i] < minimum) minimum = nums[i];
+        int min_val = nums[0], max_val = nums[0];
+        for(int i = 1; i < n; i++) {
+            min_val = min(min_val, nums[i]);
+            max_val = max(max_val, nums[i]);
         }
-        int span = maximum - minimum;
-        if(span == 0) return 0;
-        //put the left n numbers into n+1 buckets, tracking the minimum and maximum in each bucket
-        int nb = n+1; 
-        double bucket_len = double(span) / nb;
-        vector<pair<int, int> > buckets(nb, make_pair(-1, -1));
-        for(int i = 0; i < n; ++i) {
-            int ib = (nums[i] - minimum) / bucket_len;
-            //put maximum in last bucket
-            if(ib == nb) ib = nb-1;
+        if(min_val == max_val || min_val == max_val-1) return max_val - min_val;
+        
+        int nbuck = n+1;
+        vector<pair<int, int> > buckets(nbuck, make_pair(-1, -1));//pair is for lower and higher bounds
+        double blen = (max_val-min_val)/(double)nbuck; //length of the bucket interval
+        //put numbers in buckets, which stores the lower and higher bounds of each interval
+        for(int i = 0; i < n; i++) {
+            int ib = (nums[i] - min_val) / blen;
+            if(ib == nbuck) ib = nbuck-1;
             if(buckets[ib].first == -1) buckets[ib].first = buckets[ib].second = nums[i];
             else {
-                if(nums[i] < buckets[ib].first) buckets[ib].first = nums[i];
-                if(nums[i] > buckets[ib].second) buckets[ib].second = nums[i];
+                buckets[ib].first = min(buckets[ib].first, nums[i]);
+                buckets[ib].second = max(buckets[ib].second, nums[i]);
             }
         }
-        //now scan all buckets and find all empty ones
-        int max_diff = INT_MIN, diff = 0;
-        int left = -1, right = -1; //left and right boundary of empty space
-        for(int ib = 0; ib < nb; ++ib) {
-            if(buckets[ib].first == -1) { //can't be first or last bucket
-                if(left == -1) left = buckets[ib-1].second;
-                right = buckets[ib+1].first;
-            } else { //calculate previous
-                max_diff = max(max_diff, right - left);
-                left = right = -1;
-            }
+        //scan interval and find maximum gap
+        int max_gap = 0;
+        //buckets[0] and buckets[ib-1] surely is defined (min, max)
+        int right = buckets[0].second;
+        for(int i = 1; i < nbuck; i++) {
+            if(buckets[i].first == -1) continue;
+            max_gap = max(max_gap, buckets[i].first - right);
+            right = buckets[i].second;
         }
-        return max_diff;
+        return max_gap;
     }
 };
+
