@@ -15,6 +15,7 @@ find(7) -> false
 // add is O(1) amortized, just increment count in table
 // find needs to traverse all entries in table. Handle two cases: number and residue are the same, and differerent.
 // Slight optimization: only check half of cases (i >= j), avoid rechecking the same pair.
+// using map will lead to TLE, because add is O(lgn)
 
 class TwoSum {
 
