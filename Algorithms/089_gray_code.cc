@@ -36,3 +36,17 @@ public:
         return res;
     }
 };
+
+// Solution 2 using one single loop
+class Solution {
+public:
+   vector<int> grayCode(int n) {
+        if(n < 0) return vector<int>();
+        vector<int> result(1 << n, 0); //pow(2, n)
+        for(int j = 1, size = 1; j < result.size(); ++j) {
+            if(j == size)  size <<= 1;
+            result[j] = result[size-j-1] + (size >> 1);
+        }
+        return result;
+    }
+};
