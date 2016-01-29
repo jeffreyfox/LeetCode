@@ -62,3 +62,20 @@ public:
     }
 };
 
+// Solution 2. Another elegant solution!
+// https://leetcode.com/discuss/66203/java-solution-without-knowing-the-difference-in-len
+
+class Solution {
+public:
+    ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
+        if(!headA || !headB) return NULL;
+        ListNode *a = headA, *b = headB;
+        while(a != b) {
+            a = a ? a->next : headB;
+            b = b ? b->next : headA;
+        }
+        return a;
+    }
+};
+
+
