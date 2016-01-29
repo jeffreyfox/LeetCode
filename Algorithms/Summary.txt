@@ -225,6 +225,7 @@
 285_inorder_successor_in_bst.cc
 287_find_the_duplicate_number.cc
 288_unique_word_abbreviation.cc
+289_game_of_life.cc
 290_word_pattern.cc
 291_word_pattern_ii.cc
 292_nim_game.cc
