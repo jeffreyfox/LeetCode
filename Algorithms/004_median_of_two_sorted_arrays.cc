@@ -45,12 +45,12 @@ public:
         int mid1 = lo1 + (hi1-lo1)/2;
         int mid2 = lo2 + (hi2-lo2)/2;
         int hlen1 = mid1 - lo1, hlen2 = mid2 - lo2; //number of elements before mid
-        if(nums1[mid1] <= nums2[mid2]) {
-            if(k <= hlen1 + hlen2) return findKth(nums1, lo1, hi1, nums2, lo2, mid2-1, k); //drop elements after mid2 (inclusive)
-            else return findKth(nums1, mid1+1, hi1, nums2, lo2, hi2, k-hlen1-1); //drop elements before mid1 (inclusive)
+        if(k <= hlen1 + hlen2) {
+            if(nums1[mid1] <= nums2[mid2]) return findKth(nums1, lo1, hi1, nums2, lo2, mid2-1, k); //drop elements [mid2, hi2]
+            else return findKth(nums1, lo1, mid1-1, nums2, lo2, hi2, k); //drop elements after [mid1, hi1]
         } else {
-            if(k <= hlen1 + hlen2) return findKth(nums1, lo1, mid1-1, nums2, lo2, hi2, k); //drop elements after mid1 (inclusive)
-            else return findKth(nums1, lo1, hi1, nums2, mid2+1, hi2, k-hlen2-1); //drop elements before mid2 (inclusive)
+            if(nums1[mid1] <= nums2[mid2]) return findKth(nums1, mid1+1, hi1, nums2, lo2, hi2, k-hlen1-1); //drop elements [lo1, mid1]
+            else return findKth(nums1, lo1, hi1, nums2, mid2+1, hi2, k-hlen2-1); //drop elements [lo2, mid2]
         }
     }
 };
