@@ -43,6 +43,7 @@
 045_jump_game_ii.cc
 046_permutations.cc
 047_permutations_ii.cc
+048_rotate_image.cc
 049_group_anagrams.cc
 050_pow_x_n.cc
 051_n_queens.cc
@@ -185,6 +186,9 @@
 240_search_a_2d_matrix_ii.cc
 241_different_ways_to_add_parentheses.cc
 242_valid_anagram.cc
+243_shortest_word_distance.cc
+244_shortest_word_distance_ii.cc
+245_shortest_word_distance_iii.cc
 246_strobogrammatic_number.cc
 247_strobogrammatic_number_ii.cc
 248_strobogrammatic_number_iii.cc
@@ -238,4 +242,5 @@
 312_burst_balloons.cc
 313_super_ugly_number.cc
 320_generalized_abbreviation.cc
+322_coin_change.cc
 322_coint_change.cc
