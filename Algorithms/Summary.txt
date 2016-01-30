@@ -49,10 +49,12 @@
 051_n_queens.cc
 052_n_queens_ii.cc
 053_maximum_subarray.cc
+054_spiral_matrix.cc
 055_jump_game.cc
 056_merge_intervals.cc
 057_insert_interval.cc
 058_length_of_last_word.cc
+059_spiral_matrix_ii.cc
 060_permutation_sequence.cc
 062_unique_paths.cc
 063_unique_paths_ii.cc
@@ -78,6 +80,7 @@
 085_maximal_rectangle.cc
 087_scramble_string.cc
 088_merge_sorted_array.cc
+089_gray_code.cc
 090_subsets_ii.cc
 091_decode_ways.cc
 093_restore_ip_addresses.cc
@@ -116,9 +119,12 @@
 132_palindrome_partitioning_ii.cc
 134_gas_station.cc
 135_candy.cc
+136_single_number.cc
 138_copy_list_with_random_pointer.cc
 139_word_break.cc
 140_word_break_ii.cc
+141_linked_list_cycle.cc
+142_linked_list_cycle_ii.cc
 143_reorder_list.cc
 144_binary_tree_preorder_traversal.cc
 145_binary_tree_postorder_traversal.cc
@@ -134,6 +140,7 @@
 157_read_n_characters_given_read4.cc
 158_read_n_characters_given_read4_ii.cc
 159_longest_substr_at_most_two_distinct_char.cc
+160_intersection_of_two_linked_lists.cc
 161_one_edit_distance.cc
 162_find_peak_element.cc
 164_maximum_gap.cc
@@ -161,6 +168,7 @@
 206_reverse_linked_list.cc
 208_implement_trie.cc
 209_minimum_size_subarray_sum.cc
+211_add_and_search_word.cc
 212_word_search_ii.cc
 213_house_robber_ii.cc
 214_shortest_palindrome.cc
@@ -213,6 +221,8 @@
 269_alien_dictionary.cc
 270_closest_binary_search_tree_value.cc
 272_closest_binary_search_tree_value_ii.cc
+274_h_index.cc
+275_h_index_ii.cc
 276_paint_fence.cc
 277_find_the_celebrity.cc
 278_first_bad_version.cc
@@ -245,3 +255,4 @@
 320_generalized_abbreviation.cc
 322_coin_change.cc
 322_coint_change.cc
+323_number_of_connected_components_in_an_undirected_graph.cc
