@@ -108,7 +108,6 @@ private:
     Node* head;
 };
 
-
 class Solution {
 public:
     vector<string> findWords(vector<vector<char>>& board, vector<string>& words) {
@@ -148,123 +147,90 @@ public:
     Trie t;
 };
 
-// Solution 2.
+// Solution 2 (100ms)
+class TrieNode {
+public:
+    TrieNode() {
+        isKey = false;
+        for(int i = 0; i < 26; i++) next[i] = NULL;
+    }
+    bool isKey;
+    TrieNode* next[26];
+};
+
 class Trie {
 public:
-    struct Node {
-        bool isKey;
-        vector<Node*> links;
-        Node() : isKey(false) {
-            links.resize(26, NULL);
-        }
-    };
-
     Trie() {
-        root = new Node();
+        root = new TrieNode();
     }
 
-    ~Trie() {
-        eraseNode(root);
-    }
-    void insert(const string& s) {
-        insertUtil(root, s, 0);
+    void insert(const string& word) {
+        insert(root, word, 0);
     }
 
-    bool exist(const string& s) {
-        Node *node = find(root, s, 0);
+    bool search(const string& word) {
+        TrieNode * node = search(root, word, 0);
         return node != NULL && node->isKey;
     }
-    bool existPrefix(const string& s) {
-        Node *node = find(root, s, 0);
+
+    // Returns if there is any word in the trie that starts with the given prefix.
+    bool containsPrefix(const string& prefix) {
+        TrieNode* node = search(root, prefix, 0);
         return node != NULL;
     }
-    void erase(const string& s) {
-        eraseUtil(root, s, 0);
-    }
-private:
-    void insertUtil(Node* node, const string& s, int k) {
-        if(k == s.size()) { node->isKey = true; return; }
-        int i = s[k] - 'a';
-        if(node->links[i] == NULL) node->links[i] = new Node();
-        insertUtil(node->links[i], s, k+1);
-    }
 
-    Node* eraseUtil(Node* node, const string& s, int k) {
-        if(node == NULL) return NULL;
-        if(k == s.size()) {
-            node->isKey = false;
-        } else {
-            int c = s[k] - 'a';
-            node->links[c] = eraseUtil(node->links[c], s, k+1);
-        }
-        if(node != root && !hasLinks(node) && !node->isKey) {
-            delete node; //no nodes below it
-            node = NULL;
-        }
-        return node;
+private:
+    void insert(TrieNode* x, const string& word, int d) {
+        if(d == word.size()) { x->isKey = true; return; }
+        //if link not exist, create it before descending
+        int idx = word[d] - 'a';
+        if(x->next[idx] == NULL) x->next[idx] = new TrieNode;
+        insert(x->next[idx], word, d+1);
     }
-    bool hasLinks(Node* node) {
-        if(node == NULL) return false;
-        for(int i = 0; i < 26; ++i) 
-            if(node->links[i]) return true;
-        return false;
+    TrieNode* search(TrieNode* x, const string& word, int d) {
+        if(d == word.size()) return x;
+        int idx = word[d] - 'a';
+        //if link is null, return null;
+        if(x->next[idx] == NULL) return NULL;
+        return search(x->next[idx], word, d+1);
     }
-    Node* find(Node* node, const string& s, int k) {
-        if(node == NULL || k == s.size()) return node;
-        int i = s[k] - 'a';
-        return find(node->links[i], s, k+1);
-    }
-    void eraseNode(Node* node) {
-        if(!node) return;
-        for(int i = 0; i < 26; ++i) eraseNode(node->links[i]);
-        delete node;
-    }
-    Node* root;
+    TrieNode* root;
 };
 
 class Solution {
 public:
     vector<string> findWords(vector<vector<char>>& board, vector<string>& words) {
         vector<string> result;
-        if(board.empty() || board[0].empty()) return result;
-        int m = board.size(), n = board[0].size();
+        if(board.empty() || board[0].empty() || words.empty()) return result;
+        for(auto w : words) t.insert(w);
         string tmp;
-        for(auto it : words) t.insert(it);
-        for(int i = 0; i < m; ++i) {
-            for(int j = 0; j < n; ++j) {
+        int m = board.size(), n = board[0].size();
+        for(int i = 0; i < m; i++) {
+            for(int j = 0; j < n; j++) {
                 dfs(board, i, j, tmp, result);
             }
         }
         return result;
     }
-
     void dfs(vector<vector<char>>& board, int i, int j, string& tmp, vector<string>& result) {
         int m = board.size(), n = board[0].size();
-        if(i < 0 || i >= m || j < 0 || j >= n) return; //illegal position
-        if(board[i][j] == '*') return; //visited
+        tmp += board[i][j];
         char c = board[i][j];
-        tmp = tmp + c;
-        if(t.exist(tmp) && !found(result, tmp)) {
-            result.push_back(tmp);
+        board[i][j] = '*'; //mark as visited
+        if(t.search(tmp)) { //found a word
+            int k = 0, size = result.size(); //avoid duplicates
+            for(; k < size; k++) if(result[k] == tmp) break;
+            if(k == size) result.push_back(tmp); 
         }
-        board[i][j] = '*';
-        if(t.existPrefix(tmp)) {
-            dfs(board, i, j+1, tmp, result);
-            dfs(board, i, j-1, tmp, result);
-            dfs(board, i+1, j, tmp, result);
-            dfs(board, i-1, j, tmp, result);
+        if(t.containsPrefix(tmp)) {
+            if(i < m-1 && board[i+1][j] != '*') dfs(board, i+1, j, tmp, result);
+            if(j < n-1 && board[i][j+1] != '*') dfs(board, i, j+1, tmp, result);
+            if(i > 0 && board[i-1][j] != '*') dfs(board, i-1, j, tmp, result);
+            if(j > 0 && board[i][j-1] != '*') dfs(board, i, j-1, tmp, result);
         }
-        board[i][j] = c;
+        board[i][j] = c; //reset back to original
         tmp.pop_back();
-    }
-    
-    bool found(vector<string>& result, string& tmp) {
-        for(auto it : result) {
-            if(tmp == it) return true;
-        }
-        return false;
     }
     Trie t;
 };
-
 
