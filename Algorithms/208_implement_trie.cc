@@ -10,7 +10,75 @@ You may assume that all inputs are consist of lowercase letters a-z.
 // trie.insert("somestring");
 // trie.search("key");
 
-/// Solution 1, simpler, with delete function (which slows down runtime by 40 ms!)
+/// Solution 1. Follows the Java implementation from the Sedgewick book.
+/// The character we are currently at does not correpsond to the node itself, but one of its links!
+
+/// When we do search(x, str, d), we are actually looking for x->next[str[d]] !, 
+/// e.g. ab , when d == 0, we search character 'a' in the first link of root.
+/// Then we search b in the second link of node 'a'. When we arrive b, we have d == 2, pointing to str.end(). then we check if b is a key.
+/// When d reaches one past the end of str, return the node we are currently at.
+/// If we encountered a NULL node before that, we simply return null.
+
+/// When we do insert(x, str, d), we are actually inserting str[d] to the associated next link of the node x.
+/// e.g. inserting ab to empty trie. first insert(root, "ab", 0), which directly goes to root->next[0], and we have 
+/// insert(root->next[0], "ab", 1), we first need to create the node corresponding to 'a' (this node is pointed by the first link of root)
+/// in the last step, so it is interpreted as 'a'. Then we should check its second link for 'b'. We then call
+/// insert(a_node->next[1], "ab", 2), we again need to create one, then as d reaches the end, we set isKey to true, and then return the node
+/// (not its links)
+
+class TrieNode {
+public:
+    // Initialize your data structure here.
+    TrieNode() {
+        isKey = false;
+        for(int i = 0; i < 26; i++) next[i] = NULL;
+    }
+    bool isKey;
+    TrieNode* next[26];
+};
+
+class Trie {
+public:
+    Trie() {
+        root = new TrieNode();
+    }
+
+    // Inserts a word into the trie.
+    void insert(string word) {
+        root = insert(root, word, 0);
+    }
+
+    // Returns if the word is in the trie.
+    bool search(string word) {
+        TrieNode * node = search(root, word, 0);
+        return node != NULL && node->isKey;
+    }
+
+    // Returns if there is any word in the trie
+    // that starts with the given prefix.
+    bool startsWith(string prefix) {
+        TrieNode* node = search(root, prefix, 0);
+        return node != NULL;
+    }
+
+private:
+    TrieNode* insert(TrieNode* x, const string& word, int d) {
+        if(x == NULL) x = new TrieNode;
+        if(d == word.size()) { x->isKey = true; return x; }
+        int idx = word[d] - 'a';
+        x->next[idx] = insert(x->next[idx], word, d+1);
+        return x;
+    }
+    TrieNode* search(TrieNode* x, const string& word, int d) {
+        if(x == NULL) return NULL;
+        if(d == word.size()) return x;
+        int idx = word[d] - 'a';
+        return search(x->next[idx], word, d+1);
+    }
+    TrieNode* root;
+};
+
+/// Solution 2, with delete function (which slows down runtime by 40 ms!)
 
 class TrieNode {
 public:
@@ -73,62 +141,3 @@ private:
     TrieNode* root;
 };
 
-// Your Trie object will be instantiated and called as such:
-// Trie trie;
-// trie.insert("somestring");
-// trie.search("key");
-
-
-/// Solution 2, slightly different. Follows the Java implementation from the Sedgewick book.
-
-class TrieNode {
-public:
-    // Initialize your data structure here.
-    TrieNode() {
-        isKey = false;
-        for(int i = 0; i < 26; i++) next[i] = NULL;
-    }
-    bool isKey;
-    TrieNode* next[26];
-};
-
-class Trie {
-public:
-    Trie() {
-        root = new TrieNode();
-    }
-
-    // Inserts a word into the trie.
-    void insert(string word) {
-        root = insert(root, word, 0);
-    }
-
-    // Returns if the word is in the trie.
-    bool search(string word) {
-        TrieNode * node = search(root, word, 0);
-        return node != NULL && node->isKey;
-    }
-
-    // Returns if there is any word in the trie
-    // that starts with the given prefix.
-    bool startsWith(string prefix) {
-        TrieNode* node = search(root, prefix, 0);
-        return node != NULL;
-    }
-
-private:
-    TrieNode* insert(TrieNode* x, const string& word, int d) {
-        if(x == NULL) x = new TrieNode;
-        if(d == word.size()) { x->isKey = true; return x; }
-        int idx = word[d] - 'a';
-        x->next[idx] = insert(x->next[idx], word, d+1);
-        return x;
-    }
-    TrieNode* search(TrieNode* x, const string& word, int d) {
-        if(x == NULL) return NULL;
-        if(d == word.size()) return x;
-        int idx = word[d] - 'a';
-        return search(x->next[idx], word, d+1);
-    }
-    TrieNode* root;
-};
