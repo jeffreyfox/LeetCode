@@ -32,3 +32,22 @@ public:
         return hi+1;
     }
 };
+
+// Solution 2. Use another table to store the counts, O(n) space, but O(n) time.
+// dict[i] stores the number of papers that have citation of i, since hindex can only be 0 to n, where n is the size of input array,
+// we only need to keep track of the counts for i = 0 .. n, hence the size of dict is n+1.
+
+class Solution {
+public:
+    int hIndex(vector<int>& citations) {
+        if(citations.empty()) return 0;
+        int n = citations.size();
+        vector<int> dict(n+1, 0); //dict[i]: count for citations equal to i
+        for(auto c: citations)  dict[min(c, n)]++;
+        for(int i = n, tot = 0; i >= 0; i--) {
+            tot += dict[i];
+            if(tot >= i) return i;
+        }
+        return 0;
+    }
+};
