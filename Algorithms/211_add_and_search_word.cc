@@ -1,87 +1,86 @@
-/// Use a trie as underlying data-structure
-/// Implement pattern search functionality (support wildcard '.')
+/*
+Design a data structure that supports the following two operations:
 
-class Trie {
-public:
-    struct Node {
-        bool isKey;
-        Node** links; // array of nodes
-        Node() : isKey(false) {
-            links = new Node*[26];
-            for (int i = 0; i < 26; ++i)
-                links[i] = NULL;
-        }
-    };
-    
-    Trie() { root = new Node(); }
+void addWord(word)
+bool search(word)
+search(word) can search a literal word or a regular expression string containing only letters a-z or .. A . means it can represent any one letter.
 
-    //whether trie contains a key that equals "word"?
-    bool contains(const string& word) const {
-        Node* node = get(root, word, 0);
-        return node != NULL && node->isKey;
-    }
-    
-    //whether trie contains a key that equals "word"? (key can have '.')
-    bool containsPattern(const string& word) const {
-        return containsPattern(root, word, 0);
-    }  
+For example:
 
-    void put(const string& word) {
-        root = put(root, word, 0);
-    }
-
-private:
-
-    Node* get(Node* node, const string& word, int k) const {
-        if (node == NULL) return NULL;
-        if (k == word.size()) return node;
-        int i = word[k] - 'a';
-        return get(node->links[i], word, k+1);
-    }
-    
-    Node* put(Node*& node, const string& word, int k) {
-        if (node == NULL) node = new Node();
-        if (k == word.size()) node->isKey = true;
-        else {
-            int i = word[k] - 'a';
-            node->links[i] = put(node->links[i], word, k+1);
-        }
-        return node;
-    }
-    bool containsPattern(Node* node, const string& word, int k) const {
-        if (node == NULL) return false;
-        if (k == word.size()) return node->isKey;
-        if (word[k] != '.') {
-            int i = word[k] - 'a';
-            return containsPattern(node->links[i], word, k+1);
-        } else { // char is a wildcard '.'
-            for (int i = 0; i < 26; ++i)
-                if (containsPattern(node->links[i], word, k+1)) return true;
-            return false;
-        }
-    }
-    Node* root; //root of trie
-};
-
-class WordDictionary {
-public:
-
-    // Adds a word into the data structure.
-    void addWord(string word) {
-        dict.put(word);
-    }
-
-    // Returns if the word is in the data structure. A word could
-    // contain the dot character '.' to represent any one letter.
-    bool search(string word) {
-        return dict.containsPattern(word);
-    }
-    
-private:
-    Trie dict; //dictionary
-};
+addWord("bad")
+addWord("dad")
+addWord("mad")
+search("pad") -> false
+search("bad") -> true
+search(".ad") -> true
+search("b..") -> true
+Note:
+You may assume that all words are consist of lowercase letters a-z.
+*/
 
 // Your WordDictionary object will be instantiated and called as such:
 // WordDictionary wordDictionary;
 // wordDictionary.addWord("word");
 // wordDictionary.search("pattern");
+
+/// Use a trie as underlying data-structure, search function now returns boolean, and supports checking wildcard '.'
+/// if new character is normal a-z, do normal search, otherwise it is a '.', then check all non-null next links
+
+class TrieNode {
+public:
+    TrieNode() : isKey(false) {
+        for(int i = 0; i < 26; i++) next[i] = NULL;
+    }
+    bool isKey;
+    TrieNode* next[26];
+};
+
+class Trie {
+public:
+    Trie() { root = new TrieNode; }
+    
+    void insert(const string& word) {
+        insert(root, word, 0);
+    }
+    bool search(const string& word) {
+        return search(root, word, 0);
+    }
+    
+private:
+    void insert(TrieNode *x, const string& word, int d) {
+        if(d == word.size()) { x->isKey = true; return; }
+        int idx = word[d] - 'a';
+        if(x->next[idx] == NULL) x->next[idx] = new TrieNode;
+        insert(x->next[idx], word, d+1);
+    }
+    //x will never be null
+    bool search(TrieNode *x, const string& word, int d) {
+        if(d == word.size()) return x->isKey;
+        if(word[d] != '.') {
+            int idx = word[d] - 'a';
+            return (x->next[idx] && search(x->next[idx], word, d+1));
+        } else {
+            for(int idx = 0; idx < 26; idx++) {
+                if(x->next[idx] && search(x->next[idx], word, d+1)) return true;
+            }
+            return false;
+        }
+    }
+    TrieNode* root;
+};
+
+class WordDictionary {
+public:
+    WordDictionary() : t() {}
+    // Adds a word into the data structure.
+    void addWord(string word) {
+        t.insert(word);
+    }
+
+    // Returns if the word is in the data structure. A word could
+    // contain the dot character '.' to represent any one letter.
+    bool search(string word) {
+        return t.search(word);
+    }
+    Trie t;
+};
