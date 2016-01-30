@@ -48,12 +48,6 @@ public:
         root = insert(root, word, 0);
     }
 
-/* // a slightly different way of insert (no returning links)
-    void insert(string word) {
-        insert(root, word, 0);
-    }
-*/
-
     // Returns if the word is in the trie.
     bool search(string word) {
         TrieNode * node = search(root, word, 0);
@@ -75,15 +69,6 @@ private:
         x->next[idx] = insert(x->next[idx], word, d+1);
         return x;
     }
-/* // a slightly different way of insert (no returning links)
-void insert(TrieNode* x, const string& word, int d) {
-        if(d == word.size()) { x->isKey = true; return; }
-        //if link not exist, create it before descending
-        int idx = word[d] - 'a';
-        if(x->next[idx] == NULL) x->next[idx] = new TrieNode;
-        insert(x->next[idx], word, d+1);
-    }
-*/
     TrieNode* search(TrieNode* x, const string& word, int d) {
         if(x == NULL) return NULL;
         if(d == word.size()) return x;
@@ -93,7 +78,63 @@ void insert(TrieNode* x, const string& word, int d) {
     TrieNode* root;
 };
 
-/// Solution 2, with delete function (which slows down runtime by 40 ms!)
+/// Solution 2. Slightly simpler, make sure search and insert will never encounter null nodes, can remove the check of x == NULL.
+/// this also reduces stack depth by one (no need to descend in to a null node), and easier to comprehend.
+
+class TrieNode {
+public:
+    // Initialize your data structure here.
+    TrieNode() {
+        isKey = false;
+        for(int i = 0; i < 26; i++) next[i] = NULL;
+    }
+    bool isKey;
+    TrieNode* next[26];
+};
+
+class Trie {
+public:
+    Trie() {
+        root = new TrieNode();
+    }
+
+    // Inserts a word into the trie.
+    void insert(string word) {
+        insert(root, word, 0);
+    }
+
+    // Returns if the word is in the trie.
+    bool search(string word) {
+        TrieNode * node = search(root, word, 0);
+        return node != NULL && node->isKey;
+    }
+
+    // Returns if there is any word in the trie
+    // that starts with the given prefix.
+    bool startsWith(string prefix) {
+        TrieNode* node = search(root, prefix, 0);
+        return node != NULL;
+    }
+
+private:
+    void insert(TrieNode* x, const string& word, int d) {
+        if(d == word.size()) { x->isKey = true; return; }
+        //if link not exist, create it before descending
+        int idx = word[d] - 'a';
+        if(x->next[idx] == NULL) x->next[idx] = new TrieNode;
+        insert(x->next[idx], word, d+1);
+    }
+    TrieNode* search(TrieNode* x, const string& word, int d) {
+        if(d == word.size()) return x;
+        int idx = word[d] - 'a';
+        //if link is null, return null;
+        if(x->next[idx] == NULL) return NULL;
+        return search(x->next[idx], word, d+1);
+    }
+    TrieNode* root;
+};
+
+/// Solution 3, with delete function (which slows down runtime by 40 ms!)
 
 class TrieNode {
 public:
