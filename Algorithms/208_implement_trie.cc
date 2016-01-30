@@ -23,8 +23,8 @@ You may assume that all inputs are consist of lowercase letters a-z.
 /// e.g. inserting ab to empty trie. first insert(root, "ab", 0), which directly goes to root->next[0], and we have 
 /// insert(root->next[0], "ab", 1), we first need to create the node corresponding to 'a' (this node is pointed by the first link of root)
 /// in the last step, so it is interpreted as 'a'. Then we should check its second link for 'b'. We then call
-/// insert(a_node->next[1], "ab", 2), we again need to create one, then as d reaches the end, we set isKey to true, and then return the node
-/// (not its links)
+/// insert(a_node->next[1], "ab", 2), we again need to create one, then as d reaches the end, we set isKey to true, and then return the node (not its links)
+/// When not reaching the end, we need to recursively call the insert of its links, and return the new link address. We finally return the node x.
 
 class TrieNode {
 public:
