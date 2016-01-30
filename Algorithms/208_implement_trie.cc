@@ -48,6 +48,12 @@ public:
         root = insert(root, word, 0);
     }
 
+/* // a slightly different way of insert (no returning links)
+    void insert(string word) {
+        insert(root, word, 0);
+    }
+*/
+
     // Returns if the word is in the trie.
     bool search(string word) {
         TrieNode * node = search(root, word, 0);
@@ -69,6 +75,15 @@ private:
         x->next[idx] = insert(x->next[idx], word, d+1);
         return x;
     }
+/* // a slightly different way of insert (no returning links)
+void insert(TrieNode* x, const string& word, int d) {
+        if(d == word.size()) { x->isKey = true; return; }
+        //if link not exist, create it before descending
+        int idx = word[d] - 'a';
+        if(x->next[idx] == NULL) x->next[idx] = new TrieNode;
+        insert(x->next[idx], word, d+1);
+    }
+*/
     TrieNode* search(TrieNode* x, const string& word, int d) {
         if(x == NULL) return NULL;
         if(d == word.size()) return x;
