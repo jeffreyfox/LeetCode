@@ -93,17 +93,4 @@ private:
     unordered_map<int, ListNode*> dict;
     ListNode *head, *tail;
 };
-    void appendToTail(ListNode* node) {
-        node->prev = tail->prev;
-        node->next = tail;
-        node->prev->next = node;
-        node->next->prev = node;
-    }
-    void deleteHead() {
-        ListNode *tmp = head->next;
-        st.erase(tmp->key);
-        head->next = tmp->next;
-        tmp->next->prev = head;
-        delete tmp;
-    }
-};
+
