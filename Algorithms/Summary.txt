@@ -178,6 +178,7 @@
 217_contains_duplicate.cc
 218_the_skyline_problem.cc
 219_contains_duplicate_ii.cc
+220_contains_duplicate_iii.cc
 221_maximal_square.cc
 223_rectangle_area.cc
 225_implement_stack_using_queues.cc
