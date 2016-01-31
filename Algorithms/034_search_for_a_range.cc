@@ -13,8 +13,7 @@ return [3, 4].
 /// Binary search two passes.
 /// First find the left-most index with value >= target as lo
 /// Then find the right-most index with value <= target as hi
-// If lo <= hi, then found the interval
-// Otherwise, not found, return (-1, -1)
+/// Caveat: If lo <= hi, then found the interval, otherwise, not found, return [-1, -1]
 
 class Solution {
 public:
