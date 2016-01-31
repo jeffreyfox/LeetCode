@@ -30,6 +30,7 @@
 031_next_permutation.cc
 032_longest_valid_parentheses.cc
 033_search_in_rotated_sorted_array.cc
+034_search_for_a_range.cc
 035_search_insert_position.cc
 036_valid_sudoku.cc
 037_sudoku_solver.cc
