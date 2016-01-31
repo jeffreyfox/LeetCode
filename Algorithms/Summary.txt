@@ -162,6 +162,7 @@
 191_number_of_1_bits.cc
 198_house_robber.cc
 200_number_of_islands.cc
+201_bitwise_and_of_numbers_range.cc
 202_happy_number.cc
 203_remove_linked_list_elements.cc
 204_count_primes.cc
@@ -257,7 +258,9 @@
 311_sparse_matrix_multiplication.cc
 312_burst_balloons.cc
 313_super_ugly_number.cc
+314_binary_tree_vertical_order_traversal.cc
 320_generalized_abbreviation.cc
 322_coin_change.cc
 322_coint_change.cc
 323_number_of_connected_components_in_an_undirected_graph.cc
+328_odd_even_linked_list.cc
