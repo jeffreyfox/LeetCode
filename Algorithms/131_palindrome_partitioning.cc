@@ -40,9 +40,8 @@ public:
         tmp.resize(tmp.size()-1); //remove last entry
     }
     bool isPalindrome(const string& s, int i, int j) {
-        int len = j-i+1;
-        for(int k = 0; k < len/2; ++k) {
-            if(s[i+k] != s[j-k]) return false;
+        while(i < j) {
+            if(s[i++] != s[j--]) return false;
         }
         return true;
     }
