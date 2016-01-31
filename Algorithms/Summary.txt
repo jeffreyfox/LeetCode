@@ -96,6 +96,8 @@
 102_binary_tree_level_order_traversal.cc
 103_binary_tree_zigzag_level_order_traversal.cc
 104_maximum_depth_of_binary_tree.cc
+105_construct_binary_tree_from_preorer_and_inorder.cc
+106_construct_binary_tree_from_inorder_and_postorder.cc
 107_binary_tree_level_order_traversal_ii.cc
 108_convert_sorted_array_to_bst.cc
 109_convert_sorted_list_to_bst.cc
@@ -103,6 +105,7 @@
 111_minimum_depth_of_binary_tree.cc
 112_path_sum.cc
 113_path_sum_ii.cc
+114_flatten_binary_tree_to_linked_list.cc
 115_distinct_subsequences.cc
 116_populating_next_right_pointers.cc
 117_populating_next_right_pointers_ii.cc
