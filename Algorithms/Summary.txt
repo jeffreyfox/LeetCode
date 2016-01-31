@@ -165,6 +165,7 @@
 190_reverse_bits.cc
 191_number_of_1_bits.cc
 198_house_robber.cc
+199_binary_tree_right_side_view.cc
 200_number_of_islands.cc
 201_bitwise_and_of_numbers_range.cc
 202_happy_number.cc
