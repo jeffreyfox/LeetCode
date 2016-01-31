@@ -158,6 +158,7 @@
 165_compare_version_numbers.cc
 167_two_sum_ii.cc
 168_excel_sheet_column_title.cc
+169_majority_element.cc
 170_two_sum_iii.cc
 171_excel_sheet_column_number.cc
 172_factorial_trailing_zeroes.cc
