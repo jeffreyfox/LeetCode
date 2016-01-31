@@ -7,6 +7,9 @@ if [ "$#" -eq 1 ]; then
   fi   
 fi
 
+ls *_.cc > tmp.txt
+cat Summary.txt tmp.txt > tmp2.txt
+
 echo -en "\n"
 for (( N = 1; N <= 310; N=N+1 ))
 do
@@ -15,7 +18,7 @@ do
     printf '%03d-%03d | ' $((N)) $((N+9))
   fi
   file=$( printf '%03d' $N )
-  cnt=`grep -c ${file} Summary.txt`
+  cnt=`grep -c ${file} tmp2.txt`
   if [ $cnt -ne 0 ] ; then
     [ $reverse -eq 1 ] && echo -en "  " || echo -en "X "
   else 
@@ -28,3 +31,5 @@ do
   fi
 done
 echo -en "\n"
+
+rm -rf tmp.txt tmp2.txt
