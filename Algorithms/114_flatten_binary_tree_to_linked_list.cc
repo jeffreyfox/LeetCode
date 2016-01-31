@@ -43,18 +43,15 @@ class Solution {
 public:
     void flatten(TreeNode* root) {
         if(!root) return;
-        flatten(root->right);
         flatten(root->left);
+        flatten(root->right);
         if(root->left) {
-            TreeNode *node = rightMostChild(root->left);
+            TreeNode *node = root->left;
+            while(node->right) node = node->right;
             node->right = root->right;
             root->right = root->left;
+            root->left = NULL;
         }
-        root->left = NULL;
-    }
-    
-    TreeNode *rightMostChild(TreeNode* root) {
-        while(root->right) root = root->right;
-        return root;
     }
 };
+
