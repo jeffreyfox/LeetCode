@@ -183,6 +183,7 @@
 225_implement_stack_using_queues.cc
 226_invert_binary_tree.cc
 228_summary_ranges.cc
+229_majority_element_ii.cc
 230_kth_smallest_element_in_bst.cc
 231_power_of_two.cc
 232_implement_queue_using_stacks.cc
@@ -241,6 +242,7 @@
 291_word_pattern_ii.cc
 292_nim_game.cc
 293_flip_game.cc
+294_flip_game_ii.cc
 295_find_median_from_data_stream.cc
 296_best_meeting_point.cc
 299_bulls_and_cows.cc
@@ -251,6 +253,7 @@
 305_number_of_islands_ii.cc
 307_range_sum_query_mutable.cc
 308_range_sum_query_2d_mutable.cc
+311_sparse_matrix_multiplication.cc
 312_burst_balloons.cc
 313_super_ugly_number.cc
 320_generalized_abbreviation.cc
