@@ -3,7 +3,8 @@ Given a string S, find the longest palindromic substring in S. You may assume th
 */
 
 // Scan from left to right, for each character, check if it is in the middle of a palindrome. 
-// Consider even and odd cases
+// Consider even and odd cases.
+// Caveat: be careful of index bounds!
 
 class Solution {
 public:
