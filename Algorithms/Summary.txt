@@ -58,6 +58,7 @@
 058_length_of_last_word.cc
 059_spiral_matrix_ii.cc
 060_permutation_sequence.cc
+061_rotate_list.cc
 062_unique_paths.cc
 063_unique_paths_ii.cc
 064_minimum_path_sum.cc
@@ -125,6 +126,7 @@
 129_sum_root_to_leaf_numbers.cc
 131_palindrome_partitioning.cc
 132_palindrome_partitioning_ii.cc
+133_clone_graph.cc
 134_gas_station.cc
 135_candy.cc
 136_single_number.cc
