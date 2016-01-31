@@ -137,6 +137,7 @@
 147_insertion_sort_list.cc
 148_sort_list.cc
 149_max_points_on_a_line.cc
+150_evaluate_reverse_polish_notation.cc
 151_reverse_words_in_a_string.cc
 152_maximum_product_subarray.cc
 153_find_minimum_in_rotated_sorted_array.cc
