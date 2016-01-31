@@ -9,7 +9,6 @@ class Solution {
 public:
     string longestPalindrome(string s) {
         if(s.empty()) return s;
-
         int n = s.size();
         int istart = 0, max_len = 1;
         for(int i = 0; i < n; ++i) {
