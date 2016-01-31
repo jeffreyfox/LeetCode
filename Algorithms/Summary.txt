@@ -141,6 +141,7 @@
 153_find_minimum_in_rotated_sorted_array.cc
 154_find_minimum_in_rotated_sorted_array_ii.cc
 155_min_stack.cc
+156_binary_tree_upside_down.cc
 157_read_n_characters_given_read4.cc
 158_read_n_characters_given_read4_ii.cc
 159_longest_substr_at_most_two_distinct_char.cc
@@ -213,6 +214,7 @@
 252_meeting_rooms.cc
 253_meeting_rooms_ii.cc
 254_factor_combinations.cc
+255_verify_preorder_sequence_in_bst.cc
 256_paint_house.cc
 257_binary_tree_paths.cc
 258_add_digits.cc
