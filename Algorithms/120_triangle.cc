@@ -16,7 +16,7 @@ Note:
 Bonus point if you are able to do this using only O(n) extra space, where n is the total number of rows in the triangle. 
 */
 
-// Standard DP
+// Solution using standard DP, with 2 vectors representing current and next rows.
 
 class Solution {
 public:
