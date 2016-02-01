@@ -57,6 +57,33 @@ public:
     }
 };
 
+// Solution 2, similar idea to solution 1, but use a map
+class Solution {
+public:
+    string minWindow(string s, string t) {
+        unordered_map<char, int> dict;
+        int count = t.size(), istart = 0, minL = INT_MAX, minS = -1;
+        for(auto c : t) dict[c]++;
+        for(int i = 0; i < s.size(); i++) {
+            char c = s[i];
+            if(!dict.count(c)) continue; //not a character in t
+            
+            if(--dict[c] >= 0) --count;
+            if(count == 0) { //found one
+                while(!dict.count(s[istart]) || dict[s[istart]] < 0) {
+                    if(dict.count(s[istart])) dict[s[istart]]++;
+                    istart++; //remove characters not in t, or redundant ones
+                }
+                int len = i-istart+1;
+                if(len < minL) { minS = istart;  minL = len; }
+                dict[s[istart++]]++;  //remove istart
+                count = 1; //update count
+            }
+        }
+        return minS == -1 ? "" : s.substr(minS, minL);
+    }
+};
+
 /*
 Another solution is to use a queue to store (position in S of) T's characters seen so far, see below:
 */
