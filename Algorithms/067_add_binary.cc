@@ -7,7 +7,8 @@ b = "1"
 Return "100". 
 */
 
-// General solution that works works for binary and hex and oct systems, except need to change R to 8 or 16 
+// General solution that works for binary (R = 2), octal (R = 8) and hexadecimal (R = 16)  systems.
+
 class Solution {
 public:
     string addBinary(string a, string b) {
