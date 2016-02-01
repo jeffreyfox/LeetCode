@@ -26,7 +26,7 @@ It should return [1,4,8,2,5,9,3,6,7].
  * while (i.hasNext()) cout << i.next();
  */
 
-// pointer always points to the the next valid value. After obtaining the next value, move pointer to next valid value.
+// Solution 1. Maintain an array of pointers, which always points to the the next valid value. After obtaining the next value, move pointer to next valid value.
 
 class ZigzagIterator {
 public:
@@ -64,3 +64,25 @@ private:
     int n; //number of arrays
 };
 
+// Solution 2. Maintain a queue of iterator pairs, each pair corresponding to the beginning and end of an array. Each time dequeue a pair,
+// and if the array is not exhausted, enqueue again.
+class ZigzagIterator {
+public:
+    ZigzagIterator(vector<int>& v1, vector<int>& v2) {
+        if(!v1.empty()) q.push(make_pair(v1.begin(), v1.end()));
+        if(!v2.empty()) q.push(make_pair(v2.begin(), v2.end()));
+    }
+
+    int next() {
+        auto beg = q.front().first;
+        auto end = q.front().second;
+        q.pop();
+        if(beg+1 < end) q.push(make_pair(beg+1, end));
+        return *beg;
+    }
+
+    bool hasNext() {
+        return !q.empty();
+    }
+    queue<pair<vector<int>::iterator, vector<int>::iterator> > q;
+};
