@@ -92,6 +92,28 @@ public:
     }
 };
 
+// Another iterative solution using a stack and a pointer pointing to current node
+class Solution {
+public:
+    vector<int> inorderTraversal(TreeNode* root) {
+        vector<int> result;
+        if(!root) return result;
+        stack<TreeNode*> s;
+        TreeNode *curr = root;
+        while(!s.empty() || curr) {
+            if(curr) {
+                s.push(curr);
+                curr = curr->left;
+            } else { //need to process curr
+                curr = s.top(); s.pop();
+                result.push_back(curr->val);
+                curr = curr->right;
+            }
+        }
+        return result;
+    }
+};
+
 // Morris traversal O(n) without using a stack or recursive calls.
 class Solution {
 public:
