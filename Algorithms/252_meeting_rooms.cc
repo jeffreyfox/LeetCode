@@ -39,3 +39,25 @@ public:
         return true;
     }
 };
+
+// Solution 2 using a comparator class object
+class CompareStart {
+public:
+    bool operator() (const Interval& a, const Interval& b) {
+        return a.start < b.start;
+    }
+};
+
+class Solution {
+public:
+    bool canAttendMeetings(vector<Interval>& intervals) {
+        CompareStart cs;
+        sort(intervals.begin(), intervals.end(), cs);
+        int n = intervals.size();
+        for(int i = 0; i < n-1; i++) {
+            if(intervals[i].start < intervals[i+1].end && intervals[i+1].start < intervals[i].end) return false;
+        }
+        return true;
+    }
+};
+
