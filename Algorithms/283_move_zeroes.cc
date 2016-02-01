@@ -10,6 +10,8 @@ Note:
 */
 
 // Solution 1. One loop. Avoid redundant assignments.
+// Loop invariant: j always points to one past the already processes sub-array with all elements being non-zero
+// set elements to zero as i goes along.
 
 class Solution {
 public:
