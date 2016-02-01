@@ -26,7 +26,7 @@ It should return [1,4,8,2,5,9,3,6,7].
  * while (i.hasNext()) cout << i.next();
  */
 
-// pointer always points to the the next valid value. After robtaining the next value, move pointer to next valid value.
+// pointer always points to the the next valid value. After obtaining the next value, move pointer to next valid value.
 
 class ZigzagIterator {
 public:
@@ -48,8 +48,8 @@ public:
         indices[arrayIdx]++;
         int i = (arrayIdx+1) % n;
         while(i != arrayIdx && indices[i] == nums[i].size()) i = (i+1) % n;
-        if(i == arrayIdx && indices[i] == nums[i].size()) arrayIdx = n;
-        else arrayIdx = i;
+        if(i == arrayIdx && indices[i] == nums[i].size()) arrayIdx = n; // no available elements, set arrayIdx to n
+        else arrayIdx = i; //found next available array index
 
         return val;
     }
