@@ -65,3 +65,25 @@ private:
     int n; //number of arrays
 };
 
+// Solution 2. Similar to 281. Use a stack to store the pair of iterators
+class Vector2D {
+public:
+    Vector2D(vector<vector<int>>& vec2d) {
+        for(auto vit = vec2d.rbegin(); vit != vec2d.rend(); vit++) {
+            if(!vit->empty()) s.push(make_pair(vit->begin(), vit->end()));
+        }
+    }
+
+    int next() {
+        auto beg = s.top().first;
+        auto end = s.top().second;
+        s.pop();
+        if(beg+1 < end) s.push(make_pair(beg+1, end));
+        return *beg;
+    }
+
+    bool hasNext() {
+        return !s.empty();
+    }
+    stack<pair<vector<int>::iterator, vector<int>::iterator> > s;
+};
