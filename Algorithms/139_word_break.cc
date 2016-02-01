@@ -51,7 +51,7 @@ public:
     }
 };
 
-// Solution 3. DP with memoization
+// Solution 3. DP with memoization (16ms)
 class Solution {
 public:
     bool wordBreak(string s, unordered_set<string>& wordDict) {
