@@ -8,20 +8,24 @@ Write a function to determine if a given target is in the array.
 */
 
 /*
-Binary search. The array can be broken into two part, first part is 4-7, second part is 0-2. If array is unrotated, then only first part exists (corner case). 
+Binary search. The array can be broken into two part, first part is 4-7, second part is 0-2. If array is unrotated,
+then only first part exists (corner case). 
 There are three anchor points, lo, hi, and mid.
 First determine whether mid is in first half or second half. Due to duplicated items, we now has three cases:
-1. Mid is in first half iff nums[mid] > nums[lo] 
-2. Mid is in second half iff nums[mid] < nums[lo]
-3. if nums[mid] == nums[lo], we can't say for sure which part mid belongs to, but we know that nums[lo] is not target, so we simply increment lo. 
+1. mid is in first half iff nums[mid] > nums[lo] 
+2. mid is in second half iff nums[mid] < nums[lo]
+3. if nums[mid] == nums[lo], we can't say for sure which part mid belongs to, but we know that nums[lo] is not target, 
+so we simply increment lo. 
 Examples for 3. 
  2 2 2 2 3 2 2
 lo    mid   hi  (mid is in first half)
  2 2 3 2 2 2 2
 lo    mid   hi  (mid is in second half)
 
-1. If mid is in first half, we know that nums[mid] >= nums[lo] (could be equal because mid can be lo, when hi = lo+1), if target falls between the two, then the index has to be between lo and mid. Otherwise, it is between mid and hi.
-2. If mid is in second half, we know that nums[mid] <= nums[hi] (could be equal because mid can be hi, when hi = lo), if target falls between the two, then the index has to be between mid and hi. Otherwise, it is between lo and mid.
+1. If mid is in first half, we know that nums[mid] >= nums[lo] (could be equal because mid can be lo, when hi = lo+1), 
+if target falls between the two, then the index has to be between lo and mid. Otherwise, it is between mid and hi.
+2. If mid is in second half, we know that nums[mid] <= nums[hi] (could be equal because mid can be hi, when hi = lo), 
+if target falls between the two, then the index has to be between mid and hi. Otherwise, it is between lo and mid.
 */
 
 class Solution {
