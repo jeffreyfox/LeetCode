@@ -22,9 +22,9 @@ and increment it as needed. There are several things to consider:
 1. how to distinguish between characters appearing in T and not? (e.g. "D" v.s. "A")
 2. how to know whether we have all the characters we need to construct T?
 
-For Q1, we can use an index vector (dict[256]) to store the occurrences of each alphabet in T, and for other alphabets, 
-initialized as -s.len(). When scanning, if we see the individual count of a char to be smaller or equal than -s.len(), 
-we know that it does not appear in T.
+For Q1, we can use an index vector (dict[256]) to store the occurrences of each alphabet in T, and for other alphabets,  initialized as 0. 
+When scanning, we have two pointers i and istart, i will decrement dict, and istart will increment dict, we can prove that 
+the dict[c] entries for characters not in T will never become positive. 
 For Q2, we maintain another variable "count", initialized as T.len(), and decremented only when we have seen a "useful" character. 
 "useful" means character appearing in T and also not redundant. How to know if it is redundant or not? We can check the individual 
 count is negative or not. When count == 0, we know that s[istart, i] covers T.
@@ -44,27 +44,32 @@ and then only do: istart++;
 class Solution {
 public:
     string minWindow(string s, string t) {
+        if(t.empty() || s.empty()) return "";
         int slen = s.size();
-        vector<int> dict(256, -slen);
-        int nc = t.size();
-        for(int i = 0; i < nc; ++i) {
-            if(dict[t[i]] < 0) dict[t[i]] = 1;
-            else dict[t[i]]++;
+        vector<int> dict(256, 0);
+        for(auto c : t) {
+            if(dict[c] < 0) dict[c] = 1;
+            else dict[c] ++;
         }
-        int istart = 0, count = nc;
-        int min_len = INT_MAX, min_start = -1;
-        for(size_t i = 0; i < s.size(); ++i) {
-            if(--dict[s[i]] >= 0) count--;
+        int count = t.size();
+        int istart = 0, minS = -1, minL = INT_MAX;
+        for(int i = 0; i < slen; i++) {
+            char c = s[i];
+            --dict[c];
+            if(dict[c] >= 0) count--;
             if(count == 0) {
                 while(dict[s[istart]] < 0) {
-                    dict[s[istart++]]++;
+                    dict[s[istart]]++;
+                    istart++;
                 }
-                int len = i-istart+1;
-                if(len < min_len) { min_len = len; min_start = istart; }
-                dict[s[istart++]]++; count = 1;
+                //dict[s[istart]] == 0
+                if(minL > i-istart+1) { minS = istart, minL = i-istart+1; }
+                //remove first char (for sure it is in s)
+                dict[s[istart]]++;   istart++;
+                count = 1;
             }
         }
-        return min_start == -1 ? "" : s.substr(min_start, min_len);        
+        return (minS == -1) ? "" : s.substr(minS, minL);
     }
 };
 
