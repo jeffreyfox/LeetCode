@@ -34,30 +34,26 @@ class Solution {
 public:
     bool exist(vector<vector<char>>& board, string word) {
         if(board.empty() || board[0].empty()) return false;
-        if(word.empty()) return true;
         int m = board.size(), n = board[0].size();
-        if(m*n < word.size()) return false;
-        for(int i = 0; i < m; ++i) {
-            for(int j = 0; j < n; ++j) {
-                if(existHelper(board, i, j, word, 0)) return true;
+        for(int i = 0; i < m; i++) {
+            for(int j = 0; j < n; j++) {
+                if(dfs(board, i, j, word, 0)) return true;
             }
         }
         return false;
     }
-    bool existHelper(vector<vector<char> >& board, int i, int j, const string& word, int k) {
-        if(k == word.size()) return true; //found
+    //check whether board[i][j] matches with word[k] and continue searching
+    bool dfs(vector<vector<char> >& board, int i, int j, const string& word, int k) {
+        if(k == word.size()) return true;
         int m = board.size(), n = board[0].size();
-        if(i < 0 || i >= m || j < 0 || j >= n) return false; //not legal position
-        if(board[i][j] == '*') return false; //already visited
-        if(board[i][j] != word[k]) return false; //not match
+        if(i < 0 || j < 0 || i >= m || j >= n) return false;
+        if(board[i][j] != word[k]) return false;
         char c = board[i][j];
-        board[i][j] = '*';
-        //matches, move to next one
-        if(existHelper(board, i-1, j, word, k+1)) return true;
-        if(existHelper(board, i+1, j, word, k+1)) return true;
-        if(existHelper(board, i, j-1, word, k+1)) return true;
-        if(existHelper(board, i, j+1, word, k+1)) return true;
-        
+        board[i][j] = '*'; //mark as visited
+        if(dfs(board, i-1, j, word, k+1)) return true;
+        if(dfs(board, i, j-1, word, k+1)) return true;
+        if(dfs(board, i+1, j, word, k+1)) return true;
+        if(dfs(board, i, j+1, word, k+1)) return true;
         board[i][j] = c; //retrace
         return false;
     }
