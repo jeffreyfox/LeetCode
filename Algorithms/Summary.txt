@@ -69,6 +69,7 @@
 069_sqrt_x.cc
 070_climbing_stairs.cc
 072_edit_distance.cc
+073_set_matrix_zeroes.cc
 073_set_matrix_zeros.cc
 074_search_a_2d_matrix.cc
 075_sort_colors.cc
