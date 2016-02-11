@@ -26,44 +26,76 @@ You should return the indices: [0,9].
 //     b a r f o o t h e[f o o b a r]m a n  ,  i = 9, j = 15, occurs = {foo => 1, bar = 1}, found '9'
 //     b a r f o o t h e f o o[b a r m a n] ,  i = 12, j = 18, break since the is not in words, occurs = {}
 
+/*
+Only use one map to store the counts, when see the string, reduce the individual counts, when it reaches zero we know that we have exactly the amount we need.
+simpler than 074, since the window can only contain words in dictionary, and also the counts should not exceed the total counts in dictionary (no excessive words). 
+So here we keep this loop invariant and use it to simplify our routines.
+Maintain a dict that counts the occurrences of all words in word vector. the trick is to recover dict for each sub runs. 
+Each time we move i, we update dict, each time we move istart, we recover dict, in the end, when both i and istart reaches end, 
+we recovered the original dict.
+
+When seeing a new string at i, check several cases:
+1. if not seen in dict, then the previous searches [istart, i) are invalid, just move istart forward to i and pop all words seen, 
+and update count properly.
+2. if in dict, then decrement the count, if it is excessive word, then move istart to pop out words until the count is zero 
+(meaning no excessive). 
+3. if not excessive, simply go on.
+4. if count == 0, then we have found one window, insert to result.
+*/
+
 class Solution {
 public:
     vector<int> findSubstring(string s, vector<string>& words) {
-        vector<int> ret;
-        if(words.empty()) return ret;
-        map<string, int> counts; //counts of each unique word
-        map<string, int> occurs; //occurrences of each word in s
-        for(int i = 0; i < words.size(); ++i) {
-            counts[words[i]]++;
-        }
-        int L = words[0].size(); //word length
-        for (int l = 0; l < L; ++l) { //do L passes
-            int i = l, j = l;
-            occurs.clear(); // clear occurences map
-            //scan each substring of length L
-            while(j+L <= s.size()) {
-                string t = s.substr(j, L);
-                if(counts.count(t) == 0) { //not found such word
-                    i = j = j+L;
-                    occurs.clear();
+        vector<int> result;
+        if(s.empty() || words.empty()) return result;
+        int wl = words[0].size();
+        if(wl == 0) return result;
+        int slen = s.size();
+        
+        unordered_map<string, int> dict;
+        for(auto s : words) dict[s]++;
+        
+        for(int j = 0; j < wl; j++) {
+            int i = j, istart = j, count = words.size();
+            //loop invariant: [istart, i) contains no words not in dict, no excessive words
+            while(i + wl <= slen) {
+                string str = s.substr(i, wl);
+                if(!dict.count(str)) { //not found, reset start, i, and count
+                    while(istart < i) { //for sure istart is contained in dict
+                        ++dict[s.substr(istart, wl)];
+                        istart += wl;
+                    }
+                    i += wl;
+                    istart = i;
+                    count = words.size();
                     continue;
                 }
-                occurs[t] ++; //found such word
-                if(j == i + L*words.size()) { //reached max size of window
-                    string t2 = s.substr(i, L);
-                    if(counts.count(t2) > 0) occurs[t2] --;
-                    i += L; //move left side of window forward by L
+                dict[str]--;
+                if(dict[str] >= 0) count--;
+                while(dict[str] < 0) {
+                    if(++dict[s.substr(istart, wl)] > 0) count++;
+                    istart += wl;
                 }
-                if(occurs == counts) ret.push_back(i);
-                j += L;
+
+                if(count == 0) {
+                    result.push_back(istart);
+                    dict[s.substr(istart, wl)]++;
+                    istart += wl; //move forward
+                    count = 1;
+                }
+                i += wl;  //move forward
+            }
+            //increment istart to mantain correct counting in dict and count
+            while(istart + wl <= slen) {
+                ++dict[s.substr(istart, wl)];
+                istart += wl;
             }
         }
-        return ret;
+        return result;
     }
 };
 
-// Can further optimize and only use one map to store the counts, when see the string, reduce the individual counts, when it reaches zero we know that we have exactly the amount we need.
-// similar to min window, use only one dict to store the counting information. The key is to restore the information after each run.
+// an old solution, similar to min window, use only one dict to store the counting information. The key is to restore the information after each run.
 
 class Solution {
 public:
