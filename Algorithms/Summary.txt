@@ -254,6 +254,7 @@
 283_move_zeroes.cc
 284_peeking_iterator.cc
 285_inorder_successor_in_bst.cc
+286_walls_and_gates.cc
 287_find_the_duplicate_number.cc
 288_unique_word_abbreviation.cc
 289_game_of_life.cc
