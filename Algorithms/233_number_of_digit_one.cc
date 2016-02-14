@@ -1,4 +1,16 @@
-// Counter the occurrences of 1 on each digit seperately, and sum them up.
+/*
+Given an integer n, count the total number of digit 1 appearing in all non-negative integers less than or equal to n.
+
+For example:
+Given n = 13,
+Return 6, because digit 1 occurred in the following numbers: 1, 10, 11, 12, 13.
+
+Hint:
+
+Beware of overflow.
+*/
+
+// Count the occurrences of 1 on each digit seperately, and sum them up.
 // First observe that for any number starting with a one on digit i, there are 10^i of them, e.g. i = 2, 100-199 (count = 100)
 // For an arbitrary number, let's determine how many times the number of 1s appear at digit i, 
 // let the number formed to the left of d as l, and to the right of d as r. For example: 264d32, where d can be 0 to 9.
