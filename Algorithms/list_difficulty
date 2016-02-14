@@ -24,9 +24,6 @@ do
   ((total++))
 done < ${file}.txt
 
-echo -en "\n"
-echo "Total     = $total"
-echo "Solved    = $solved"
-echo "Remaining = $((total-solved))"
+echo "Total ($total)   Solved ($solved)   Remaining ($((total-solved)))"
 echo -en "\n"
 
