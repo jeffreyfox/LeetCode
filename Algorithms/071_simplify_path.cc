@@ -14,40 +14,40 @@ Corner Cases:
     In this case, you should ignore redundant slashes and return "/home/foo".
 */
 
-// break the string into tokens, add to a queue; when seeing a "..", pop from queue (if not empty)
+// use a double-ended queue, break the string into tokens, 
+// when see a '.', do nothing
+// when see a "..", pop back element from queue (if not empty)
+// when see a normal word, push to back of queue
 // Then process queue and construct return string
 // if queue is empty, then return "/".
 
 class Solution {
 public:
     string simplifyPath(string path) {
-        vector<string> tokens;
-        if(path.empty()) return string();
-        deque<string> q; //double ended queue
-        path += "/";
+        string result;
+        if(path == "") return result;
         int n = path.size();
-
-        int i = 0, j = 0;
-        for (int i = 1; i < n; ++i) {
-            if (path[i] == '/') { //found another '/'
-                int len = i-j-1;
-                if (len == 0) { j = i; continue; }
-                string s = path.substr(j+1, len);
-                if (s == ".") ;
-                else if (s == "..") {
-                    if (!q.empty()) q.pop_back();
-                } else q.push_back(s);
-                j = i;
-            }
+        deque<string> s;
+        int i = 0;
+        while(i < n) {
+            if(path[i] == '/') { i++; continue; }
+            //find string
+            int j = i+1;
+            while(j < n && path[j] != '/') j++;
+            //[i, j) is the string
+            string tmp = path.substr(i, j-i);
+            if(tmp == "..") {
+                if(!s.empty()) s.pop_back();
+            } else if(tmp == ".") ;
+            else s.push_back(tmp);
+            i = j+1;
         }
-        
-        if(q.empty()) return "/";
-
-        string ret;
-        while (!q.empty()) {
-            ret += "/" + q.front();
-            q.pop_front();
+        if(s.empty()) return "/";
+        while(!s.empty()) {
+            result += "/" + s.front();
+            s.pop_front();
         }
-        return ret;
+        return result;
     }
 };
+
