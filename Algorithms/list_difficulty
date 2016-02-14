@@ -7,7 +7,7 @@ fi
 
 file=$1
 
-echo "Generating report for $file ..."
+echo "$file : "
 
 solved=0
 total=0
