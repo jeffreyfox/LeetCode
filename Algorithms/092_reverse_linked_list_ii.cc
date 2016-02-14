@@ -19,6 +19,7 @@ Given m, n satisfy the following condition:
  *     ListNode(int x) : val(x), next(NULL) {}
  * };
  */
+ 
 // Use a counter k, one pass.
 // 1. When reached (m-1)-th element, save the curr and next node as pa and pb:
 // 2. when k between m and n-1, do reverse
@@ -58,5 +59,4 @@ public:
         }
         return p->next;
     }
-
 };
