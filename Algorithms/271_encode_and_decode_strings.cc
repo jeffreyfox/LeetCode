@@ -77,3 +77,54 @@ public:
     }
 };
 
+// solution 2 without delimiter, but serialize the length of each string into a 4 character string (len fits in 32bits)
+// Caveats:
+// use unsigned int to avoid any sign issues (char is signed)
+// when converting char to unsigned, use (c & 255), do not just do unsigned(c).
+// when c = -127, unsigned(c) will do sign extension and get INT_MAX, only c & 255 will lead to 255
+
+class Codec {
+public:
+
+    // Encodes a list of strings to a single string.
+    string encode(vector<string>& strs) {
+        string result;
+        for(auto s : strs) {
+            result += int2str(s.size()) + s;
+        }
+        return result;
+    }
+
+    // Decodes a single string to a list of strings.
+    vector<string> decode(string s) {
+        vector<string> result;
+        int i = 0, n = s.size();
+        while(i < n) {
+            //get first 4 bytes
+            unsigned len = str2int(s.substr(i, 4));
+            i += 4;
+            result.push_back(s.substr(i, len));
+            i += len;
+        }
+        return result;
+    }
+    //convert an integer to string, 4 bytes => 4 characters
+    string int2str(unsigned x) {
+        string s(4, 0);
+        for(int i = 0; i < 4; i++) {
+            s[3-i] = x & 255; //get last 8 bytes
+            x >>= 8; //shift to left by 8 bytes
+        }
+        return s;
+    }
+   
+    //convert a length-4 string to integer, 4 characters => 4 bytes
+    unsigned str2int(string s) {
+        unsigned x = 0;
+        for(int i = 0; i < 4; i++) {
+            x = (x << 8) + (s[i] & 255); //don't use unsigned(s[i]), will get unexpected results!
+        }
+        return x;
+    }
+};
+
