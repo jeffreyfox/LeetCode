@@ -68,6 +68,7 @@
 068_text_justification.cc
 069_sqrt_x.cc
 070_climbing_stairs.cc
+071_simplify_path.cc
 072_edit_distance.cc
 073_set_matrix_zeroes.cc
 073_set_matrix_zeros.cc
@@ -83,11 +84,13 @@
 083_remove_duplicates_from_sorted_list.cc
 084_largest_rectangle_in_histogram.cc
 085_maximal_rectangle.cc
+086_partition_list.cc
 087_scramble_string.cc
 088_merge_sorted_array.cc
 089_gray_code.cc
 090_subsets_ii.cc
 091_decode_ways.cc
+092_reverse_linked_list_ii.cc
 093_restore_ip_addresses.cc
 094_binary_tree_inorder_traversal.cc
 095_unique_binary_search_trees_ii.cc
@@ -125,6 +128,7 @@
 127_word_ladder.cc
 128_longest_consecutive_sequence.cc
 129_sum_root_to_leaf_numbers.cc
+130_surrounded_regions.cc
 131_palindrome_partitioning.cc
 132_palindrome_partitioning_ii.cc
 133_clone_graph.cc
