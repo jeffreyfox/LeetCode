@@ -10,8 +10,7 @@ For example,
     Given numerator = 2, denominator = 3, return "0.(6)".
 */
 
-// Use a table to track the first occuring position of residue, add corresponding quotient to decimal string
-// also take care of sign
+// Use a table to track the first occuring position of residue, add corresponding quotient to decimal string, also take care of sign
 // caveat: use long for all integer variables to avoid integer overflow!
 
 class Solution {
