@@ -164,6 +164,7 @@
 163_missing_ranges.cc
 164_maximum_gap.cc
 165_compare_version_numbers.cc
+166_fraction_to_recurring_decimal.cc
 167_two_sum_ii.cc
 168_excel_sheet_column_title.cc
 169_majority_element.cc
@@ -209,6 +210,7 @@
 230_kth_smallest_element_in_bst.cc
 231_power_of_two.cc
 232_implement_queue_using_stacks.cc
+233_number_of_digit_one.cc
 234_palindrome_linked_list.cc
 235_lowest_common_ancestor_of_binary_search_tree.cc
 236_lowest_common_ancestor_of_binary_tree.cc
@@ -245,6 +247,7 @@
 268_missing_number.cc
 269_alien_dictionary.cc
 270_closest_binary_search_tree_value.cc
+271_encode_and_decode_strings.cc
 272_closest_binary_search_tree_value_ii.cc
 273_integer_to_english_words.cc
 274_h_index.cc
