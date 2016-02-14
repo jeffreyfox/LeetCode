@@ -202,6 +202,7 @@
 219_contains_duplicate_ii.cc
 220_contains_duplicate_iii.cc
 221_maximal_square.cc
+222_count_complete_tree_nodes.cc
 223_rectangle_area.cc
 225_implement_stack_using_queues.cc
 226_invert_binary_tree.cc
