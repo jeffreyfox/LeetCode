@@ -274,6 +274,7 @@
 294_flip_game_ii.cc
 295_find_median_from_data_stream.cc
 296_best_meeting_point.cc
+298_binary_tree_longest_consecutive_sequence.cc
 299_bulls_and_cows.cc
 300_longest_increasing_subsequence.cc
 302_smallest_rectangle_enclosing_black_pixels.cc
