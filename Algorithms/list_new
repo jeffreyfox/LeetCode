@@ -1,2 +1,2 @@
 #git log --stat --after=2015/11/13 | grep "|" | grep + | grep -oE "[0-9]{3}_.*\.cc" | grep -vE "_[0-9]\.cc" | sort -u | grep -v 088_merge_sort_array.cc
-git log --stat=100 --after=2015/11/13 | grep + | grep -oE "[0-9]{3}_.*\.cc" | grep -vE "_[0-9]\.cc" | sort -u | grep -v 088_merge_sort_array.cc | grep -v 073_set_matrix_zeros.cc | grep -vE '3[0-9][0-9]_.*\.cc' | tee Summary.txt
+git log --stat=100 --after=2015/11/13 | grep + | grep -oE "[0-9]{3}_.*\.cc" | grep -vE "_[0-9]\.cc" | sort -u | grep -v 088_merge_sort_array.cc | grep -v 073_set_matrix_zeros.cc | tee Summary.txt
