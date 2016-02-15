@@ -2,20 +2,8 @@
 #grep Medium Problems.csv | grep -oE "[0-9]{3}" > Medium.txt
 #grep Easy Problems.csv | grep -oE "[0-9]{3}" > Easy.txt
 
-simple=0
-if [ "$#" -eq 1 ]; then
-  if [ $1 = "-s" ]; then
-    simple=1
-  fi   
-fi
-
 list_difficulty Easy
 list_difficulty Medium
 list_difficulty Hard
 
-if [ $simple -eq 0 ]; then
-  concat_difficulty Easy
-  concat_difficulty Medium
-  concat_difficulty Hard
-  concat_difficulty All
-fi
+concat_difficulty All
