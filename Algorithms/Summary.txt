@@ -188,8 +188,10 @@
 204_count_primes.cc
 205_isomorphic_strings.cc
 206_reverse_linked_list.cc
+207_course_schedule.cc
 208_implement_trie.cc
 209_minimum_size_subarray_sum.cc
+210_course_schedule_ii.cc
 211_add_and_search_word.cc
 212_word_search_ii.cc
 213_house_robber_ii.cc
@@ -203,8 +205,10 @@
 221_maximal_square.cc
 222_count_complete_tree_nodes.cc
 223_rectangle_area.cc
+224_basic_calculator.cc
 225_implement_stack_using_queues.cc
 226_invert_binary_tree.cc
+227_basic_calculator_ii.cc
 228_summary_ranges.cc
 229_majority_element_ii.cc
 230_kth_smallest_element_in_bst.cc
