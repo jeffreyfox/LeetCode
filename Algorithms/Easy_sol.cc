@@ -815,7 +815,8 @@ public:
  ***    036,Easy,Valid Sudoku 
  ****************************************************/
 
-/* Determine if a Sudoku is valid, according to: Sudoku Puzzles - The Rules.
+/*
+Determine if a Sudoku is valid, according to: Sudoku Puzzles - The Rules.
 
 The Sudoku board could be partially filled, where empty cells are filled with the character '.'.
 
@@ -823,7 +824,6 @@ A partially filled sudoku which is valid.
 
 Note:
 A valid Sudoku board (partially filled) is not necessarily solvable. Only the filled cells need to be validated. 
-
 */
 
 /// Check each row, column and block, record the state of each check.
@@ -1060,7 +1060,8 @@ b = "1"
 Return "100". 
 */
 
-// General solution that works works for binary and hex and oct systems, except need to change R to 8 or 16 
+// General solution that works for binary (R = 2), octal (R = 8) and hexadecimal (R = 16)  systems.
+
 class Solution {
 public:
     string addBinary(string a, string b) {
@@ -2068,6 +2069,92 @@ public:
 };
 
 /**************************************************** 
+ ***    160,Easy,Intersection of Two Linked Lists 
+ ****************************************************/
+
+/*
+Write a program to find the node at which the intersection of two singly linked lists begins.
+
+
+For example, the following two linked lists:
+
+A:          a1 → a2
+                   ↘
+                     c1 → c2 → c3
+                   ↗            
+B:     b1 → b2 → b3
+begin to intersect at node c1.
+
+
+Notes:
+
+If the two linked lists have no intersection at all, return null.
+The linked lists must retain their original structure after the function returns.
+You may assume there are no cycles anywhere in the entire linked structure.
+Your code should preferably run in O(n) time and use only O(1) memory.
+*/
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+
+// Use detect cycle routine. connect A's tail to B's head, and run detect cycle II code to find the intersection point. Reset A's tail to NULL
+
+class Solution {
+public:
+    ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
+        if(!headA || !headB) return NULL;
+        
+        ListNode *tailA(headA);
+        while(tailA->next) tailA = tailA->next;
+        tailA->next = headB; //connect A's tail to B
+        ListNode *node = detectCycle(headA);
+        tailA->next = NULL; //reset
+        return node;
+    }
+    
+    ListNode *detectCycle(ListNode *head) {
+        if(head == NULL) return NULL;
+        ListNode *slow = head, *fast = head;
+        while(fast && fast->next) {
+            slow = slow->next;
+            fast = fast->next->next;
+            if(slow == fast) break;
+        }
+        if(!fast || !fast->next) return NULL; //no cycle detected
+        slow = head;
+        while (slow != fast) {
+            slow = slow->next;
+            fast = fast->next;
+        }
+        return slow;
+    }
+};
+
+// Solution 2. Another elegant solution!
+// https://leetcode.com/discuss/66203/java-solution-without-knowing-the-difference-in-len
+
+class Solution {
+public:
+    ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
+        if(!headA || !headB) return NULL;
+        ListNode *a = headA, *b = headB;
+        while(a != b) {
+            a = a ? a->next : headB;
+            b = b ? b->next : headA;
+        }
+        return a;
+    }
+};
+
+
+
+/**************************************************** 
  ***    165,Easy,Compare Version Numbers 
  ****************************************************/
 
@@ -2176,6 +2263,33 @@ public:
 };
 
 /**************************************************** 
+ ***    169,Easy,Majority Element 
+ ****************************************************/
+
+/*
+Given an array of size n, find the majority element. The majority element is the element that appears more than ⌊ n/2 ⌋ times.
+
+You may assume that the array is non-empty and the majority element always exist in the array.
+*/
+
+// Solution using Moore's Voting Algorithm
+
+class Solution {
+public:
+    int majorityElement(vector<int>& nums) {
+        int n = nums.size();
+        int maj = 0, count = 0;
+        for(auto x : nums) {
+            if(count == 0) { maj = x; count++; }
+            else if(x == maj) count++;
+            else count--;
+        }
+        return maj;
+    }
+};
+
+
+/**************************************************** 
  ***    170,Easy,Two Sum III - Data structure design 
  ****************************************************/
 
@@ -2196,6 +2310,7 @@ find(7) -> false
 // add is O(1) amortized, just increment count in table
 // find needs to traverse all entries in table. Handle two cases: number and residue are the same, and differerent.
 // Slight optimization: only check half of cases (i >= j), avoid rechecking the same pair.
+// using map will lead to TLE, because add is O(lgn)
 
 class TwoSum {
 
@@ -3496,6 +3611,62 @@ public:
 };
 
 /**************************************************** 
+ ***    243,Easy,Shortest Word Distance 
+ ****************************************************/
+
+/*
+Given a list of words and two words word1 and word2, return the shortest distance between these two words in the list.
+
+For example,
+Assume that words = ["practice", "makes", "perfect", "coding", "makes"].
+
+Given word1 = “coding”, word2 = “practice”, return 3.
+Given word1 = "makes", word2 = "coding", return 1.
+
+Note:
+You may assume that word1 does not equal to word2, and word1 and word2 are both in the list.
+*/
+
+// Solution 1. Keep two indices, one for each word (20ms)
+// optimizations: do not use std::min() function, also prestore the word.size() as n
+
+class Solution {
+public:
+    int shortestDistance(vector<string>& words, string word1, string word2) {
+        int j1(-1), j2(-1), mind = INT_MAX, n = words.size();
+        for(int i = 0; i < n; i++) {
+            const string& w = words[i];
+            if(w == word1) {
+                j1 = i;
+                if(j2 >= 0 && mind > j1-j2) mind = j1-j2;
+            } else if(w == word2) {
+                j2 = i;
+                if(j1 >= 0 && mind > j2-j1) mind = j2-j1;
+            }
+        }
+        return mind;
+    }
+};
+
+// Solution 2. Use just one index, before assigning the new index, check the difference with previous, also need to check the current word is the same as last word
+class Solution {
+public:
+    int shortestDistance(vector<string>& words, string word1, string word2) {
+        int index(-1), mind = INT_MAX, n = words.size();
+        for(int i = 0; i < n; i++) {
+            if(words[i] == word1 || words[i] == word2) {
+                if(index != -1 && words[index] != words[i]) { //not the same word
+                    mind = min(mind, i-index);
+                }
+                index = i;
+            }
+        }
+        return mind;
+    }
+};
+
+
+/**************************************************** 
  ***    246,Easy,Strobogrammatic Number 
  ****************************************************/
 
@@ -3636,6 +3807,28 @@ public:
         return true;
     }
 };
+
+// Solution 2 using a comparator class object
+class CompareStart {
+public:
+    bool operator() (const Interval& a, const Interval& b) {
+        return a.start < b.start;
+    }
+};
+
+class Solution {
+public:
+    bool canAttendMeetings(vector<Interval>& intervals) {
+        CompareStart cs;
+        sort(intervals.begin(), intervals.end(), cs);
+        int n = intervals.size();
+        for(int i = 0; i < n-1; i++) {
+            if(intervals[i].start < intervals[i+1].end && intervals[i+1].start < intervals[i].end) return false;
+        }
+        return true;
+    }
+};
+
 
 /**************************************************** 
  ***    257,Easy,Binary Tree Paths 
@@ -3933,6 +4126,8 @@ Note:
 */
 
 // Solution 1. One loop. Avoid redundant assignments.
+// Loop invariant: j always points to one past the already processes sub-array with all elements being non-zero
+// set elements to zero as i goes along.
 
 class Solution {
 public:
@@ -4262,76 +4457,6 @@ public:
         }
         return s;
     }
-};
-
-
-/**************************************************** 
- ***    303,Easy,Range Sum Query - Immutable 
- ****************************************************/
-
-/*
-Given an integer array nums, find the sum of the elements between indices i and j (i ≤ j), inclusive.
-
-Example:
-
-Given nums = [-2, 0, 3, -5, 2, -1]
-
-sumRange(0, 2) -> 1
-sumRange(2, 5) -> -1
-sumRange(0, 5) -> -3
-
-Note:
-
-    You may assume that the array does not change.
-    There are many calls to sumRange function.
-*/
-
-// Your NumArray object will be instantiated and called as such:
-// NumArray numArray(nums);
-// numArray.sumRange(0, 1);
-// numArray.sumRange(1, 2);
-
-// Since array is immutable, use standard DP. Use an array storing the partial sums. Array has an additional entry in the front storing "0".
-
-class NumArray {
-public:
-    NumArray(vector<int> &nums) {
-        n = nums.size();
-        sum.resize(n+1, 0);
-        for(int i = 0; i < n; ++i)
-            sum[i+1] = sum[i] + nums[i];
-    }
-
-    int sumRange(int i, int j) {
-        if(i < 0 || i >= n || j < 0 || j > n || i > j) return 0;
-        return sum[j+1] - sum[i];
-    }
-    vector<int> sum; //partial sums
-    int n;
-};
-
-// Another solution also storing the nums array itself, and optimized for i == j case.
-
-class NumArray {
-public:
-    NumArray(vector<int> &nums) {
-        n = nums.size();
-        sum.resize(n+1, 0);
-        val.resize(n+1, 0);
-        for(int i = 0; i < n; ++i) {
-            sum[i+1] = sum[i] + nums[i];
-            val[i+1] = nums[i];
-        }
-    }
-
-    int sumRange(int i, int j) {
-        if(i < 0 || i >= n || j < 0 || j > n || i > j) return 0;
-        if(i == j) return val[i+1];
-        else return sum[j+1] - sum[i];
-    }
-    vector<int> sum; //partial sums
-    vector<int> val; //values
-    int n;
 };
 
 

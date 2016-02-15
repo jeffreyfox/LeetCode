@@ -200,6 +200,38 @@ public:
 };
 
 /**************************************************** 
+ ***    005,Medium,Longest Palindromic Substring 
+ ****************************************************/
+
+/*
+Given a string S, find the longest palindromic substring in S. You may assume that the maximum length of S is 1000, and there exists one unique longest palindromic substring.
+*/
+
+// Scan from left to right, for each character, check if it is in the middle of a palindrome. 
+// Consider even and odd cases.
+// Caveat: be careful of index bounds!
+
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        if(s.empty()) return s;
+        int n = s.size();
+        int istart = 0, max_len = 1;
+        for(int i = 0; i < n; ++i) {
+            //check odd substrings (j is offset from middle)
+            for(int j = 1; j <= i && i+j < n && s[i-j] == s[i+j]; ++j) {
+                if(2*j+1 > max_len) { max_len = 2*j+1; istart = i-j; }
+            }
+            //check even substrings (j is offset from middle)
+            for(int j = 1; j <= i+1 && i+j < n && s[i-j+1] == s[i+j]; ++j) {
+                if(2*j > max_len) { max_len = 2*j; istart = i-j+1; }
+            }
+        }
+        return s.substr(istart, max_len);
+    }
+};
+
+/**************************************************** 
  ***    011,Medium,Container With Most Water 
  ****************************************************/
 
@@ -808,6 +840,53 @@ public:
     }
 };
 
+
+/**************************************************** 
+ ***    034,Medium,Search for a Range 
+ ****************************************************/
+
+/*
+Given a sorted array of integers, find the starting and ending position of a given target value.
+
+Your algorithm's runtime complexity must be in the order of O(log n).
+
+If the target is not found in the array, return [-1, -1].
+
+For example,
+Given [5, 7, 7, 8, 8, 10] and target value 8,
+return [3, 4]. 
+*/
+
+/// Binary search two passes.
+/// First find the left-most index with value >= target as lo
+/// Then find the right-most index with value <= target as hi
+/// Caveat: If lo <= hi, then found the interval, otherwise, not found, return [-1, -1]
+
+class Solution {
+public:
+    vector<int> searchRange(vector<int>& nums, int target) {
+        vector<int> ret(2, -1);
+        if(nums.empty()) return ret;
+        int n = nums.size();
+        int lo(0), hi(n-1);
+        while(lo <= hi) {
+            int mid = lo + (hi-lo)/2;
+            if(nums[mid] < target) lo = mid+1;
+            else hi = mid-1;
+        }
+        ret[0] = lo;
+
+        lo = 0, hi = n-1;
+        while(lo <= hi) {
+            int mid = lo + (hi-lo)/2;
+            if(nums[mid] <= target) lo = mid+1;
+            else hi = mid-1;
+        }
+        ret[1] = hi;
+        if(ret[0] > ret[1]) ret[0] = ret[1] = -1;
+        return ret;
+    }
+};
 
 /**************************************************** 
  ***    035,Medium,Search Insert Position 
@@ -1467,6 +1546,41 @@ public:
 
 
 /**************************************************** 
+ ***    048,Medium,Rotate Image 
+ ****************************************************/
+
+/*
+You are given an n x n 2D matrix representing an image.
+
+Rotate the image by 90 degrees (clockwise).
+
+Follow up:
+Could you do this in-place?
+*/
+
+/// Proceed in a circular fashion, and outer to inner.
+/// Each element, perform a 4-rotation with 3 counterparts
+/// make sure the bounds for i and j are correct
+class Solution {
+public:
+    void rotate(vector<vector<int>>& matrix) {
+        int n = matrix.size();
+        if(n <= 1) return;
+        
+        for(int i = 0; i < n/2; ++i) {
+            for(int j = i; j < n-1-i; ++j) {
+                //4-rotation
+                int tmp = matrix[i][j];
+                matrix[i][j] = matrix[n-1-j][i];
+                matrix[n-1-j][i] = matrix[n-1-i][n-1-j];
+                matrix[n-1-i][n-1-j] = matrix[j][n-1-i];
+                matrix[j][n-1-i] = tmp;
+            }
+        }
+    }
+};
+
+/**************************************************** 
  ***    049,Medium,Group Anagrams 
  ****************************************************/
 
@@ -1747,6 +1861,67 @@ public:
 };
 
 /**************************************************** 
+ ***    054,Medium,Spiral Matrix 
+ ****************************************************/
+
+/*
+Given a matrix of m x n elements (m rows, n columns), return all elements of the matrix in spiral order.
+
+For example,
+Given the following matrix:
+
+[
+ [ 1, 2, 3 ],
+ [ 4, 5, 6 ],
+ [ 7, 8, 9 ]
+]
+You should return [1,2,3,6,9,8,7,4,5].
+*/
+
+// Keep track of the current boundaries of the matrix, and the current state indicating moving direction
+// When moving direction changes, update boundary accordingly
+// Return when exactly m*n elements have been visited
+
+class Solution {
+public:
+    vector<int> spiralOrder(vector<vector<int>>& matrix) {
+        vector<int> result;
+        if(matrix.empty() || matrix[0].empty()) return result;
+        int m = matrix.size(), n = matrix[0].size(), mn = m*n;
+        top = 0; bottom = m-1; left = 0; right = n-1;
+        state = 0;
+        result.resize(mn);
+        int i(0), j(0), k(0);
+        while(k < mn) {
+            result[k++] = matrix[i][j];
+            //update boundary and go to next step
+            switch(state) {
+                case 0:
+                    if(j < right) j++; // move right
+                    else { state = 1; i++; top++; } //start to move down
+                    break;
+                case 1:
+                    if(i < bottom) i++; // move down
+                    else { state = 2; j--; right--; } //start to move left
+                    break;
+                case 2:
+                    if(j > left) j--; //move left
+                    else { state = 3; i--; bottom--; } //start to move up
+                    break;
+                case 3:
+                    if(i > top) i--; //move up
+                    else { state = 0; j++; left++; } //start to move right 
+                    break;
+                default:
+                    break;
+            }
+        }
+        return result;
+    }
+    int top, bottom, left, right, state;
+};
+
+/**************************************************** 
  ***    055,Medium,Jump Game 
  ****************************************************/
 
@@ -1843,6 +2018,64 @@ public:
         }
         return true;
     }
+};
+
+/**************************************************** 
+ ***    059,Medium,Spiral Matrix II 
+ ****************************************************/
+
+/*
+Given an integer n, generate a square matrix filled with elements from 1 to n2 in spiral order.
+
+For example,
+Given n = 3,
+
+You should return the following matrix:
+[
+ [ 1, 2, 3 ],
+ [ 8, 9, 4 ],
+ [ 7, 6, 5 ]
+]
+*/
+
+// same idea as 54. spiral matrix 
+
+class Solution {
+public:
+    vector<vector<int>> generateMatrix(int n) {
+        vector<vector<int> > result;
+        if(n == 0) return result;
+        top = 0; bottom = n-1; left = 0; right = n-1;
+        state = 0;
+        result.resize(n, vector<int>(n, 0));
+        int i(0), j(0), k(1), nn(n*n);
+        while(k <= nn) {
+            result[i][j] = k++;
+            //update boundary and go to next step
+            switch(state) {
+                case 0:
+                    if(j < right) j++; // move right
+                    else { state = 1; i++; top++; } //start to move down
+                    break;
+                case 1:
+                    if(i < bottom) i++; // move down
+                    else { state = 2; j--; right--; } //start to move left
+                    break;
+                case 2:
+                    if(j > left) j--; //move left
+                    else { state = 3; i--; bottom--; } //start to move up
+                    break;
+                case 3:
+                    if(i > top) i--; //move up
+                    else { state = 0; j++; left++; } //start to move right 
+                    break;
+                default:
+                    break;
+            }
+        }
+        return result;
+    }
+    int top, bottom, left, right, state;
 };
 
 /**************************************************** 
@@ -1969,6 +2202,59 @@ public:
 };
 
 
+
+/**************************************************** 
+ ***    061,Medium,Rotate List 
+ ****************************************************/
+
+/*
+Given a list, rotate the list to the right by k places, where k is non-negative.
+
+For example:
+Given 1->2->3->4->5->NULL and k = 2,
+return 4->5->1->2->3->NULL.
+*/
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+
+// 1. Find the length of list, and the tail node
+// 2. reduce k, if k % l == 0, then do nothing
+// 3. find the new tail by calculating the residue
+// 4. patch the two sub-lists
+
+class Solution {
+public:
+    ListNode* rotateRight(ListNode* head, int k) {
+        if (head == NULL || head->next == NULL) return head;
+        if (k == 0) return head;
+        
+        ListNode *p = head, *tail(NULL);
+        int l = 0; 
+        //find length of list and tail
+        while (p) {
+            if(p->next == NULL) tail = p;
+            p = p->next; l++;
+        }
+        if (k % l == 0) return head; //no rotation required
+        //scan and stop at the new tail
+        int cnt = l - k % l;
+        p = head;
+        while (cnt > 1) { // it is not > 0!
+            p = p->next; cnt--;
+        }
+        ListNode *q = p->next; //q is the new head
+        p->next = NULL; //p is new tail
+        tail->next = head; //glue to segments together
+        return q;
+    }
+};
 
 /**************************************************** 
  ***    062,Medium,Unique Paths 
@@ -2140,6 +2426,12 @@ public:
  ***    069,Medium,Sqrt(x) 
  ****************************************************/
 
+/*
+Implement int sqrt(int x).
+
+Compute and return the square root of x.
+*/
+
 /// Binary search. Loop invariant:
 /// [1 .. lo-1]: < sqrt(x)
 /// [lo .. hi]: to be checked
@@ -2202,6 +2494,196 @@ public:
         return y;
     }
 };
+
+/**************************************************** 
+ ***    071,Medium,Simplify Path 
+ ****************************************************/
+
+/*
+Given an absolute path for a file (Unix-style), simplify it.
+
+For example,
+path = "/home/", => "/home"
+path = "/a/./b/../../c/", => "/c"
+
+click to show corner cases.
+Corner Cases:
+
+    Did you consider the case where path = "/../"?
+    In this case, you should return "/".
+    Another corner case is the path might contain multiple slashes '/' together, such as "/home//foo/".
+    In this case, you should ignore redundant slashes and return "/home/foo".
+*/
+
+// use a double-ended queue, break the string into tokens, 
+// when see a '.', do nothing
+// when see a "..", pop back element from queue (if not empty)
+// when see a normal word, push to back of queue
+// Then process queue and construct return string
+// if queue is empty, then return "/".
+
+class Solution {
+public:
+    string simplifyPath(string path) {
+        string result;
+        if(path == "") return result;
+        int n = path.size();
+        deque<string> s;
+        int i = 0;
+        while(i < n) {
+            if(path[i] == '/') { i++; continue; }
+            //find string
+            int j = i+1;
+            while(j < n && path[j] != '/') j++;
+            //[i, j) is the string
+            string tmp = path.substr(i, j-i);
+            if(tmp == "..") {
+                if(!s.empty()) s.pop_back();
+            } else if(tmp == ".") ;
+            else s.push_back(tmp);
+            i = j+1;
+        }
+        if(s.empty()) return "/";
+        while(!s.empty()) {
+            result += "/" + s.front();
+            s.pop_front();
+        }
+        return result;
+    }
+};
+
+
+/**************************************************** 
+ ***    073,Medium,Set Matrix Zeroes 
+ ****************************************************/
+
+/*
+Given a m x n matrix, if an element is 0, set its entire row and column to 0. Do it in place.
+
+click to show follow up.
+
+Follow up:
+Did you use extra space?
+A straight forward solution using O(mn) space is probably a bad idea.
+A simple improvement uses O(m + n) space, but still not the best solution.
+Could you devise a constant space solution?
+*/
+
+/// Solution 1. O(MN) time, O(1) space Algorithm
+/// scan from top to bottom, and each row from right to left
+/// use a boolean to track if current row contains any zeroes, and another to track if previous row contails any zeroes. 
+/// (a) If see an zero at (i, j), then set all elements above it to zero (only if the element directly above it is not zero), 
+/// also label current row's boolean as true(contains one zero). 
+/// (b) If see an element that is non-zero, check if the element above it is zero, if yes, then set this element as zero as well
+/// The tricky part is we need to set any rows containing an zero all to zero. If we do this after finishing scanning a row,
+/// then when we move to next line, the newly added zeroes will disrupt step (b). To avoid this, we only set entire row after
+/// we finish step (b) for the next row. In other words, after we finish scanning row i, we set entire row i-1 to zero if needed
+/// thus we need two variables to track the status of current and previous rows.
+
+
+class Solution {
+public:
+    void setZeroes(vector<vector<int>>& matrix) {
+        int m = matrix.size();
+        if(m == 0) return;
+        int n = matrix[0].size();
+        if(n == 0) return;
+       
+        //whether last row, and current row has zero?
+        bool last = false, curr = false;
+        
+        for(int i = 0; i < m; ++i) { //row
+            
+            for(int j = 0; j < n; ++j) { //column
+                if(matrix[i][j] == 0) {
+                    curr = true;
+                    if(i > 0 && matrix[i-1][j] != 0) setColAbove(matrix, i, j);
+                } else if(i > 0 && matrix[i-1][j] == 0) {
+                    matrix[i][j] = 0; //set to zero
+                }
+            }
+            
+            //there is zero in the last line, set that row to zero
+            if(last) setRow(matrix, i-1);
+            
+            last = curr;
+            curr = false;
+        }
+        //don't forget the last row!
+        if(last) setRow(matrix, m-1);
+    }
+    //set row i all to zero
+    void setRow(vector<vector<int>>& matrix, int i) {
+        for(int k = 0; k < matrix[i].size(); ++k) 
+            matrix[i][k] = 0;
+    }
+    //set elements above row i, and at col j to zero
+    void setColAbove(vector<vector<int>>& matrix, int i, int j) {
+        for(int k = 0; k < i; ++k) 
+            matrix[k][j] = 0;
+    }
+};
+
+/// Solution 2. Similar to solution 1, less optimized. At first row, search below and see if there is a zero there, if yes, mark the 
+/// element in the first row as zero.
+class Solution {
+public:
+    void setZeroes(vector<vector<int>>& matrix) {
+        if(matrix.empty() || matrix[0].empty()) return;
+        int m = matrix.size(), n = matrix[0].size();
+        bool hasZeroCurr(false), hasZeroLast(false);
+        for(int i = 0; i < m; i++) {
+            for(int j = 0; j < n; j++) {
+                if(matrix[i][j] == 0) hasZeroCurr = true;
+                else if(i == 0) {
+                    //search below
+                    for(int k = i+1; k < m; k++)
+                        if(matrix[k][j] == 0) { matrix[i][j] = 0; break;}
+                } else if(matrix[i-1][j] == 0) matrix[i][j] = 0; //set element in this row to 0
+            }
+            //set last row as zero
+            if(hasZeroLast) setRow(matrix, i-1);
+            
+            hasZeroLast = hasZeroCurr; //update
+            hasZeroCurr = false; //reset
+        }
+        if(hasZeroLast) setRow(matrix, m-1);
+    }
+    void setRow(vector<vector<int>>& matrix, int ir) {
+        int n = matrix[0].size();
+        for(int j = 0; j < n; j++)
+            matrix[ir][j] = 0;
+    }
+};
+
+/// Solution 3. 
+/// Two pass O(MN) time, O(m+n) space algorithm
+/// Use two arrays to track if a given row/column has zero
+
+class Solution {
+public:
+    void setZeroes(vector<vector<int>>& matrix) {
+        int m = matrix.size(); 
+        if(m == 0) return; 
+        int n = matrix[0].size(); 
+        if(n == 0) return; 
+        
+        vector<bool> rows(m, false);
+        vector<bool> cols(n, false);
+        for(int i = 0; i < m; ++i) {
+            for(int j = 0; j < n; ++j) {
+                if(matrix[i][j] == 0) rows[i] = cols[j] = true;
+            }
+        }
+        
+        for(int i = 0; i < m; ++i) {
+            for(int j = 0; j < n; ++j) {
+                if(rows[i] || cols[j]) matrix[i][j] = 0;
+            }
+        }
+    }
+};
+
 
 /**************************************************** 
  ***    074,Medium,Search a 2D Matrix 
@@ -2559,30 +3041,26 @@ class Solution {
 public:
     bool exist(vector<vector<char>>& board, string word) {
         if(board.empty() || board[0].empty()) return false;
-        if(word.empty()) return true;
         int m = board.size(), n = board[0].size();
-        if(m*n < word.size()) return false;
-        for(int i = 0; i < m; ++i) {
-            for(int j = 0; j < n; ++j) {
-                if(existHelper(board, i, j, word, 0)) return true;
+        for(int i = 0; i < m; i++) {
+            for(int j = 0; j < n; j++) {
+                if(dfs(board, i, j, word, 0)) return true;
             }
         }
         return false;
     }
-    bool existHelper(vector<vector<char> >& board, int i, int j, const string& word, int k) {
-        if(k == word.size()) return true; //found
+    //check whether board[i][j] matches with word[k] and continue searching
+    bool dfs(vector<vector<char> >& board, int i, int j, const string& word, int k) {
+        if(k == word.size()) return true;
         int m = board.size(), n = board[0].size();
-        if(i < 0 || i >= m || j < 0 || j >= n) return false; //not legal position
-        if(board[i][j] == '*') return false; //already visited
-        if(board[i][j] != word[k]) return false; //not match
+        if(i < 0 || j < 0 || i >= m || j >= n) return false;
+        if(board[i][j] != word[k]) return false;
         char c = board[i][j];
-        board[i][j] = '*';
-        //matches, move to next one
-        if(existHelper(board, i-1, j, word, k+1)) return true;
-        if(existHelper(board, i+1, j, word, k+1)) return true;
-        if(existHelper(board, i, j-1, word, k+1)) return true;
-        if(existHelper(board, i, j+1, word, k+1)) return true;
-        
+        board[i][j] = '*'; //mark as visited
+        if(dfs(board, i-1, j, word, k+1)) return true;
+        if(dfs(board, i, j-1, word, k+1)) return true;
+        if(dfs(board, i+1, j, word, k+1)) return true;
+        if(dfs(board, i, j+1, word, k+1)) return true;
         board[i][j] = c; //retrace
         return false;
     }
@@ -2719,20 +3197,24 @@ Write a function to determine if a given target is in the array.
 */
 
 /*
-Binary search. The array can be broken into two part, first part is 4-7, second part is 0-2. If array is unrotated, then only first part exists (corner case). 
+Binary search. The array can be broken into two part, first part is 4-7, second part is 0-2. If array is unrotated,
+then only first part exists (corner case). 
 There are three anchor points, lo, hi, and mid.
 First determine whether mid is in first half or second half. Due to duplicated items, we now has three cases:
-1. Mid is in first half iff nums[mid] > nums[lo] 
-2. Mid is in second half iff nums[mid] < nums[lo]
-3. if nums[mid] == nums[lo], we can't say for sure which part mid belongs to, but we know that nums[lo] is not target, so we simply increment lo. 
+1. mid is in first half iff nums[mid] > nums[lo] 
+2. mid is in second half iff nums[mid] < nums[lo]
+3. if nums[mid] == nums[lo], we can't say for sure which part mid belongs to, but we know that nums[lo] is not target, 
+so we simply increment lo. 
 Examples for 3. 
  2 2 2 2 3 2 2
 lo    mid   hi  (mid is in first half)
  2 2 3 2 2 2 2
 lo    mid   hi  (mid is in second half)
 
-1. If mid is in first half, we know that nums[mid] >= nums[lo] (could be equal because mid can be lo, when hi = lo+1), if target falls between the two, then the index has to be between lo and mid. Otherwise, it is between mid and hi.
-2. If mid is in second half, we know that nums[mid] <= nums[hi] (could be equal because mid can be hi, when hi = lo), if target falls between the two, then the index has to be between mid and hi. Otherwise, it is between lo and mid.
+1. If mid is in first half, we know that nums[mid] >= nums[lo] (could be equal because mid can be lo, when hi = lo+1), 
+if target falls between the two, then the index has to be between lo and mid. Otherwise, it is between mid and hi.
+2. If mid is in second half, we know that nums[mid] <= nums[hi] (could be equal because mid can be hi, when hi = lo), 
+if target falls between the two, then the index has to be between mid and hi. Otherwise, it is between lo and mid.
 */
 
 class Solution {
@@ -2810,6 +3292,112 @@ public:
         head = dummy->next;
         delete dummy;
         return head;
+    }
+};
+
+/**************************************************** 
+ ***    086,Medium,Partition List 
+ ****************************************************/
+
+/*
+Given a linked list and a value x, partition it such that all nodes less than x come before nodes greater than or equal to x.
+
+You should preserve the original relative order of the nodes in each of the two partitions.
+
+For example,
+Given 1->4->3->2->5->2 and x = 3,
+return 1->2->2->4->3->5.
+*/
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+
+// No dummy heads, two sub-lists for < x and >= x
+// when finish, patch two lists together, and remember to set list tail's next pointer to NULL!
+
+class Solution {
+public:
+    ListNode* partition(ListNode* head, int x) {
+        if(!head || !head->next) return head;
+        //p1 .. q1 < x, p2 .. q2 >= x
+        ListNode *p1(NULL), *q1(NULL), *p2(NULL), *q2(NULL);
+        ListNode *curr = head;
+        while(curr) {
+            if(curr->val < x) {
+                if(!p1) p1 = q1 = curr; //first one
+                else q1 = q1->next = curr; 
+            } else {
+                if(!p2) p2 = q2 = curr; //first one
+                else q2 = q2->next = curr; 
+            }
+            curr = curr->next;
+        }
+        if(q1) q1->next = p2; //connect the two
+        if(q2) q2->next = NULL; //set tail to NULL!
+        return p1 ? p1 : p2;
+    }
+};
+
+/**************************************************** 
+ ***    089,Medium,Gray Code 
+ ****************************************************/
+
+/*
+The gray code is a binary numeral system where two successive values differ in only one bit.
+Given a non-negative integer n representing the total number of bits in the code, print the sequence of gray code. A gray code sequence must begin with 0.
+For example, given n = 2, return [0,1,3,2]. Its gray code sequence is:
+00 - 0
+01 - 1
+11 - 3
+10 - 2
+Note:
+For a given n, a gray code sequence is not uniquely defined.
+For example, [0,2,3,1] is also a valid gray code sequence according to the above definition.
+For now, the judge is able to judge based on one instance of gray code sequence. Sorry about that.
+*/
+
+// Dynamic programming, start from 1, expand to n:
+// 1: (0 1)
+// 2: (0 1, 2+1 2+0) = (0 1 3 2)
+// 3: (0 1 3 2, 4+2 4+3 4+1 4+0) = (0 1 3 2 6 7 5 4)
+// One array is enough (no need to use another array to store temporary results
+// Be careful of corner case n = 0 (somehow should return [0])
+
+class Solution {
+public:
+    vector<int> grayCode(int n) {
+        vector<int> res;
+        if (n == 0) return vector<int>(1, 0);
+        res.resize(2, 0);
+        res[1] = 1;
+        for (int i = 1; i < n; ++i) {
+            int size = res.size();
+            res.resize(size*2);
+            for(int j = 0; j < size; ++j) {
+               res[j+size] = (1 << i) + res[size-1-j];
+            }
+        }
+        return res;
+    }
+};
+
+// Solution 2 using one single loop
+class Solution {
+public:
+   vector<int> grayCode(int n) {
+        if(n < 0) return vector<int>();
+        vector<int> result(1 << n, 0); //pow(2, n)
+        for(int j = 1, size = 1; j < result.size(); ++j) {
+            if(j == size)  size <<= 1;
+            result[j] = result[size-j-1] + (size >> 1);
+        }
+        return result;
     }
 };
 
@@ -3000,6 +3588,73 @@ public:
 
 
 /**************************************************** 
+ ***    092,Medium,Reverse Linked List II 
+ ****************************************************/
+
+/* 
+Reverse a linked list from position m to n. Do it in-place and in one-pass.
+
+For example:
+Given 1->2->3->4->5->NULL, m = 2 and n = 4,
+
+return 1->4->3->2->5->NULL.
+
+Note:
+Given m, n satisfy the following condition:
+1 ≤ m ≤ n ≤ length of list. 
+*/
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+ 
+// Use a counter k, one pass.
+// 1. When reached (m-1)-th element, save the curr and next node as pa and pb:
+// 2. when k between m and n-1, do reverse
+// 3. when k = n, patch two segments together using pa and pb.
+// Use a dummy head pointer
+//  1 => .. => m-1 => m => ... => n => n+1 => ...
+//              pa   pb           curr  next
+//       ... => pa => curr => pb => next => ...
+
+class Solution {
+public:
+    ListNode* reverseBetween(ListNode* head, int m, int n) {
+        if(head == NULL || head->next == NULL) return head;
+        if(m == n) return head;
+
+        ListNode dum(0), *p(&dum);
+        p->next = head;
+        ListNode *curr(p), *next(NULL);
+        ListNode *pa(NULL), *pb(NULL);
+        for (int k = 0; curr != NULL && k <= n; k++) {
+            if (k < m-1)  curr = curr->next;
+            else if (k == m-1)  {
+                pa = curr;
+                pb = curr->next;
+                curr = curr->next;
+                next = curr->next; //init next at this point
+            }
+            else if (k < n) { // do reverse: change curr->next to point to curr
+                ListNode *nextnext = next->next;  //store in temp variable
+                next->next = curr;
+                curr = next;  //update curr
+                next = nextnext; //update next
+            } else if (k == n) { //connect two list segments
+                pa->next = curr;
+                pb->next = next;
+            }
+        }
+        return p->next;
+    }
+};
+
+/**************************************************** 
  ***    093,Medium,Restore IP Addresses 
  ****************************************************/
 
@@ -3177,6 +3832,28 @@ public:
             while(node) {
                 st.push_back(node);
                 node = node->left;
+            }
+        }
+        return result;
+    }
+};
+
+// Another iterative solution using a stack and a pointer pointing to current node
+class Solution {
+public:
+    vector<int> inorderTraversal(TreeNode* root) {
+        vector<int> result;
+        if(!root) return result;
+        stack<TreeNode*> s;
+        TreeNode *curr = root;
+        while(!s.empty() || curr) {
+            if(curr) {
+                s.push(curr);
+                curr = curr->left;
+            } else { //need to process curr
+                curr = s.top(); s.pop();
+                result.push_back(curr->val);
+                curr = curr->right;
             }
         }
         return result;
@@ -3518,6 +4195,160 @@ public:
 };
 
 /**************************************************** 
+ ***    105,Medium,Construct Binary Tree from Preorder and Inorder Traversal 
+ ****************************************************/
+
+/*
+Given preorder and inorder traversal of a tree, construct the binary tree.
+
+Note:
+You may assume that duplicates do not exist in the tree. 
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+
+// Recursive solution. Use start and length of subarray as parameter
+/// pre: [  X  [ left ] [ right ] ] : total length = len
+///        lo1    mid    len-mid+1
+/// in:  [ [ left ]  X  [ right ] ] : total length = len
+///        lo2  mid      len-mid+1
+class Solution {
+public:
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        if(preorder.empty()) return NULL;
+        int n = preorder.size();
+        return build(preorder, inorder, 0, 0, n);
+    }
+    //starting positions of arrays and lengths
+    TreeNode *build(vector<int>& preorder, vector<int>& inorder, int lo1, int lo2, int len) {
+        if(len == 0) return NULL;
+        int r = preorder[lo1];
+        TreeNode *root = new TreeNode(r);
+        int mid = 0; //number of nodes in left subtree
+        while(inorder[lo2+mid] != r) mid++;
+        root->left = build(preorder, inorder, lo1+1, lo2, mid);
+        root->right = build(preorder, inorder, lo1+1+mid, lo2+mid+1, len-mid-1);
+        return root;
+    }
+};
+
+// Solution 2, slightly different version
+
+class Solution {
+public:
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        if(preorder.empty()) return NULL;
+        int n = preorder.size();
+        return buildTree(preorder, 0, n-1, inorder, 0, n-1);
+    }
+    //build tree from pre[p1 ..p2] and in[i1 .. i2]
+    TreeNode* buildTree(vector<int>& preorder, int p1, int p2, vector<int>& inorder, int i1, int i2) {
+        int len = p2 - p1 + 1;
+        if(len <= 0) return NULL;
+        if(len == 1) return new TreeNode(preorder[p1]); //one node only
+        int root_val = preorder[p1];
+        TreeNode *root = new TreeNode(root_val);
+        
+        int i = i1;
+        for(; i <= i2; i++) {
+            if(inorder[i] == root_val) break;
+        }
+        //i is the root in inorder
+        int nl = i-i1; //number of elements in left subtree
+        root->left = buildTree(preorder, p1+1, p1+nl, inorder, i1, i-1);
+        root->right = buildTree(preorder, p1+nl+1, p2, inorder, i+1, i2);
+    }
+};
+
+/**************************************************** 
+ ***    106,Medium,Construct Binary Tree from Inorder and Postorder Traversal 
+ ****************************************************/
+
+/*
+Given inorder and postorder traversal of a tree, construct the binary tree.
+
+Note:
+You may assume that duplicates do not exist in the tree. 
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+
+// Similar idea as 105
+
+class Solution {
+public:
+    TreeNode* buildTree(vector<int>& inorder, vector<int>& postorder) {
+        if(inorder.empty()) return NULL;
+        int n = inorder.size();
+        return build(inorder, postorder, 0, 0, n);
+    }
+    //starting positions of arrays and lengths
+    TreeNode *build(vector<int>& inorder, vector<int>& postorder, int lo1, int lo2, int len) {
+        if(len == 0) return NULL;
+        int r = postorder[lo2+len-1];
+        TreeNode *root = new TreeNode(r);
+        int mid = 0; //number of nodes in left subtree
+        while(inorder[lo1+mid] != r) mid++;
+        root->left = build(inorder, postorder, lo1, lo2, mid);
+        root->right = build(inorder, postorder, lo1+mid+1, lo2+mid, len-mid-1);
+        return root;
+    }
+};
+
+// Solution 2, slightly different.
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* buildTree(vector<int>& inorder, vector<int>& postorder) {
+        if(inorder.empty()) return NULL;
+        int n = inorder.size();
+        return buildTree(inorder, 0, n-1, postorder, 0, n-1);
+    }
+    //build tree from in[i1 .. i2] and post[p1 .. p2]
+    TreeNode* buildTree(vector<int>& inorder, int i1, int i2, vector<int>& postorder, int p1, int p2) {
+        int len = p2 - p1 + 1;
+        if(len <= 0) return NULL;
+        if(len == 1) return new TreeNode(postorder[p1]); //one node only
+        int root_val = postorder[p2]; //last one is root
+        TreeNode *root = new TreeNode(root_val);
+        
+        int i = i1;
+        for(; i <= i2; i++) {
+            if(inorder[i] == root_val) break;
+        }
+        //i is the root in inorder
+        int nl = i-i1; //number of elements in left subtree
+        root->left = buildTree(inorder, i1, i-1, postorder, p1, p1+nl-1);
+        root->right = buildTree(inorder, i+1, i2, postorder, p1+nl, p2-1);
+    }
+};
+
+
+/**************************************************** 
  ***    108,Medium,Convert Sorted Array to Binary Search Tree 
  ****************************************************/
 
@@ -3683,6 +4514,68 @@ public:
 };
 
 /**************************************************** 
+ ***    114,Medium,Flatten Binary Tree to Linked List 
+ ****************************************************/
+
+/*
+ Given a binary tree, flatten it to a linked list in-place.
+
+For example,
+Given
+
+         1
+        / \
+       2   5
+      / \   \
+     3   4   6
+
+The flattened tree should look like:
+
+   1
+    \
+     2
+      \
+       3
+        \
+         4
+          \
+           5
+            \
+             6
+
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+
+// Recursive solution. First flatten right, then left, then insert left list between root and root->right. Finally, remember to set root->left to NULL!
+// Caveat: Set root->left to NULL in the end!
+
+class Solution {
+public:
+    void flatten(TreeNode* root) {
+        if(!root) return;
+        flatten(root->left);
+        flatten(root->right);
+        if(root->left) {
+            TreeNode *node = root->left;
+            while(node->right) node = node->right;
+            node->right = root->right;
+            root->right = root->left;
+            root->left = NULL;
+        }
+    }
+};
+
+
+/**************************************************** 
  ***    116,Medium,Populating Next Right Pointers in Each Node 
  ****************************************************/
 
@@ -3795,6 +4688,54 @@ public:
             last = head->next; //move to new row
             head->next = NULL; //reset to NULL!
         }
+    }
+};
+
+/**************************************************** 
+ ***    120,Medium,Triangle 
+ ****************************************************/
+
+/*
+Given a triangle, find the minimum path sum from top to bottom. Each step you may move to adjacent numbers on the row below.
+
+For example, given the following triangle
+
+[
+     [2],
+    [3,4],
+   [6,5,7],
+  [4,1,8,3]
+]
+
+The minimum path sum from top to bottom is 11 (i.e., 2 + 3 + 5 + 1 = 11).
+
+Note:
+Bonus point if you are able to do this using only O(n) extra space, where n is the total number of rows in the triangle. 
+*/
+
+// Solution using standard DP, with 2 vectors representing current and next rows.
+
+class Solution {
+public:
+    int minimumTotal(vector<vector<int>>& triangle) {
+        if(triangle.empty()) return 0;
+        int ret = INT_MAX;
+        int nr = triangle.size();
+        vector<int> currRow(nr, INT_MAX);
+        vector<int> nextRow(nr, INT_MAX);
+        //row 0:
+        currRow[0] = triangle[0][0];
+        for (int ir = 1; ir < nr; ++ir) { //ir has ir+1 elements in triangle (0 .. ir)
+            nextRow[0] = currRow[0] + triangle[ir][0];
+            for (int j = 1; j < ir; ++j)
+                nextRow[j] = min(currRow[j-1], currRow[j]) + triangle[ir][j];
+            nextRow[ir] = currRow[ir-1] + triangle[ir][ir];
+            currRow.swap(nextRow);
+        }
+        for (size_t i = 0; i < currRow.size(); ++i) {
+            ret = min(ret, currRow[i]);
+        }
+        return ret;
     }
 };
 
@@ -4146,6 +5087,255 @@ public:
 
 
 /**************************************************** 
+ ***    130,Medium,Surrounded Regions 
+ ****************************************************/
+
+/*
+Given a 2D board containing 'X' and 'O', capture all regions surrounded by 'X'.
+
+A region is captured by flipping all 'O's into 'X's in that surrounded region.
+
+For example,
+
+X X X X
+X O O X
+X X O X
+X O X X
+
+After running your function, the board should be:
+
+X X X X
+X X X X
+X X X X
+X O X X
+*/
+
+// Use BFS search instead of DFS to avoid stack-overflow
+// First label all 'O' connected to borders as 'T' (BFS)
+// Then linearly scan all matrix, mark all 'O' as 'X' and 'T' as 'O'
+
+class Solution {
+public:
+    void solve(vector<vector<char>>& board) {
+        if(board.empty() || board[0].empty()) return;
+        int m = board.size(), n = board[0].size();
+        //bfs, starting from boundary 'O's
+        vector<pair<int, int> > curr, next;
+        for(int i = 0; i < m; i++) {
+            testSet(board, i, 0, curr);
+            testSet(board, i, n-1, curr);
+        }
+        for(int j = 1; j < n-1; j++) {
+            testSet(board, 0, j, curr);
+            testSet(board, m-1, j, curr);
+        }
+        //now do bfs
+        while(!curr.empty()) {
+            for(auto pos : curr) {
+                int ir = pos.first, jc = pos.second;
+                if(ir > 0)    testSet(board, ir-1, jc, next);
+                if(ir < m-1)  testSet(board, ir+1, jc, next);
+                if(jc > 0)    testSet(board, ir, jc-1, next);
+                if(jc < n-1)  testSet(board, ir, jc+1, next);
+            }
+            curr.swap(next);
+            next.clear();
+        }
+        //now set all 'O' to 'X' and all 'T' back to 'O'
+        for(int i = 0; i < m; i++) {
+            for(int j = 0; j < n; j++) {
+                if(board[i][j] == 'O') board[i][j] = 'X';
+                else if(board[i][j] == 'T') board[i][j] = 'O';
+            }
+        }
+    }
+    //helper function to set value 'O' temporarily as 'T', and push position to queue
+    void testSet(vector<vector<char>>& board, int i, int j, vector<pair<int, int> >& q) {
+        if(board[i][j] == 'O') {
+            board[i][j] = 'T';
+            q.push_back(make_pair(i, j));
+        }
+    }
+};
+
+// DFS search version, causes runtime error due to stack overflow (stack runs too deep)
+// First label all 'O' connected to borders as 'T' (BFS)
+// Then linearly scan all matrix, mark all 'O' as 'X' and 'T' as 'O'
+
+class Solution {
+public:
+    void solve(vector<vector<char>>& board) {
+        if (board.empty() || board[0].empty()) return;
+        int m = board.size(), n = board[0].size();
+        //dfs on boundary nodes, temporary mark as 'T'
+        for (int i = 0; i < m; ++i) {
+            if(board[i][0] == 'O') dfs(board, i, 0);
+            if(board[i][n-1] == 'O') dfs(board, i, n-1);
+        }
+        for (int j = 1; j < n-1; ++j) {
+            if(board[0][j] == 'O') dfs(board, 0, j);
+            if(board[m-1][j] == 'O') dfs(board, m-1, j);
+        }
+        //scan all matrix, mark all 'O' as 'X'; mark all 'T' back to 'O'
+        for (int i = 0; i < m; ++i)  {
+            for (int j = 0; j < n; ++j) {
+                if(board[i][j] == 'O') board[i][j] = 'X';
+                if(board[i][j] == 'T') board[i][j] = 'O';
+            }
+        }
+    }
+    void dfs(vector<vector<char> >& board, int i, int j) {
+        int m = board.size(), n = board[0].size();
+        board[i][j] = 'T';
+        // check four neighbors
+        if(j < n-1 && board[i][j+1] == 'O') dfs(board, i, j+1);
+        if(j > 0   && board[i][j-1] == 'O') dfs(board, i, j-1);
+        if(i < m-1 && board[i+1][j] == 'O') dfs(board, i+1, j);
+        if(i > 0   && board[i-1][j] == 'O') dfs(board, i-1, j);
+    }
+};
+
+
+/**************************************************** 
+ ***    131,Medium,Palindrome Partitioning 
+ ****************************************************/
+
+/*
+Given a string s, partition s such that every substring of the partition is a palindrome.
+
+Return all possible palindrome partitioning of s.
+
+For example, given s = "aab",
+Return
+
+  [
+    ["aa","b"],
+    ["a","a","b"]
+  ]
+*/
+
+/// use DFS. Don't need to use dynamic programming, since there is no overlapping subproblems. Only checked ispalindrome(s, i, j) once for each i, j pair.
+
+class Solution {
+public:
+    vector<vector<string>> partition(string s) {
+        vector<string> tmp;
+        vector<vector<string> > ret;
+        if(s.empty()) return ret;
+        
+        dfs(s, 0, tmp, ret);
+        return ret;
+    }
+    
+    void dfs(const string& s, int i, vector<string>& tmp, vector<vector<string> >& ret) {
+        if(i == s.size()) {
+            ret.push_back(tmp);
+            return;
+        }
+        tmp.push_back(""); //add one entry
+        for (int j = i; j < s.size(); ++j) {
+            if(isPalindrome(s, i, j)) {
+                tmp.back() = s.substr(i, j-i+1);
+                dfs(s, j+1, tmp, ret);
+            }
+        }
+        tmp.resize(tmp.size()-1); //remove last entry
+    }
+    bool isPalindrome(const string& s, int i, int j) {
+        while(i < j) {
+            if(s[i++] != s[j--]) return false;
+        }
+        return true;
+    }
+};
+
+/**************************************************** 
+ ***    133,Medium,Clone Graph 
+ ****************************************************/
+
+/*
+Clone an undirected graph. Each node in the graph contains a label and a list of its neighbors.
+
+OJ's undirected graph serialization:
+
+Nodes are labeled uniquely.
+We use # as a separator for each node, and , as a separator for node label and each neighbor of the node.
+
+As an example, consider the serialized graph {0,1,2#1,2#2,2}.
+
+The graph has a total of three nodes, and therefore contains three parts as separated by #.
+
+    First node is labeled as 0. Connect node 0 to both nodes 1 and 2.
+    Second node is labeled as 1. Connect node 1 to node 2.
+    Third node is labeled as 2. Connect node 2 to node 2 (itself), thus forming a self-cycle.
+
+Visually, the graph looks like the following:
+
+       1
+      / \
+     /   \
+    0 --- 2
+         / \
+         \_/
+*/
+
+/**
+ * Definition for undirected graph.
+ * struct UndirectedGraphNode {
+ *     int label;
+ *     vector<UndirectedGraphNode *> neighbors;
+ *     UndirectedGraphNode(int x) : label(x) {};
+ * };
+ */
+
+/// One pass solution using DFS. Make sure only visit unvisited nodes. First create a copy for current node, and then process its neighors,
+/// It neighbor already visited (indicated by the map), then use the copy as the new neighbor, otherwise dfs on the neighbor.
+/// Maintain a map from old node to new node, which also serves as the visited marker
+
+class Solution {
+public:
+    typedef UndirectedGraphNode Node;
+    UndirectedGraphNode *cloneGraph(UndirectedGraphNode *node) {
+        if(!node) return NULL;
+        return dfs(node);
+    }
+    Node* dfs(Node* node) {
+        Node* newnode = new Node(node->label);
+        dict[node] = newnode; //insert to map before processing neighbors (handle self-loops)
+        newnode->neighbors = node->neighbors;
+        for(int i = 0; i < node->neighbors.size(); i++) {
+            if(dict.count(node->neighbors[i])) newnode->neighbors[i] = dict[node->neighbors[i]];
+            else newnode->neighbors[i] = dfs(node->neighbors[i]);
+        }
+        return newnode;
+    }
+    unordered_map<Node*, Node*> dict;
+};
+
+/// Solution 2, slightly different one. In DFS, first check if node is visited or not. If visited, just return the copy.
+
+class Solution {
+public:
+    typedef UndirectedGraphNode Node;
+    UndirectedGraphNode *cloneGraph(UndirectedGraphNode *node) {
+        if(!node) return NULL;
+        return dfs(node);
+    }
+    Node* dfs(Node* node) {
+        if(dict.count(node)) return dict[node];
+        Node* newnode = new Node(node->label);
+        dict[node] = newnode; //insert to map before processing neighbors (handle self-loops)
+        newnode->neighbors = node->neighbors;
+        for(int i = 0; i < node->neighbors.size(); i++) {
+            newnode->neighbors[i] = dfs(node->neighbors[i]);
+        }
+        return newnode;
+    }
+    unordered_map<Node*, Node*> dict;
+};
+
+
+/**************************************************** 
  ***    134,Medium,Gas Station 
  ****************************************************/
 
@@ -4246,6 +5436,89 @@ public:
 
 
 /**************************************************** 
+ ***    136,Medium,Single Number 
+ ****************************************************/
+
+/*
+Given an array of integers, every element appears twice except for one. Find that single one.
+
+Note:
+Your algorithm should have a linear runtime complexity. Could you implement it without using extra memory? 
+*/
+
+/// Use exclusive OR
+
+class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        int v = 0;
+        for (int i = 0; i < nums.size(); ++i)
+            v ^= nums[i];
+        return v;
+    }
+};
+
+/**************************************************** 
+ ***    137,Medium,Single Number II 
+ ****************************************************/
+
+/*
+Given an array of integers, every element appears three times except for one. Find that single one.
+
+Note:
+Your algorithm should have a linear runtime complexity. Could you implement it without using extra memory? 
+*/
+
+/// Use bit operations. Can extend to general cases (N times)
+/// Use three variables to store the occurrences of each bit: 
+/// ones stores whether the bit has been set for AT LEAST 1 times
+/// twos stores whether the bit has been set for AT LEAST 2 times
+/// threes stores whether the bit has been set for 3 times
+/// when each bit position has reached maximum number of times (3), we reset the corresponding bit positions in ones and twos to zero
+
+/// The "AT LEAST" implies that the ones, twos are not mutually exclusive (e.g. ones & twos != 0)
+
+// 1. A given bit position has appeared 3 times iff already appeared 2 times AND the corresponding bit of nums[i] is set, hence: threes = twos & nums[i]
+// 2. For twos, if it is already set (appeared at least 2 times), we don’t touch it, otherwise, it can be set to 1 iff it has appeared at least one time and nums[i] has the bit set, hence twos = twos | (ones & nums[i]). 
+// 3. For ones, if it is already set (appeared at least 1 times), we don’t touch it, otherwise, it can be set to 1 iff nums[i] has the bit set, hence ones = ones | nums[i]. 
+// 4. For both twos and ones, we need to reset bits when reaching 3 times. Thus: ones = ones & ~threes; twos = twos & ~threes;
+
+class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        int ones(0), twos(0), threes(0);
+        for(int i = 0; i < nums.size(); ++i) {
+            threes = twos & nums[i];
+            twos = (twos | (ones & nums[i])) & ~threes;
+            ones = (ones | nums[i]) & ~threes; // it is |, not ^
+        }
+        return ones;
+    }
+};
+
+// Extension to general cases (N times)
+/// Use an array to store the occurrences of each bit: 
+/// count[1] stores whether the bit has been set for AT LEAST 1 times
+/// count[2] stores whether the bit has been set for AT LEAST 2 times
+/// count[N] stores whether the bit has been set for N times
+/// when each bit position has reached maximum number of times (N), we reset the corresponding bit positions in count to zero
+
+class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        const int N = 3; //number of times, can be generalized to > 3
+        vector<int> count(N+1, 0); //count[i]: occured AT LEAST i times? (count[0] unused)
+        for(int i = 0; i < nums.size(); ++i) {
+            count[N] = count[N-1] & nums[i];
+            for(int n = N-1; n > 1; --n)
+                count[n] = (count[n] | (count[n-1] & nums[i])) & ~count[N];
+            count[1] = (count[1] | nums[i]) & ~count[N];
+        }
+        return count[1];
+    }
+};
+
+/**************************************************** 
  ***    139,Medium,Word Break 
  ****************************************************/
 
@@ -4302,7 +5575,7 @@ public:
     }
 };
 
-// Solution 3. DP with memoization
+// Solution 3. DP with memoization (16ms)
 class Solution {
 public:
     bool wordBreak(string s, unordered_set<string>& wordDict) {
@@ -4324,6 +5597,88 @@ public:
     unordered_map<string, bool> breakable;
 };
 
+
+/**************************************************** 
+ ***    141,Medium,Linked List Cycle 
+ ****************************************************/
+
+/*
+Given a linked list, determine if it has a cycle in it.
+
+Follow up:
+Can you solve it without using extra space?
+*/
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+
+// Floyd's algorithm. Maintain a slow and a fast pointer
+// see http://keithschwarz.com/interesting/code/?dir=find-duplicate
+
+class Solution {
+public:
+    bool hasCycle(ListNode *head) {
+        if (head == NULL) return false;
+        ListNode *slow(head), *fast(head);
+        while(fast && fast->next) {
+            slow = slow->next;
+            fast = fast->next->next;
+            if(slow == fast) return true;
+        }
+        return false;
+    }
+};
+
+/**************************************************** 
+ ***    142,Medium,Linked List Cycle II 
+ ****************************************************/
+
+/*
+Given a linked list, return the node where the cycle begins. If there is no cycle, return null.
+
+Note: Do not modify the linked list.
+
+Follow up:
+Can you solve it without using extra space?
+*/
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+
+// Floyd's algorithm. Maintain a slow and a fast pointer
+// see http://keithschwarz.com/interesting/code/?dir=find-duplicate
+
+class Solution {
+public:
+    ListNode *detectCycle(ListNode *head) {
+        if(head == NULL) return NULL;
+        ListNode *slow = head, *fast = head;
+        while(fast && fast->next) {
+            slow = slow->next;
+            fast = fast->next->next;
+            if(slow == fast) break;
+        }
+        if(!fast || !fast->next) return NULL; //no cycle detected
+        slow = head;
+        while (slow != fast) {
+            slow = slow->next;
+            fast = fast->next;
+        }
+        return slow;
+    }
+};
 
 /**************************************************** 
  ***    143,Medium,Reorder List 
@@ -4725,6 +6080,54 @@ public:
 
 
 /**************************************************** 
+ ***    150,Medium,Evaluate Reverse Polish Notation 
+ ****************************************************/
+
+/*
+Evaluate the value of an arithmetic expression in Reverse Polish Notation.
+
+Valid operators are +, -, *, /. Each operand may be an integer or another expression.
+
+Some examples:
+
+  ["2", "1", "+", "3", "*"] -> ((2 + 1) * 3) -> 9
+  ["4", "13", "5", "/", "+"] -> (4 + (13 / 5)) -> 6
+*/
+
+/// Use a stack. Pushing numbers to stack. When seeing an operator, pop two numbers, operate, and put value back to stack.
+/// caveat: when evaluating integer numbers, take care of possible positive/negative signs!
+
+class Solution {
+public:
+    int evalRPN(vector<string>& tokens) {
+        deque<int> st; //stack
+        for(size_t i = 0; i < tokens.size(); ++i) {
+            const string& str = tokens[i];
+            if(str == "+" || str == "-" || str == "*" || str == "/") {
+                 int num2 = st.back(); st.pop_back();
+                 int num1 = st.back(); st.pop_back();
+                 if(str == "+") st.push_back(num1+num2);
+                 else if(str == "-") st.push_back(num1-num2);
+                 else if(str == "*") st.push_back(num1*num2);
+                 else if(str == "/") st.push_back(num1/num2);
+            } else {
+                 st.push_back(eval(str));
+            }
+        }
+        return st.back();
+    }
+    int eval(const string& str) {
+        int v = 0;
+        int sign = 1;
+        for(size_t i = 0; i < str.size(); ++i) {
+            if(i == 0 && (str[i] == '-' || str[i] == '+')) sign = (str[i] == '+') ? 1 : -1;
+            else v = v*10 + (str[i] - '0');
+        }
+        return sign*v;
+    }
+};
+
+/**************************************************** 
  ***    151,Medium,Reverse Words in a String 
  ****************************************************/
 
@@ -4940,6 +6343,53 @@ public:
 };
 
 /**************************************************** 
+ ***    156,Medium,Binary Tree Upside Down 
+ ****************************************************/
+
+/*
+Given a binary tree where all the right nodes are either leaf nodes with a sibling (a left node that shares the same parent node) or empty, flip it upside down and turn it into a tree where the original right nodes turned into left leaf nodes. Return the new root.
+
+For example:
+Given a binary tree {1,2,3,4,5},
+    1
+   / \
+  2   3
+ / \
+4   5
+return the root of the binary tree [4,5,2,#,#,3,1].
+   4
+  / \
+ 5   2
+    / \
+   3   1  
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+
+// Recursive solution. Rememeber to set root's child pointers to NULL!
+
+class Solution {
+public:
+    TreeNode* upsideDownBinaryTree(TreeNode* root) {
+        if(!root) return NULL;
+        if(!root->left) return root;
+        TreeNode * newRoot = upsideDownBinaryTree(root->left);
+        root->left->left = root->right;
+        root->left->right = root;
+        root->left = root->right = NULL;
+        return newRoot;
+    }
+};
+
+/**************************************************** 
  ***    161,Medium,One Edit Distance 
  ****************************************************/
 
@@ -5046,6 +6496,133 @@ public:
     }
 };
 
+
+/**************************************************** 
+ ***    163,Medium,Missing Ranges 
+ ****************************************************/
+
+/*
+Given a sorted integer array where the range of elements are [lower, upper] inclusive, return its missing ranges.
+
+For example, given [0, 1, 3, 50, 75], lower = 0 and upper = 99, return ["2", "4->49", "51->74", "76->99"]. 
+*/
+
+// First locate the lower and upper in the array, using binary search.
+// Then linearly scan the portion of array that falls into [lower, upper], and check missing ranges.
+
+class Solution {
+public:
+    vector<string> findMissingRanges(vector<int>& nums, int lower, int upper) {
+        vector<string> ret;
+        int i(0), j(0);
+        int n = nums.size();
+        int lo(0), hi(n-1), mid(0);
+        //i is first element >= lower
+        while(lo <= hi) {
+           mid = lo + (hi-lo)/2;
+           if(nums[mid] < lower) lo++;
+           else hi--;
+        }
+        i = lo;
+        lo = 0, hi = n-1;
+        //j is last element <= upper
+        while(lo <= hi) {
+           mid = lo + (hi-lo)/2;
+           if(nums[mid] > upper) hi--;
+           else lo++;
+        }
+        j = hi;
+
+        if(i > j) { //array is outside of [lower, upper]
+            appendRange(ret, lower, upper);
+            return ret;
+        }
+        //insert
+        appendRange(ret, lower, nums[i]-1);
+        for(int k = i; k < j; ++k) {
+            appendRange(ret, nums[k]+1, nums[k+1]-1);
+        }
+        appendRange(ret, nums[j]+1, upper);
+        return ret;
+    }
+    void appendRange(vector<string>& ret, int lo, int hi) {
+        if(lo == hi) ret.push_back(num2str(lo));
+        else if(lo < hi) ret.push_back(num2str(lo) + "->" + num2str(hi));
+    }
+    string num2str(int num) {
+        if(num == 0) return "0";
+        string s;
+        int sign = num >= 0 ? 1 : -1;
+        num = abs(num);
+        while(num) {
+            s = char(num%10 + '0') + s;
+            num /= 10;
+        }
+        if(sign < 0) s = "-" + s;
+        return s;
+    }
+};
+
+
+/**************************************************** 
+ ***    166,Medium,Fraction to Recurring Decimal 
+ ****************************************************/
+
+/*
+Given two integers representing the numerator and denominator of a fraction, return the fraction in string format.
+
+If the fractional part is repeating, enclose the repeating part in parentheses.
+
+For example,
+
+    Given numerator = 1, denominator = 2, return "0.5".
+    Given numerator = 2, denominator = 1, return "2".
+    Given numerator = 2, denominator = 3, return "0.(6)".
+*/
+
+// Use a table to track the first occuring position of residue, add corresponding quotient to decimal string, also take care of sign
+// caveat: use long for all integer variables to avoid integer overflow!
+
+class Solution {
+public:
+    string fractionToDecimal(int numerator, int denominator) {
+        long a = numerator, b = denominator; //use long to avoid overflow!
+        bool negative = (a < 0 && b > 0) || (a > 0 && b < 0);
+        a = abs(a), b = abs(b); //get absolute value
+        long q = a / b, r = a % b;
+        string integer = int2str(q);
+        if(negative) integer = '-' + integer;
+        if(r == 0) return integer;
+        
+        string decimal;
+        int i = 0; //position of decimal
+        unordered_map<long, int> table; // the place in decimal that a given r value has appeared the first time
+        do {
+            q = (r*10) / b;
+            if(!table.count(r)) { // not found
+                table[r] = i;
+                decimal += char(q + '0');
+            } else { //found!
+                int j = table[r];
+                decimal.insert(j, "(");
+                decimal += ")";
+                break;
+            }
+            r = (r*10) % b; //update r
+            i++; //update i
+        } while(r);
+        return integer + "." + decimal;
+    }
+
+    string int2str(long val) {
+        string s;
+        do {
+            s = char(val % 10 + '0') + s;
+            val /= 10;
+        } while(val);
+        return s;
+    }
+};
 
 /**************************************************** 
  ***    167,Medium,Two Sum II - Input array is sorted 
@@ -5250,41 +6827,6 @@ public:
  ***    187,Medium,Repeated DNA Sequences 
  ****************************************************/
 
-/// Similar approach to solution 1, except we use 2-digit code for each character, thus resulting in 20-bit hash code for 
-/// the substring, represented by an integer (32 bits). 
-/// Use a function to return the hash code for the 4 characters, we only requires 2 bits
-/// First calculate the hash code for the first 9 digit, when we add a new digit, we multiply by 4 (radix-4 hash code), or
-/// equivalently, << 2. How to strip off the highest character when moving to next? Notice that we only have 20 bits, and 
-/// we simply turn off the highest 12 bits, so we mask with Ox000FFFFF.
-
-class Solution {
-public:
-    vector<string> findRepeatedDnaSequences(string s) {
-        vector<string> ret;
-        int n = s.size();
-        if(n < 10) return ret;
-        map<int, int> count;
-        int hash = 0;
-        for(int i = 0; i < 9; ++i) {
-            int v = char2num(s[i]);
-            hash = (hash << 2) | v;
-        }
-        for(int i = 9; i < n; ++i) {
-            int v = char2num(s[i]);
-            hash = (hash << 2) & 0x000FFFFF | v;
-            count[hash]++;
-            if(count[hash] == 2) ret.push_back(s.substr(i-9, 10));
-        }
-        return ret;
-    }
-    
-    int char2num(char c) {
-        if      (c == 'A') return 0;
-        else if (c == 'C') return 1;
-        else if (c == 'G') return 2;
-        else               return 3;
-    }
-};
 /*
 All DNA is composed of a series of nucleotides abbreviated as A, C, G, and T, for example: "ACGAATTCCG". When studying DNA, it is sometimes useful to identify repeated sequences within the DNA.
 
@@ -5357,6 +6899,86 @@ public:
     }
 };
 
+
+/**************************************************** 
+ ***    199,Medium,Binary Tree Right Side View 
+ ****************************************************/
+
+/*
+Given a binary tree, imagine yourself standing on the right side of it, return the values of the nodes you can see ordered from top to bottom.
+
+For example:
+Given the following binary tree,
+   1            <---
+ /   \
+2     3         <---
+ \     \
+  5     4       <---
+You should return [1, 3, 4].
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+ 
+ /// Solution 1. Level order traversal using two vectors (curr, next). When getting the last element of curr, insert it to result.
+
+class Solution {
+public:
+    vector<int> rightSideView(TreeNode* root) {
+        vector<int> result;
+        if(!root) return result;
+        vector<TreeNode*> curr, next;
+        curr.push_back(root);
+        while(!curr.empty()) {
+            int n = curr.size();
+            for(int i = 0; i < n; i++) {
+                TreeNode* node = curr[i];
+                if(node->left)  next.push_back(node->left);
+                if(node->right) next.push_back(node->right);
+                if(i == n-1) result.push_back(node->val);
+            }
+            curr.swap(next);
+            next.clear();
+        }
+        return result;
+    }
+};
+
+ /// Solution 2. Level order traversal. We encounter the rightmost element at each level in two cases:
+ /// (a) there's no element in the queue (queue empty)
+ /// (b) the next element in the queue has higher level
+ 
+class Solution {
+public:
+    vector<int> rightSideView(TreeNode* root) {
+        queue<int> lq;
+        queue<TreeNode*> nq;
+        vector<int> ret;
+        if(root == NULL) return ret;
+        nq.push(root); lq.push(0);
+        while(!nq.empty()) {
+            TreeNode *node = nq.front(); nq.pop();
+            int level = lq.front(); lq.pop();
+            if(node->left) {
+                nq.push(node->left);
+                lq.push(level+1);
+            }
+            if(node->right) {
+                nq.push(node->right);
+                lq.push(level+1);
+            }
+            if(lq.empty() || lq.front() > level) ret.push_back(node->val);
+        }
+        return ret;
+    }
+};
 
 /**************************************************** 
  ***    200,Medium,Number of Islands 
@@ -5513,6 +7135,163 @@ public:
 
 
 /**************************************************** 
+ ***    201,Medium,Bitwise AND of Numbers Range 
+ ****************************************************/
+
+/*
+Given a range [m, n] where 0 <= m <= n <= 2147483647, return the bitwise AND of all numbers in this range, inclusive.
+
+For example, given the range [5, 7], you should return 4.
+*/
+
+
+/* If we search from highest bits to lowest bits, the result should have the same bit if m and n have the same bit, 
+and once we encountered the first different bit, then all the bits in result on and after this bit should be zero. 
+The reason is as follows. Suppose the first different bit is at i, then m[i] should be 0 and n[i] should be 1 (m <=n), 
+then the numbers ..011111 and ..100000 should be between m and n, and it will give all zeros after AND operations. 
+Thus, the key is to find the highest set bit of m^n, and use ~(m^n-1) as the mask.
+Also works for m == n case, where m_and = m, and m_xor = 0, the return value is thus m & ~0 = m & 1111111 = m
+*/
+class Solution {
+public:
+    int rangeBitwiseAnd(int m, int n) {
+        int m_and = m & n;
+        int m_xor = m ^ n;
+        //mask is the number from highest bit of mask2 minus 1 (i.e. 0011111..)
+        int mask;
+        while(m_xor) { //each loop removes a rightmost set bit of m_xor
+            mask = m_xor-1;
+            m_xor = m_xor & mask;
+        }
+        //after loop, m_xor is 0, and mask is of form 00111..
+        return m_and & (~mask);
+    }
+};
+
+// Solution 2. Shift m and n until they are equal. Record the number of shifts, and shift m back.
+
+class Solution {
+public:
+    int rangeBitwiseAnd(int m, int n) {
+        int i = 0;
+        while(m != n) {
+            i ++;
+            m >>= 1;
+            n >>= 1;
+        }
+        return m << i;
+    }
+};
+
+// Solution 3.
+// Alternative solution by shifting bits. For explanations refer to the first solution.
+
+class Solution {
+public:
+    int rangeBitwiseAnd(int m, int n) {
+        if(m == n || n == 0) return n;
+        int ret = 0;
+        unsigned int i = 0x80000000; //1000...
+        while(i) {
+            if ((m ^ n) & i) break; //m and n's bits differ at that bit
+            else ret = ret | (m & i); //bit the same, copy m's bit to result
+            i >>= 1; //move one bit lower
+        }
+        return ret;
+    }
+};
+
+/**************************************************** 
+ ***    207,Medium,Course Schedule 
+ ****************************************************/
+
+/*
+There are a total of n courses you have to take, labeled from 0 to n - 1.
+
+Some courses may have prerequisites, for example to take course 0 you have to first take course 1, which is expressed as a pair: [0,1]
+
+Given the total number of courses and a list of prerequisite pairs, is it possible for you to finish all courses?
+
+For example:
+
+2, [[1,0]]
+
+There are a total of 2 courses to take. To take course 1 you should have finished course 0. So it is possible.
+
+2, [[1,0],[0,1]]
+
+There are a total of 2 courses to take. To take course 1 you should have finished course 0, and to take course 0 you should also have finished course 1. So it is impossible.
+
+Note:
+The input prerequisites is a graph represented by a list of edges, not adjacency matrices. Read more about how a graph is represented.
+
+click to show more hints.
+Hints:
+
+    This problem is equivalent to finding if a cycle exists in a directed graph. If a cycle exists, no topological ordering exists and therefore it will be impossible to take all courses.
+    Topological Sort via DFS - A great video tutorial (21 minutes) on Coursera explaining the basic concepts of Topological Sort.
+    Topological sort could also be done via BFS.
+*/
+
+// Solution using graph cycle-detection using dfs
+
+class Graph {
+public:
+    Graph(int NN) : N(NN) {
+        adj.resize(N);
+    }
+    void addEdge(int v, int w) {
+        adj[v].push_back(w);
+    }
+    int NV() const { return N; }
+    const vector<int>& neighbors(int v) const { return adj[v]; }
+private:
+    int N; //number of vertices
+    vector<vector<int> > adj; //adjacency lists
+};
+
+class CycleDetector {
+public:
+    CycleDetector(const Graph& gg): g(gg), hasCycle(false) {
+        status.resize(g.NV(), 0);
+    }
+    //detect cycle using dfs, immediately return if found cycle
+    bool detectCycle() { 
+        for(int v = 0; v < g.NV() && !hasCycle; v++) {
+            if(status[v] == 0) dfs(v);
+        }
+        return hasCycle;
+    }
+private:
+    void dfs(int v) {
+        status[v] = 1; //on stack
+        for(auto w : g.neighbors(v)) {
+            if(hasCycle) return; //found cycle, just return
+            if(status[w] == 1) { hasCycle = true; return; } //found cycle!
+            else if(status[w] == 0) dfs(w); //unvisited, visit
+        }
+        status[v] = 2; //finished
+    }
+    const Graph& g;
+    bool hasCycle; //has cycle
+    vector<int> status; //vertex status during dfs (0: unvisited, 1: onstack, 2: finished)
+};
+
+class Solution {
+public:
+    bool canFinish(int numCourses, vector<pair<int, int>>& prerequisites) {
+        //construct directed graph
+        Graph g(numCourses);
+        for(auto c : prerequisites) 
+            g.addEdge(c.second, c.first);
+        //detect cycle using dfs
+        CycleDetector det(g);
+        return !det.detectCycle();
+    }
+};
+
+
+/**************************************************** 
  ***    208,Medium,Implement Trie (Prefix Tree) 
  ****************************************************/
 
@@ -5528,7 +7307,131 @@ You may assume that all inputs are consist of lowercase letters a-z.
 // trie.insert("somestring");
 // trie.search("key");
 
-/// Solution 1, simpler, with delete function (which slows down runtime by 40 ms!)
+/// Solution 1. Follows the Java implementation from the Sedgewick book.
+/// The character we are currently at does not correpsond to the node itself, but one of its links!
+
+/// When we do search(x, str, d), we are actually looking for x->next[str[d]] !, 
+/// e.g. ab , when d == 0, we search character 'a' in the first link of root.
+/// Then we search b in the second link of node 'a'. When we arrive b, we have d == 2, pointing to str.end(). then we check if b is a key.
+/// When d reaches one past the end of str, return the node we are currently at.
+/// If we encountered a NULL node before that, we simply return null.
+
+/// When we do insert(x, str, d), we are actually inserting str[d] to the associated next link of the node x.
+/// e.g. inserting ab to empty trie. first insert(root, "ab", 0), which directly goes to root->next[0], and we have 
+/// insert(root->next[0], "ab", 1), we first need to create the node corresponding to 'a' (this node is pointed by the first link of root)
+/// in the last step, so it is interpreted as 'a'. Then we should check its second link for 'b'. We then call
+/// insert(a_node->next[1], "ab", 2), we again need to create one, then as d reaches the end, we set isKey to true, and then return the node (not its links)
+/// When not reaching the end, we need to recursively call the insert of its links, and return the new link address. We finally return the node x.
+
+class TrieNode {
+public:
+    // Initialize your data structure here.
+    TrieNode() {
+        isKey = false;
+        for(int i = 0; i < 26; i++) next[i] = NULL;
+    }
+    bool isKey;
+    TrieNode* next[26];
+};
+
+class Trie {
+public:
+    Trie() {
+        root = new TrieNode();
+    }
+
+    // Inserts a word into the trie.
+    void insert(string word) {
+        root = insert(root, word, 0);
+    }
+
+    // Returns if the word is in the trie.
+    bool search(string word) {
+        TrieNode * node = search(root, word, 0);
+        return node != NULL && node->isKey;
+    }
+
+    // Returns if there is any word in the trie
+    // that starts with the given prefix.
+    bool startsWith(string prefix) {
+        TrieNode* node = search(root, prefix, 0);
+        return node != NULL;
+    }
+
+private:
+    TrieNode* insert(TrieNode* x, const string& word, int d) {
+        if(x == NULL) x = new TrieNode;
+        if(d == word.size()) { x->isKey = true; return x; }
+        int idx = word[d] - 'a';
+        x->next[idx] = insert(x->next[idx], word, d+1);
+        return x;
+    }
+    TrieNode* search(TrieNode* x, const string& word, int d) {
+        if(x == NULL) return NULL;
+        if(d == word.size()) return x;
+        int idx = word[d] - 'a';
+        return search(x->next[idx], word, d+1);
+    }
+    TrieNode* root;
+};
+
+/// Solution 2. Slightly simpler, make sure search and insert will never encounter null nodes, can remove the check of x == NULL.
+/// this also reduces stack depth by one (no need to descend in to a null node), and easier to comprehend.
+
+class TrieNode {
+public:
+    // Initialize your data structure here.
+    TrieNode() {
+        isKey = false;
+        for(int i = 0; i < 26; i++) next[i] = NULL;
+    }
+    bool isKey;
+    TrieNode* next[26];
+};
+
+class Trie {
+public:
+    Trie() {
+        root = new TrieNode();
+    }
+
+    // Inserts a word into the trie.
+    void insert(string word) {
+        insert(root, word, 0);
+    }
+
+    // Returns if the word is in the trie.
+    bool search(string word) {
+        TrieNode * node = search(root, word, 0);
+        return node != NULL && node->isKey;
+    }
+
+    // Returns if there is any word in the trie
+    // that starts with the given prefix.
+    bool startsWith(string prefix) {
+        TrieNode* node = search(root, prefix, 0);
+        return node != NULL;
+    }
+
+private:
+    void insert(TrieNode* x, const string& word, int d) {
+        if(d == word.size()) { x->isKey = true; return; }
+        //if link not exist, create it before descending
+        int idx = word[d] - 'a';
+        if(x->next[idx] == NULL) x->next[idx] = new TrieNode;
+        insert(x->next[idx], word, d+1);
+    }
+    TrieNode* search(TrieNode* x, const string& word, int d) {
+        if(d == word.size()) return x;
+        int idx = word[d] - 'a';
+        //if link is null, return null;
+        if(x->next[idx] == NULL) return NULL;
+        return search(x->next[idx], word, d+1);
+    }
+    TrieNode* root;
+};
+
+/// Solution 3, with delete function (which slows down runtime by 40 ms!)
 
 class TrieNode {
 public:
@@ -5591,77 +7494,6 @@ private:
     TrieNode* root;
 };
 
-// Your Trie object will be instantiated and called as such:
-// Trie trie;
-// trie.insert("somestring");
-// trie.search("key");
-
-
-/// Solution 2, slightly different.
-
-class TrieNode {
-public:
-    // Initialize your data structure here.
-    TrieNode() {
-        links = new TrieNode*[26];
-        for (int i = 0; i < 26; ++i)
-            links[i] = NULL;
-        isKey = false;
-    }
-    
-    TrieNode** links; //array of pointers
-    bool isKey;
-};
-
-class Trie {
-public:
-    Trie() {
-        root = new TrieNode();
-    }
-
-    // Inserts a word into the trie.
-    void insert(string word) {
-        root = insert(root, word, 0);
-    }
-
-    TrieNode* insert(TrieNode* x, string word, int d) {
-        if (x == NULL) { x = new TrieNode(); }
-        if (d == word.size()) x->isKey = true;
-        else {
-            int i = word[d] - 'a';
-            x->links[i] = insert(x->links[i], word, d+1);
-        }
-        return x;
-    }
-    
-    // Returns if the word is in the trie.
-    bool search(string word) {
-        TrieNode *x = search(root, word, 0);
-        return (x != NULL && x->isKey);
-    }
-    
-    TrieNode* search(TrieNode* x, string word, int d) {
-        if (x == NULL) return NULL;
-        if (d == word.length()) return x;
-        int i = word[d] -'a';
-        return search(x->links[i], word, d+1);
-    }
-    
-    // Returns if there is any word in the trie
-    // that starts with the given prefix.
-    bool startsWith(string prefix) {
-        TrieNode* x = search(root, prefix, 0);
-        return x != NULL;
-    }
-    
-private:
-    TrieNode* root;
-};
-
-// Your Trie object will be instantiated and called as such:
-// Trie trie;
-// trie.insert("somestring");
-// trie.search("key");
 
 /**************************************************** 
  ***    209,Medium,Minimum Size Subarray Sum 
@@ -5735,6 +7567,198 @@ public:
     }
 };
 
+
+/**************************************************** 
+ ***    210,Medium,Course Schedule II 
+ ****************************************************/
+
+/*
+There are a total of n courses you have to take, labeled from 0 to n - 1.
+
+Some courses may have prerequisites, for example to take course 0 you have to first take course 1, which is expressed as a pair: [0,1]
+
+Given the total number of courses and a list of prerequisite pairs, return the ordering of courses you should take to finish all courses.
+
+There may be multiple correct orders, you just need to return one of them. If it is impossible to finish all courses, return an empty array.
+
+For example:
+
+2, [[1,0]]
+
+There are a total of 2 courses to take. To take course 1 you should have finished course 0. So the correct course order is [0,1]
+
+4, [[1,0],[2,0],[3,1],[3,2]]
+
+There are a total of 4 courses to take. To take course 3 you should have finished both courses 1 and 2. Both courses 1 and 2 should be taken after you finished course 0. So one correct course order is [0,1,2,3]. Another correct ordering is[0,2,1,3].
+
+Note:
+The input prerequisites is a graph represented by a list of edges, not adjacency matrices. Read more about how a graph is represented.
+
+click to show more hints.
+Hints:
+
+    This problem is equivalent to finding the topological order in a directed graph. If a cycle exists, no topological ordering exists and therefore it will be impossible to take all courses.
+    Topological Sort via DFS - A great video tutorial (21 minutes) on Coursera explaining the basic concepts of Topological Sort.
+    Topological sort could also be done via BFS.
+*/
+
+// Solution using topological sort with dfs
+
+class Graph {
+public:
+    Graph(int NN) : N(NN) {
+        adj.resize(N);
+    }
+    void addEdge(int v, int w) {
+        adj[v].push_back(w);
+    }
+    int NV() const { return N; }
+    const vector<int>& neighbors(int v) const { return adj[v]; }
+private:
+    int N; //number of vertices
+    vector<vector<int> > adj; //adjacency lists
+};
+
+class TopoSort {
+public:
+    TopoSort(const Graph& gg): g(gg), hasCycle(false) {
+        status.resize(g.NV(), 0);
+    }
+    //detect cycle using dfs, immediately return if found cycle
+    void sort() { 
+        for(int v = 0; v < g.NV() && !hasCycle; v++) {
+            if(status[v] == 0) dfs(v);
+        }
+    }
+    vector<int> getOrder() {
+        vector<int> result;
+        if(hasCycle) return result;
+        result = order;
+        reverse(result.begin(), result.end());
+        return result;
+    }
+private:
+    void dfs(int v) {
+        status[v] = 1; //on stack
+        for(auto w : g.neighbors(v)) {
+            if(hasCycle) return; //found cycle, just return
+            if(status[w] == 1) { hasCycle = true; return; } //found cycle!
+            else if(status[w] == 0) dfs(w); //unvisited, visit
+        }
+        status[v] = 2; //finished
+        order.push_back(v); //push after finished
+    }
+    const Graph& g;
+    bool hasCycle; //has cycle
+    vector<int> status; //vertex status during dfs (0: unvisited, 1: onstack, 2: finished)
+    vector<int> order; //topological order
+};
+
+class Solution {
+public:
+    vector<int> findOrder(int numCourses, vector<pair<int, int>>& prerequisites) {
+        //construct directed graph
+        Graph g(numCourses);
+        for(auto c : prerequisites) 
+            g.addEdge(c.second, c.first);
+        //detect cycle using dfs
+        TopoSort ts(g);
+        ts.sort();
+        return ts.getOrder();
+    }
+};
+
+
+/**************************************************** 
+ ***    211,Medium,Add and Search Word - Data structure design 
+ ****************************************************/
+
+/*
+Design a data structure that supports the following two operations:
+
+void addWord(word)
+bool search(word)
+search(word) can search a literal word or a regular expression string containing only letters a-z or .. A . means it can represent any one letter.
+
+For example:
+
+addWord("bad")
+addWord("dad")
+addWord("mad")
+search("pad") -> false
+search("bad") -> true
+search(".ad") -> true
+search("b..") -> true
+Note:
+You may assume that all words are consist of lowercase letters a-z.
+*/
+
+// Your WordDictionary object will be instantiated and called as such:
+// WordDictionary wordDictionary;
+// wordDictionary.addWord("word");
+// wordDictionary.search("pattern");
+
+/// Use a trie as underlying data-structure, search function now returns boolean, and supports checking wildcard '.'
+/// if new character is normal a-z, do normal search, otherwise it is a '.', then check all non-null next links
+
+class TrieNode {
+public:
+    TrieNode() : isKey(false) {
+        for(int i = 0; i < 26; i++) next[i] = NULL;
+    }
+    bool isKey;
+    TrieNode* next[26];
+};
+
+class Trie {
+public:
+    Trie() { root = new TrieNode; }
+    
+    void insert(const string& word) {
+        insert(root, word, 0);
+    }
+    bool search(const string& word) {
+        return search(root, word, 0);
+    }
+    
+private:
+    void insert(TrieNode *x, const string& word, int d) {
+        if(d == word.size()) { x->isKey = true; return; }
+        int idx = word[d] - 'a';
+        if(x->next[idx] == NULL) x->next[idx] = new TrieNode;
+        insert(x->next[idx], word, d+1);
+    }
+    //x will never be null
+    bool search(TrieNode *x, const string& word, int d) {
+        if(d == word.size()) return x->isKey;
+        if(word[d] != '.') {
+            int idx = word[d] - 'a';
+            return (x->next[idx] && search(x->next[idx], word, d+1));
+        } else {
+            for(int idx = 0; idx < 26; idx++) {
+                if(x->next[idx] && search(x->next[idx], word, d+1)) return true;
+            }
+            return false;
+        }
+    }
+    TrieNode* root;
+};
+
+class WordDictionary {
+public:
+    WordDictionary() : t() {}
+    // Adds a word into the data structure.
+    void addWord(string word) {
+        t.insert(word);
+    }
+
+    // Returns if the word is in the data structure. A word could
+    // contain the dot character '.' to represent any one letter.
+    bool search(string word) {
+        return t.search(word);
+    }
+    Trie t;
+};
 
 /**************************************************** 
  ***    213,Medium,House Robber II 
@@ -6044,6 +8068,32 @@ public:
 
 
 /**************************************************** 
+ ***    220,Medium,Contains Duplicate III 
+ ****************************************************/
+
+/*
+Given an array of integers, find out whether there are two distinct indices i and j in the array such that the difference between nums[i] and nums[j] is at most t and the difference between i and j is at most k.
+*/
+
+// Maintain a window, when searching, utilize the ordered feature of set, and find the element >= a given value in O(lgn) time. 
+
+class Solution {
+public:
+    bool containsNearbyAlmostDuplicate(vector<int>& nums, int k, int t) {
+        int n = nums.size();
+        for(int i = 0; i < n; i++) { //try element i
+            if(i > k) dict.erase(nums[i-k-1]); //remove older elements
+            long x = nums[i];
+            auto it = dict.lower_bound(x - t); //find first element >= x-t in the window
+            if(it != dict.end() && *it <= x + t) return true; //found and value <= x+t
+            dict.insert(x); //insert to window
+        }
+        return false;
+    }
+    set<long> dict; //ordered-set for fast search
+};
+
+/**************************************************** 
  ***    221,Medium,Maximal Square 
  ****************************************************/
 
@@ -6095,6 +8145,274 @@ public:
             s.push_back(i);
         }
         return max_area;
+    }
+};
+
+/**************************************************** 
+ ***    222,Medium,Count Complete Tree Nodes 
+ ****************************************************/
+
+/*
+Given a complete binary tree, count the number of nodes.
+
+Definition of a complete binary tree from Wikipedia:
+In a complete binary tree every level, except possibly the last, is completely filled, and all nodes in the last level are as far left as possible. It can have between 1 and 2h nodes inclusive at the last level h.
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+ 
+// solution using a function to get the height of left spine of tree. time complexity is:
+// lgn + ... + 1 = lgn lgn
+
+class Solution {
+public:
+    int countNodes(TreeNode* root) {
+        if(!root) return 0;
+        int h = leftSpineHeight(root);
+        int count = (1 << h) - 1; // total possible nodes for tree at root: 2^h-1
+        while(root) { //subtree under root may not be full
+            h--;
+            int hr = leftSpineHeight(root->right);
+            if(hr < h) {
+                count -= (1 << hr); // exclude missing nodes: 2^hr
+                root = root->left;
+            } else {
+                root = root->right;
+            }
+        }
+        return count;
+    }
+
+    int leftSpineHeight(TreeNode* root) {
+        int h = 0;
+        while(root) {
+            root = root->left;
+            h++;
+        }
+        return h;
+    }
+};
+
+/**************************************************** 
+ ***    224,Medium,Basic Calculator 
+ ****************************************************/
+
+/*
+Implement a basic calculator to evaluate a simple expression string.
+
+The expression string may contain open ( and closing parentheses ), the plus + or minus sign -, non-negative integers and empty spaces .
+
+You may assume that the given expression is always valid.
+
+Some examples:
+
+"1 + 1" = 2
+" 2-1 + 2 " = 3
+"(1+(4+5+2)-3)+(6+8)" = 23
+
+Note: Do not use the eval built-in library function. 
+*/
+
+// Solution 1. Basic calculator, with "+-" and parentheses, no "*/"
+// Two stacks, one for number and one for operators (can use one, where operator can be stored by an integer sign)
+// 1. when seeing a digit, update number
+// 2. when seeing a + or -, update result
+// 3. when seeing a '(', push result and operator to stack, reset num, res, and op
+// 4. when seeing a ')', first update res, and then pop num, res from stack, update res again (e.g. calculate 2 + (...)).
+// Finally after loop, update res if no '+' or '-' is seen in the string (e.g. (3))
+
+class Solution {
+public:
+    int calculate(string s) {
+        stack<int> nums;
+        stack<char> ops;
+        int res = 0;
+        int num = 0;
+        char op = '+';
+        for (int i = 0; i < s.size(); ++i) {
+            if (s[i] >= '0' && s[i] <= '9') {
+                num = num*10 + (s[i] - '0');
+            } else if (s[i] == '+' || s[i] == '-') {
+                res = (op == '+') ? res + num : res - num;
+                num = 0;
+                op = s[i];
+            } else if (s[i] == '(') {
+                nums.push(res); ops.push(op); //push number and sign to stack
+                num = 0; res = 0; op = '+';
+            } else if (s[i] == ')') {
+                res = (op == '+') ? res + num : res - num;
+                op = ops.top(); ops.pop();
+                num = nums.top(); nums.pop();
+                res = (op == '+') ? num + res : num - res;
+                num = 0;
+            }
+        }
+        if (num != 0)
+            res = (op == '+') ? res + num : res - num;
+        return res;
+    }
+
+};
+
+// Solution 2. Use only one stack, push sign (1/-1) and value to the same stack, when pop, pop twice
+
+class Solution {
+public:
+    int calculate(string s) {
+        stack<int> st;
+        int res = 0, num = 0, sgn = 1;
+        for (int i = 0; i < s.size(); ++i) {
+            if (s[i] >= '0' && s[i] <= '9') num = num*10 + (s[i] - '0');
+            else if (s[i] == '+' || s[i] == '-') {
+                res += sgn*num;
+                sgn = (s[i] == '+') ? 1 : -1;
+                num = 0; //reset num
+            } else if (s[i] == '(') {
+                st.push(res); st.push(sgn);
+                num = 0; res = 0; sgn = 1; //reset
+            } else if (s[i] == ')') {
+                res += sgn*num; //add last number first
+                res *= st.top(); st.pop(); //pop out sign
+                res += st.top(); st.pop(); //pop out number
+                num = 0; //reset num
+            }
+        }
+        if (num != 0) res += sgn*num;
+        return res;
+    }
+};
+
+
+/**************************************************** 
+ ***    227,Medium,Basic Calculator II 
+ ****************************************************/
+
+/*
+Implement a basic calculator to evaluate a simple expression string.
+
+The expression string contains only non-negative integers, +, -, *, / operators and empty spaces . The integer division should truncate toward zero.
+
+You may assume that the given expression is always valid.
+
+Some examples:
+
+"3+2*2" = 7
+" 3/2 " = 1
+" 3+5 / 2 " = 5
+
+Note: Do not use the eval built-in library function. 
+*/
+
+// Basic calculator II, with "+-*/" but no parentheses
+// No stack solution:
+// 1. when seeing an integer, run all the way to the end of integer and get the value. If it is after a '*' or '/', immediately calculate the 
+//    result and update num. Otherwise, initialize num to the value.
+// 2. when seeing a '+' or '-', add the preceding number (value stored in num and sign stored in sign) to res
+// 3. when seeing a '*' or '/', update last operator
+// Remember to reset num after processing "+-*/"
+
+// Also, after loop, need to add final num to res, and return
+// Another tiny variation is to add a '+' in the end of string, and then can return res 
+class Solution {
+public:
+    int calculate(string s) {
+        int res = 0;
+        int num = 0;
+        char op = '+';
+        int sign = 1;
+        for (int i = 0; i < s.size(); ++i) {
+            char c = s[i];
+            if (isDigit(c)) {
+                int val = c - '0';
+                int j = i+1;
+                while (j < s.size() && isDigit(s[j])) {
+                    val = val*10 + s[j] - '0';
+                    j++;
+                }
+                if (op == '*') num = num * val;
+                else if (op == '/') num = num / val;
+                else num = val;
+                i = j-1;
+            } else if (c == '+' || c == '-') {
+                res += num*sign;
+                sign = (c == '+') ? 1 : -1;
+                num = 0;
+                op = c;
+            } else if (c == '*' || c == '/') {
+                op = c;
+            } 
+        }
+
+        return res + num*sign;
+    }
+
+    bool isDigit(char c) { return c >= '0' && c <= '9'; }
+};
+
+
+/**************************************************** 
+ ***    229,Medium,Majority Element II 
+ ****************************************************/
+
+/*
+Given an integer array of size n, find all elements that appear more than ⌊ n/3 ⌋ times. The algorithm should run in linear time and in O(1) space.
+
+Hint:
+
+How many majority elements could it possibly have?
+*/
+
+// Solution extended from Moore's Voting algortihm
+// Caveat: need to count again in the end after we find maj1 and maj2, e.g. [3,2,3]. maj2 will be 2, but 2 is not a majority element.
+
+class Solution {
+public:
+    vector<int> majorityElement(vector<int>& nums) {
+        if(nums.empty()) return vector<int>();
+        int n = nums.size();
+        int maj1 = 0, maj2 = 0, count1 = 0, count2 = 0;
+        int nmaj = 0;
+        for(auto x : nums) {
+            if(nmaj == 0) { nmaj = 1; maj1 = x; count1 = 1; }
+            else if(nmaj == 1) { //always maj1 will have the value
+                if(x == maj1) count1++;
+                else { //x != maj1
+                    nmaj = 2;
+                    maj2 = x; count2 = 1;
+                }
+            } else { //already have 2 majs
+                if(x == maj1) count1++;
+                else if(x == maj2) count2++;
+                else {
+                    count1--;
+                    count2--;
+                    if(count1 == 0) nmaj--;
+                    if(count2 == 0) nmaj--;
+                    if(count1 == 0 && count2 != 0) {
+                        count1 = count2;
+                        maj1 = maj2;
+                    }
+                }
+            }
+        }
+        vector<int> result;
+        //count again
+        count1 = 0; count2 = 0;
+        for(auto x : nums) {
+            if(x == maj1) count1++;
+            else if(x == maj2) count2++;
+        }
+        if(count1 > n/3) result.push_back(maj1);
+        if(count2 > n/3) result.push_back(maj2);
+        return result;
     }
 };
 
@@ -6154,6 +8472,59 @@ public:
     }
 };
 
+
+/**************************************************** 
+ ***    233,Medium,Number of Digit One 
+ ****************************************************/
+
+/*
+Given an integer n, count the total number of digit 1 appearing in all non-negative integers less than or equal to n.
+
+For example:
+Given n = 13,
+Return 6, because digit 1 occurred in the following numbers: 1, 10, 11, 12, 13.
+
+Hint:
+
+Beware of overflow.
+*/
+
+// Count the occurrences of 1 on each digit seperately, and sum them up.
+// First observe that for any number starting with a one on digit i, there are 10^i of them, e.g. i = 2, 100-199 (count = 100)
+// For an arbitrary number, let's determine how many times the number of 1s appear at digit i, 
+// let the number formed to the left of d as l, and to the right of d as r. For example: 264d32, where d can be 0 to 9.
+// and l = 27, r = 32.
+// (1) if d = 0, then n = 27032. The numbers contributing are from 001xx to 261xx, a total of 27*100,
+//     or in general, l*10^i.
+// (2) if d = 1, then n = 27132, The numbers contributing are from 001xx to 261xx, plus 27100 to 27132, a total of 27*100 + 33,
+//     or in genera, l*10^i + r+1
+// (3) if d > 1, e.g. n = 27232. The numbers contributing are from 001xx to 271xx, a total of (27+1)*100,
+//     or in genera, (l+1)*10^i
+// Algorithm starts from least significant digit, and store and update the 10^i value.
+
+class Solution {
+public:
+    int countDigitOne(int n) {
+        if (n <= 0) return 0;
+        int ndigit = 0;
+        int x = n;
+        while (x) {
+            x /= 10; ndigit ++;
+        }
+        int count = 0;
+        int power = 1;
+        for (int i = 0; i < ndigit; ++i) { //starting from least digit to most
+            int d = n / power % 10; // digit
+            int l = n / power / 10; //number to the left of d
+            int r = n % power; //number to the right of d
+            if (d == 0) count += l*power;
+            else if (d == 1) count += l*power + r+1;
+            else count += (l+1)*power;
+            power *= 10;
+        }
+        return count;
+    }
+};
 
 /**************************************************** 
  ***    236,Medium,Lowest Common Ancestor of a Binary Tree 
@@ -6493,6 +8864,155 @@ public:
 };
 
 /**************************************************** 
+ ***    244,Medium,Shortest Word Distance II 
+ ****************************************************/
+
+/*
+This is a follow up of Shortest Word Distance. The only difference is now you are given the list of words and your method will be called repeatedly many times with different parameters. How would you optimize it?
+
+Design a class which receives a list of words in the constructor, and implements a method that takes two words word1 and word2 and return the shortest distance between these two words in the list.
+
+For example,
+Assume that words = ["practice", "makes", "perfect", "coding", "makes"].
+
+Given word1 = “coding”, word2 = “practice”, return 3.
+Given word1 = "makes", word2 = "coding", return 1.
+
+Note:
+You may assume that word1 does not equal to word2, and word1 and word2 are both in the list.
+*/
+
+// Your WordDistance object will be instantiated and called as such:
+// WordDistance wordDistance(words);
+// wordDistance.shortest("word1", "word2");
+// wordDistance.shortest("anotherWord1", "anotherWord2");
+
+// Solution 1. use a map to store string => sorted list of positions. Then find the minimum difference between elements of two sorted arrays
+
+class WordDistance {
+public:
+    WordDistance(vector<string>& words) {
+        int n = words.size();
+        for(int i = 0; i < n; i++) {
+            dict[words[i]].push_back(i);
+        }
+    }
+
+    int shortest(string word1, string word2) {
+        return shortest(dict[word1], dict[word2]);
+    }
+    
+    int shortest(const vector<int>& vec1, const vector<int>& vec2) {
+        int n1 = vec1.size(), n2 = vec2.size();
+        int i(0), j(0), mind = INT_MAX;
+        while(i < n1 && j < n2) {
+            mind = min(mind, abs(vec2[j] - vec1[i]));
+            if(vec2[j] > vec1[i]) i++;
+            else j++;
+        }
+        return mind;
+    }
+    
+    unordered_map<string, vector<int> > dict; //string and positions
+};
+
+// Solution 2. Use a hash function to convert string to int
+
+class WordDistance {
+public:
+    WordDistance(vector<string>& words) {
+        int n = words.size();
+        for(int i = 0; i < n; i++) {
+            dict[hash(words[i])].push_back(i);
+        }
+    }
+
+    int shortest(string word1, string word2) {
+        return shortest(dict[hash(word1)], dict[hash(word2)]);
+    }
+    
+    int shortest(const vector<int>& vec1, const vector<int>& vec2) {
+        int n1 = vec1.size(), n2 = vec2.size();
+        int i(0), j(0), mind = INT_MAX;
+        while(i < n1 && j < n2) {
+            mind = min(mind, abs(vec2[j] - vec1[i]));
+            if(vec2[j] > vec1[i]) i++;
+            else j++;
+        }
+        return mind;
+    }
+    
+    int hash(const string& s) {
+        const int A = 54059; /* a prime */
+        const int B = 76963; /* a prime */
+        const int C = 86969; /* a prime */
+        unsigned int h = 31 /* also prime */;
+        for(auto c : s) 
+            h = (h * A) ^ (c * B);
+        return h; // or return h % C;
+    }
+    unordered_map<int, vector<int> > dict; //string and positions
+};
+
+/**************************************************** 
+ ***    245,Medium,Shortest Word Distance III 
+ ****************************************************/
+
+/*
+This is a follow up of Shortest Word Distance. The only difference is now word1 could be the same as word2.
+
+Given a list of words and two words word1 and word2, return the shortest distance between these two words in the list.
+
+word1 and word2 may be the same and they represent two individual words in the list.
+
+For example,
+Assume that words = ["practice", "makes", "perfect", "coding", "makes"].
+
+Given word1 = “makes”, word2 = “coding”, return 1.
+Given word1 = "makes", word2 = "makes", return 3.
+
+Note:
+You may assume word1 and word2 are both in the list.
+*/
+
+// Solution 1. Similar to 243 with additional lines to take care of case where word1 == word2.
+class Solution {
+public:
+    int shortestWordDistance(vector<string>& words, string word1, string word2) {
+        int index(-1), mind = INT_MAX, n = words.size();
+        for(int i = 0; i < n; i++) {
+            const string& w = words[i];
+            if(w == word1 || w == word2) {
+                if(word1 == word2) {
+                    if(index != -1) mind = min(mind, i-index);
+                } else {
+                    if(index != -1 && words[index] != w) mind = min(mind, i-index);
+                }
+                index = i;
+            }
+        }
+        return mind;
+    }
+};
+
+// Solution 2. Simplified control logic
+
+class Solution {
+public:
+    int shortestWordDistance(vector<string>& words, string word1, string word2) {
+        int index(-1), mind = INT_MAX, n = words.size();
+        for(int i = 0; i < n; i++) {
+            const string& w = words[i];
+            if(w == word1 || w == word2) {
+                if(index != -1 && (word1 == word2 || words[index] != w)) mind = min(mind, i-index);
+                index = i;
+            }
+        }
+        return mind;
+    }
+};
+
+/**************************************************** 
  ***    247,Medium,Strobogrammatic Number II 
  ****************************************************/
 
@@ -6702,6 +9222,28 @@ private:
     int n; //number of arrays
 };
 
+// Solution 2. Similar to 281. Use a stack to store the pair of iterators
+class Vector2D {
+public:
+    Vector2D(vector<vector<int>>& vec2d) {
+        for(auto vit = vec2d.rbegin(); vit != vec2d.rend(); vit++) {
+            if(!vit->empty()) s.push(make_pair(vit->begin(), vit->end()));
+        }
+    }
+
+    int next() {
+        auto beg = s.top().first;
+        auto end = s.top().second;
+        s.pop();
+        if(beg+1 < end) s.push(make_pair(beg+1, end));
+        return *beg;
+    }
+
+    bool hasNext() {
+        return !s.empty();
+    }
+    stack<pair<vector<int>::iterator, vector<int>::iterator> > s;
+};
 
 /**************************************************** 
  ***    253,Medium,Meeting Rooms II 
@@ -6870,6 +9412,86 @@ public:
             dfs(n/j, j, tmp, result); //now start searching from j
         }
         tmp.pop_back();
+    }
+};
+
+
+/**************************************************** 
+ ***    255,Medium,Verify Preorder Sequence in Binary Search Tree 
+ ****************************************************/
+
+/*
+Given an array of numbers, verify whether it is the correct preorder traversal sequence of a binary search tree.
+
+You may assume each number in the sequence is unique.
+
+Follow up:
+Could you do it using only constant space complexity?
+*/
+
+// Solution 1. Using a stack, O(n) space. https://leetcode.com/discuss/51543/java-o-n-and-o-1-extra-space
+// when seeing a number smaller than the top of stack, push to stack, otherwise pop all values in the stack smaller than current value.
+// Also maintain a lower bound value (lo) that all new values are subject to.
+
+class Solution {
+public:
+    bool verifyPreorder(vector<int>& preorder) {
+        if(preorder.empty()) return true;
+        stack<int> s;
+        int lo = INT_MIN;
+        for(int x : preorder) {
+            if(x < lo) return false;
+            while(!s.empty() && x > s.top()) {
+                lo = s.top(); //update lower bound
+                s.pop();
+            }
+            s.push(x);
+        }
+        return true;
+    }
+};
+
+// Solution 2, manipulate original vector as stack, O(1) space. Modifies original vector. i is the top of the stack, when inserting a 
+// new value, set the ++i position to the new value.
+
+class Solution {
+public:
+    bool verifyPreorder(vector<int>& preorder) {
+        if(preorder.empty()) return true;
+        int i = -1;
+        int lo = INT_MIN;
+        for(int x : preorder) {
+            if(x < lo) return false;
+            while(i != -1 && x > preorder[i]) {
+                lo = preorder[i]; //update lower bound
+                i--;
+            }
+            preorder[++i] = x;
+        }
+        return true;
+    }
+};
+
+// Solution 3, recursive solution, very slow. Idea is to first locate root (first element), then locate left and right subtree.
+// Start of right subtree starts at the first element larger than root value. Then recursively check left and right subtree.
+// The proper lower and higher bounds need to be maintained.
+class Solution {
+public:
+    bool verifyPreorder(vector<int>& preorder) {
+        if(preorder.empty()) return true;
+     //   long lo = long(INT_MIN)-1, hi = long(INT_MAX)+1;
+        int lo = INT_MIN, hi = INT_MAX;
+        return verify(preorder, 0, preorder.size()-1, lo, hi);
+    }
+    //check whether pre[i .. j] is between [lo .. hi]
+    bool verify(vector<int>& preorder, int i, int j, int lo, int hi) {
+        if(i > j) return true; //empty
+        int root_val = preorder[i];
+        if(root_val < lo || root_val > hi) return false;
+        int k = i+1;
+        while(k <= j && preorder[k] < root_val) k++;
+        //k points to start of right subtree or end of preorder
+        return verify(preorder, i+1, k-1, lo, root_val) && verify(preorder, k, j, root_val, hi);
     }
 };
 
@@ -7345,6 +9967,294 @@ public:
 
 
 /**************************************************** 
+ ***    271,Medium,Encode and Decode Strings 
+ ****************************************************/
+
+/*
+Design an algorithm to encode a list of strings to a string. The encoded string is then sent over the network and is decoded back to the original list of strings.
+
+Machine 1 (sender) has the function:
+
+string encode(vector<string> strs) {
+  // ... your code
+  return encoded_string;
+}
+Machine 2 (receiver) has the function:
+vector<string> decode(string s) {
+  //... your code
+  return strs;
+}
+So Machine 1 does:
+
+string encoded_string = encode(strs);
+and Machine 2 does:
+
+vector<string> strs2 = decode(encoded_string);
+strs2 in Machine 2 should be the same as strs in Machine 1.
+
+Implement the encode and decode methods.
+
+Note:
+The string may contain any possible characters out of 256 valid ascii characters. Your algorithm should be generalized enough to work on any possible characters.
+Do not use class member/global/static variables to store states. Your encode and decode algorithms should be stateless.
+Do not rely on any library method such as eval or serialize methods. You should implement your own encode/decode algorithm.
+*/
+
+// Your Codec object will be instantiated and called as such:
+// Codec codec;
+// codec.decode(codec.encode(strs));
+
+// Solution using delimiter and escape character
+// use ',' as delimiter, if ',' appears in string, use '\' to escape it, also use '\' to escape itself, so
+// ',' is delimiter
+// when see a '\', get the next character as the real character
+// e.g., for "i love new,york" we will get: ",i,love,new\,york,"
+
+class Codec {
+public:
+    const char ESCAP = 92;
+    const char DELIM = ',';
+    // Encodes a list of strings to a single string.
+    string encode(vector<string>& strs) {
+        string s;
+        for(int i = 0; i < strs.size(); ++i) {
+           s += DELIM; //add delimiter
+           for(auto c : strs[i]) {
+               if(c == DELIM || c == ESCAP) s += ESCAP; //escape character '\'
+               s += c;
+           }
+           s += DELIM; //add delimiter
+        }
+        return s;
+    }
+
+    // Decodes a single string to a list of strings.
+    vector<string> decode(string s) {
+        vector<string> strs;
+        if(s.empty()) return strs;
+        int n = s.size();
+        int i = 0;
+        while(i < n) { //i points to first ','
+            int j = i+1;
+            string tmp;
+            while(s[j] != DELIM) {
+                if(s[j] == ESCAP) tmp += s[++j]; //read next char
+                else tmp += s[j];
+                j++;
+            }
+            strs.push_back(tmp);
+            i = j+1;
+        }
+        return strs;
+    }
+};
+
+// solution 2 without delimiter, but serialize the length of each string into a 4 character string (len fits in 32bits)
+// Caveats:
+// use unsigned int to avoid any sign issues (char is signed)
+// when converting char to unsigned, use (c & 255), do not just do unsigned(c).
+// when c = -127, unsigned(c) will do sign extension and get INT_MAX, only c & 255 will lead to 255
+
+class Codec {
+public:
+
+    // Encodes a list of strings to a single string.
+    string encode(vector<string>& strs) {
+        string result;
+        for(auto s : strs) {
+            result += int2str(s.size()) + s;
+        }
+        return result;
+    }
+
+    // Decodes a single string to a list of strings.
+    vector<string> decode(string s) {
+        vector<string> result;
+        int i = 0, n = s.size();
+        while(i < n) {
+            //get first 4 bytes
+            unsigned len = str2int(s.substr(i, 4));
+            i += 4;
+            result.push_back(s.substr(i, len));
+            i += len;
+        }
+        return result;
+    }
+    //convert an integer to string, 4 bytes => 4 characters
+    string int2str(unsigned x) {
+        string s(4, 0);
+        for(int i = 0; i < 4; i++) {
+            s[3-i] = x & 255; //get last 8 bytes
+            x >>= 8; //shift to left by 8 bytes
+        }
+        return s;
+    }
+   
+    //convert a length-4 string to integer, 4 characters => 4 bytes
+    unsigned str2int(string s) {
+        unsigned x = 0;
+        for(int i = 0; i < 4; i++) {
+            x = (x << 8) + (s[i] & 255); //don't use unsigned(s[i]), will get unexpected results!
+        }
+        return x;
+    }
+};
+
+
+/**************************************************** 
+ ***    273,Medium,Integer to English Words 
+ ****************************************************/
+
+/*
+Convert a non-negative integer to its english words representation. Given input is guaranteed to be less than 231 - 1.
+
+For example,
+
+123 -> "One Hundred Twenty Three"
+12345 -> "Twelve Thousand Three Hundred Forty Five"
+1234567 -> "One Million Two Hundred Thirty Four Thousand Five Hundred Sixty Seven"
+
+Hint:
+
+    Did you see a pattern in dividing the number into chunk of words? For example, 123 and 123000.
+    Group the number by thousands (3 digits). You can write a helper function that takes a number less than 1000 and convert just that chunk to words.
+    There are many edge cases. What are some good test cases? Does your code work with input such as 0? Or 1000010? (middle chunk is zero and should not be printed out)
+*/
+
+// Break into 1000 chunks, consider many edge cases.
+
+const vector<string> ones = {"Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"};
+const vector<string> tens = {"Zero", "Ten", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"};
+const vector<string> bases = {"", "Thousand", "Million", "Billion"};
+
+class Solution {
+public:
+    string numberToWords(int num) {
+        if(num == 0) return "Zero";
+        string str;
+        int base = 1000000000;
+        int k = 3;
+        while(base) {
+            if(num >= base) {
+                int v = num / base;
+                if(!str.empty()) str += " ";
+                if(k > 0) str += numberBelow1000(v) + " " + bases[k];
+                else str += numberBelow1000(v);
+                num %= base;
+            }
+            base /= 1000;
+            k--;
+        }
+        return str;
+    }
+    
+    string numberBelow1000(int num) {
+        string str;
+        
+        int d1 = num / 100; 
+        num %= 100;
+        if(d1 != 0) str += ones[d1] + " Hundred";
+        if(num == 0) ;
+        else if(num < 20) str += (str.empty() ? ones[num] : " " + ones[num]);
+        else { // num >= 20
+            int d2 = num / 10, d3 = num % 10;
+            if(d2 != 0) str += (str.empty() ? tens[d2] : " " + tens[d2]);
+            if(d3 != 0) str += (str.empty() ? ones[d3] : " " + ones[d3]);
+        }
+        return str;
+    }
+};
+
+
+/**************************************************** 
+ ***    274,Medium,H-Index 
+ ****************************************************/
+
+/*
+Given an array of citations (each citation is a non-negative integer) of a researcher, write a function to compute the researcher's h-index.
+
+According to the definition of h-index on Wikipedia: "A scientist has index h if h of his/her N papers have at least h citations each, and the other N − h papers have no more than h citations each."
+
+For example, given citations = [3, 0, 6, 1, 5], which means the researcher has 5 papers in total and each of them had received 3, 0, 6, 1, 5 citations respectively. Since the researcher has 3 papers with at least 3 citations each and the remaining two with no more than 3 citations each, his h-index is 3.
+
+Note: If there are several possible values for h, the maximum one is taken as the h-index.
+
+Hint:
+
+An easy approach is to sort the array first.
+What are the possible values of h-index?
+A faster approach is to use extra space.
+*/
+
+// Solution using binary search. First sort array in descending order. Then find the largest index i such that nums[i] >= i+1.
+
+class Solution {
+public:
+    int hIndex(vector<int>& citations) {
+        if(citations.empty()) return 0;
+        sort(citations.begin(), citations.end(), std::greater<int>());
+        int n = citations.size();
+        int lo = 0, hi = n-1;
+        //[0 .. lo-1]: num[i] >= i+1; [hi+1, n): num[i] < i+1, return hi
+        while(lo <= hi) {
+            int mid = lo + (hi-lo)/2;
+            if(citations[mid] >= mid+1) lo = mid+1;
+            else hi = mid-1;
+        }
+        return hi+1;
+    }
+};
+
+// Solution 2. Use another table to store the counts, O(n) space, but O(n) time.
+// dict[i] stores the number of papers that have citation of i, since hindex can only be 0 to n, where n is the size of input array,
+// we only need to keep track of the counts for i = 0 .. n, hence the size of dict is n+1.
+
+class Solution {
+public:
+    int hIndex(vector<int>& citations) {
+        if(citations.empty()) return 0;
+        int n = citations.size();
+        vector<int> dict(n+1, 0); //dict[i]: count for citations equal to i
+        for(auto c: citations)  dict[min(c, n)]++;
+        for(int i = n, tot = 0; i >= 0; i--) {
+            tot += dict[i];
+            if(tot >= i) return i;
+        }
+        return 0;
+    }
+};
+
+/**************************************************** 
+ ***    275,Medium,H-Index II 
+ ****************************************************/
+
+/*
+Follow up for H-Index: What if the citations array is sorted in ascending order? Could you optimize your algorithm?
+
+Hint:
+
+Expected runtime complexity is in O(log n) and the input is sorted.
+*/
+
+// binary search, similar to 274 except that here the array is sorted in ascending order.
+
+class Solution {
+public:
+    int hIndex(vector<int>& citations) {
+        if(citations.empty()) return 0;
+        int n = citations.size();
+        int lo(0), hi(n-1);
+        //[0 .. lo-1] have n-i > citations[i], [hi+1, end) have n-i <= citations[i], return n-lo
+        while(lo <= hi) {
+            int mid = lo + (hi-lo)/2;
+            if(n-mid > citations[mid]) lo = mid+1;
+            else hi = mid-1;
+        }
+        return n-lo;
+    }
+};
+
+/**************************************************** 
  ***    277,Medium,Find the Celebrity 
  ****************************************************/
 
@@ -7581,7 +10491,7 @@ It should return [1,4,8,2,5,9,3,6,7].
  * while (i.hasNext()) cout << i.next();
  */
 
-// pointer always points to the the next valid value. After robtaining the next value, move pointer to next valid value.
+// Solution 1. Maintain an array of pointers, which always points to the the next valid value. After obtaining the next value, move pointer to next valid value.
 
 class ZigzagIterator {
 public:
@@ -7603,8 +10513,8 @@ public:
         indices[arrayIdx]++;
         int i = (arrayIdx+1) % n;
         while(i != arrayIdx && indices[i] == nums[i].size()) i = (i+1) % n;
-        if(i == arrayIdx && indices[i] == nums[i].size()) arrayIdx = n;
-        else arrayIdx = i;
+        if(i == arrayIdx && indices[i] == nums[i].size()) arrayIdx = n; // no available elements, set arrayIdx to n
+        else arrayIdx = i; //found next available array index
 
         return val;
     }
@@ -7619,6 +10529,28 @@ private:
     int n; //number of arrays
 };
 
+// Solution 2. Maintain a queue of iterator pairs, each pair corresponding to the beginning and end of an array. Each time dequeue a pair,
+// and if the array is not exhausted, enqueue again.
+class ZigzagIterator {
+public:
+    ZigzagIterator(vector<int>& v1, vector<int>& v2) {
+        if(!v1.empty()) q.push(make_pair(v1.begin(), v1.end()));
+        if(!v2.empty()) q.push(make_pair(v2.begin(), v2.end()));
+    }
+
+    int next() {
+        auto beg = q.front().first;
+        auto end = q.front().second;
+        q.pop();
+        if(beg+1 < end) q.push(make_pair(beg+1, end));
+        return *beg;
+    }
+
+    bool hasNext() {
+        return !q.empty();
+    }
+    queue<pair<vector<int>::iterator, vector<int>::iterator> > q;
+};
 
 /**************************************************** 
  ***    284,Medium,Peeking Iterator 
@@ -7796,6 +10728,392 @@ public:
 
 
 /**************************************************** 
+ ***    286,Medium,Walls and Gates 
+ ****************************************************/
+
+/*
+You are given a m x n 2D grid initialized with these three possible values.
+
+-1 - A wall or an obstacle.
+0 - A gate.
+INF - Infinity means an empty room. We use the value 231 - 1 = 2147483647 to represent INF as you may assume that the distance to a gate is less than 2147483647.
+Fill each empty room with the distance to its nearest gate. If it is impossible to reach a gate, it should be filled with INF.
+
+For example, given the 2D grid:
+INF  -1  0  INF
+INF INF INF  -1
+INF  -1 INF  -1
+  0  -1 INF INF
+After running your function, the 2D grid should be:
+  3  -1   0   1
+  2   2   1  -1
+  1  -1   2  -1
+  0  -1   3   4
+*/
+  
+// Standard multi-source BFS. First identify all sources, then BFS using two vectors.
+
+class Solution {
+public:
+    void wallsAndGates(vector<vector<int>>& rooms) {
+        if(rooms.empty() || rooms[0].empty()) return;
+        int m = rooms.size(), n = rooms[0].size();
+        vector<pair<int, int> > curr, next;
+        for(int i = 0; i < m; i++) {
+            for(int j = 0; j < n; j++) {
+                if(rooms[i][j] == 0) curr.push_back(make_pair(i, j));
+            }
+        }
+        int d = 0; //distance from gate
+        while(!curr.empty()) {
+            d++; //increase distance
+            for(auto pos : curr) {
+                int i = pos.first, j = pos.second;
+                //try 4 neighbors
+                if(i > 0 && rooms[i-1][j] == INT_MAX) { rooms[i-1][j] = d;  next.push_back(make_pair(i-1, j)); }
+                if(j > 0 && rooms[i][j-1] == INT_MAX) { rooms[i][j-1] = d;  next.push_back(make_pair(i, j-1)); }
+                if(i < m-1 && rooms[i+1][j] == INT_MAX) { rooms[i+1][j] = d;  next.push_back(make_pair(i+1, j)); }
+                if(j < n-1 && rooms[i][j+1] == INT_MAX) { rooms[i][j+1] = d;  next.push_back(make_pair(i, j+1)); }
+            }
+            curr.swap(next);
+            next.clear();
+        }
+    }
+};
+
+/**************************************************** 
+ ***    289,Medium,Game of Life 
+ ****************************************************/
+
+/*
+According to the Wikipedia's article: "The Game of Life, also known simply as Life, is a cellular automaton devised by the British mathematician John Horton Conway in 1970."
+
+Given a board with m by n cells, each cell has an initial state live (1) or dead (0). Each cell interacts with its eight neighbors (horizontal, vertical, diagonal) using the following four rules (taken from the above Wikipedia article):
+
+Any live cell with fewer than two live neighbors dies, as if caused by under-population.
+Any live cell with two or three live neighbors lives on to the next generation.
+Any live cell with more than three live neighbors dies, as if by over-population..
+Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
+Write a function to compute the next state (after one update) of the board given its current state.
+
+Follow up: 
+Could you solve it in-place? Remember that the board needs to be updated at the same time: You cannot update some cells first and then use their updated values to update other cells.
+In this question, we represent the board using a 2D array. In principle, the board is infinite, which would cause problems when the active area encroaches the border of the array. How would you address these problems?
+*/
+
+// Solution using bit manipulation to do it in-place.
+// Caveat: should store the old value in lower digit! otherwise the nb function cannot properly retrieve the old state from the top left (already processed) and bottom right (not yet processed)
+
+class Solution {
+public:
+    //bit operation. Use lower digit to represent old state.
+    void gameOfLife(vector<vector<int>>& board) {
+        if(board.empty() || board[0].empty()) return;
+        int m = board.size(), n = board[0].size();
+        for(int i = 0; i < m; i++) {
+            for(int j = 0; j < n; j++) {
+                int nbcount = nb(board, i, j);
+                if(board[i][j] == 1) board[i][j] = (nbcount == 2 || nbcount == 3)*2 + 1;
+                else board[i][j] = (nbcount == 3)*2;
+            }
+        }
+        //remove the value from higher digit
+        for(int i = 0; i < m; i++) {
+            for(int j = 0; j < n; j++) {
+                board[i][j] >>= 1; //remove old value in lower digit
+            }
+        }
+    }
+    int nb(vector<vector<int> >& board, int i, int j) {
+        int count = 0;
+        int m = board.size(), n = board[0].size();
+        for(int ii = max(0, i-1); ii <= min(m-1, i+1); ii++) {
+            for(int jj = max(0, j-1); jj <= min(n-1, j+1); jj++) {
+                count += (board[ii][jj] & 1); //get old value from lower digit
+            }
+        }
+        count -= board[i][j]; //ignore itself
+        return count;
+    }
+};
+
+/**************************************************** 
+ ***    294,Medium,Flip Game II 
+ ****************************************************/
+
+/*
+You are playing the following Flip Game with your friend: Given a string that contains only these two characters: + and -, you and your friend take turns to flip two consecutive "++" into "--". The game ends when a person can no longer make a move and therefore the other person will be the winner.
+
+Write a function to determine if the starting player can guarantee a win.
+
+For example, given s = "++++", return true. The starting player can guarantee a win by flipping the middle "++" to become "+--+".
+
+Follow up:
+Derive your algorithm's runtime complexity.
+*/
+
+// Solution 1. Backtracking. Remember to retrace.
+
+class Solution {
+public:
+    bool canWin(string s) {
+        if(s.empty()) return false;
+        if(s.size() == 1) return false;
+        return canWinUtil(s);
+    }
+    bool canWinUtil(string& s) {
+        int n = s.size();
+        for(int i = 0; i < n-1; i++) { //try all possibilities
+            if(s[i] == '+' && s[i+1] == '+') {
+                s[i] = s[i+1] = '-';
+                bool wins = !canWinUtil(s);
+                s[i] = s[i+1] = '+'; //retrace
+                if(wins) return true;
+            }
+        }
+        return false;
+    }
+};
+
+// Solution 2. Dynamic programming. Store previous solutions in an unordered_map
+
+class Solution {
+public:
+    bool canWin(string s) {
+        if(s.empty()) return false;
+        if(s.size() == 1) return false;
+        return canWinUtil(s);
+    }
+    bool canWinUtil(string& s) {
+        if(dp.count(s)) return dp[s];
+        bool wins = false;
+        int n = s.size();
+        for(int i = 0; i < n-1; i++) { //try all possibilities
+            if(s[i] == '+' && s[i+1] == '+') {
+                s[i] = s[i+1] = '-';
+                wins = !canWinUtil(s);
+                s[i] = s[i+1] = '+'; //retrace
+                if(wins) break;
+            }
+        }
+        dp[s] = wins;
+        return wins;
+    }
+    unordered_map<string, bool> dp;
+};
+
+
+/**************************************************** 
+ ***    297,Medium,Serialize and Deserialize Binary Tree 
+ ****************************************************/
+
+/*
+Serialization is the process of converting a data structure or object into a sequence of bits so that it can be stored in a file or memory buffer, or transmitted across a network connection link to be reconstructed later in the same or another computer environment.
+
+Design an algorithm to serialize and deserialize a binary tree. There is no restriction on how your serialization/deserialization algorithm should work. You just need to ensure that a binary tree can be serialized to a string and this string can be deserialized to the original tree structure.
+
+For example, you may serialize the following tree
+
+    1
+   / \
+  2   3
+     / \
+    4   5
+
+as "[1,2,3,null,null,4,5]", just the same as how LeetCode OJ serializes a binary tree. You do not necessarily need to follow this format, so please be creative and come up with different approaches yourself.
+
+Note: Do not use class member/global/static variables to store states. Your serialize and deserialize algorithms should be stateless. 
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+
+// Your Codec object will be instantiated and called as such:
+// Codec codec;
+// codec.deserialize(codec.serialize(root));
+
+// Solution 1. Use leetcode format, null represented by "#". Do level-order traversal. For the last layer, ignore all "#"s (using hasNode variable)
+
+class Codec {
+public:
+    //format: length 1 2 # ...
+    // Encodes a tree to a single string.
+    string serialize(TreeNode* root) {
+        if(!root) return "";
+        string str;
+        string tmp;
+        bool hasNodes = false;
+        vector<TreeNode*> curr, next; //BFS, two levels
+        curr.push_back(root);
+        while(!curr.empty()) {
+            tmp = "";
+            hasNodes = false;
+            for(auto node : curr) {
+                if(node) {
+                    hasNodes = true;
+                    next.push_back(node->left);
+                    next.push_back(node->right);
+                }
+                if(tmp != "") tmp += " ";
+                tmp += node ? to_string(node->val) : "#";
+            }
+            if(hasNodes) str += (str == "") ? tmp : " " + tmp;
+            swap(curr, next);
+            next.clear();
+        }
+        return str;
+    }
+
+    // Decodes your encoded data to tree.
+    TreeNode* deserialize(string data) {
+        if(data == "") return NULL;
+        vector<TreeNode*> curr, next; //BFS, two levels
+        int i = 0, n = data.size();
+        string num = getNum(data, i);
+        TreeNode *root = new TreeNode(atoi(num.c_str()));
+        curr.push_back(root);
+        while(i < n) {
+            for(auto node : curr) {
+                string l = getNum(data, i);
+                string r = getNum(data, i);
+                if(l != "#") {
+                    node->left = new TreeNode(atoi(l.c_str()));
+                    next.push_back(node->left);
+                }
+                if(r != "#") {
+                    node->right = new TreeNode(atoi(r.c_str()));
+                    next.push_back(node->right);
+                }
+            }
+            swap(curr, next);
+            next.clear();
+        }
+        return root;
+    }
+
+    string getNum(const string& s, int& i) {
+        int n = s.size();
+        int j = i;
+        while(i < n && s[i] != ' ') i++;
+        int len = i-j;
+        i++; //move one step further
+        return s.substr(j, len);
+    }
+};
+
+// Solution 2. Recursive solution. Use brackets [root, left-subtree, right-subtree], so above tree will look like:
+// [1 [ 2 [] [] ] [ 3 [4[][]] [5[][]] ] ]
+// when deserializing, need to find the matching ']' to the first '['
+
+class Codec {
+public:
+
+    // Encodes a tree to a single string.
+    string serialize(TreeNode* root) {
+        if(!root) return "[]";
+        else return "[" + to_string(root->val) + serialize(root->left) + serialize(root->right) + "]";
+    }
+
+    // Decodes your encoded data to tree.
+    TreeNode* deserialize(string data) {
+        return deserializeUtil(data, 0, data.size()-1);
+    }
+    TreeNode* deserializeUtil(const string& data, int lo, int hi) {
+        int len = hi-lo+1;
+        if(len <= 2) return NULL;
+        lo++; hi--; //remove the bounding "[]"
+        int i = lo;
+        while(i <= hi && data[i] != '[') i++; //i->'['
+        int val = atoi(data.substr(lo, i-lo).c_str());
+        TreeNode* root = new TreeNode(val);
+        //find the matching ']'
+        int j = i+1;
+        int diff = 1; //# left - # right
+        while(j <= hi) {
+            if(data[j] == '[') diff++;
+            else if(data[j] == ']') {
+                diff--;
+                if(diff == 0) break; //found matching ']'
+            }
+            j++;
+        }
+        root->left = deserializeUtil(data, i, j); //i->'[', j -> ']'
+        root->right = deserializeUtil(data, j+1, hi);
+        return root;
+    }
+};
+
+
+/**************************************************** 
+ ***    298,Medium,Binary Tree Longest Consecutive Sequence 
+ ****************************************************/
+
+/*
+Given a binary tree, find the length of the longest consecutive sequence path.
+
+The path refers to any sequence of nodes from some starting node to any node in the tree along the parent-child connections. The longest consecutive path need to be from parent to child (cannot be the reverse).
+
+For example,
+   1
+    \
+     3
+    / \
+   2   4
+        \
+         5
+Longest consecutive sequence path is 3-4-5, so return 3.
+   2
+    \
+     3
+    / 
+   2    
+  / 
+ 1
+Longest consecutive sequence path is 2-3,not3-2-1, so return 2.
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+ 
+ // solution using a global variable
+ 
+class Solution {
+public:
+    int longestConsecutive(TreeNode* root) {
+        if(!root) return 0;
+        max_len = 1; //at least one
+        helper(root);
+        return max_len;
+    }
+    //longest consecutive starting from root
+    int helper(TreeNode* root) {
+        if(!root) return 0;
+        int hl = helper(root->left);
+        int hr = helper(root->right);
+        int h = 1;
+        if(root->left && root->left->val == root->val + 1) h = max(h, hl+1);
+        if(root->right && root->right->val == root->val + 1) h = max(h, hr+1);
+        max_len = max(max_len, max(h, max(hl, hr)));
+        return h;
+    }
+    int max_len;
+};
+
+/**************************************************** 
  ***    300,Medium,Longest Increasing Subsequence 
  ****************************************************/
 
@@ -7830,220 +11148,4 @@ public:
         return result;
     }
 };
-
-/**************************************************** 
- ***    304,Medium,Range Sum Query 2D - Immutable 
- ****************************************************/
-
-/*
-Given a 2D matrix matrix, find the sum of the elements inside the rectangle defined by its upper left corner (row1, col1) and lower right corner (row2, col2).
-
-Range Sum Query 2D
-The above rectangle (with the red border) is defined by (row1, col1) = (2, 1) and (row2, col2) = (4, 3), which contains sum = 8.
-
-Example:
-
-Given matrix = [
-  [3, 0, 1, 4, 2],
-  [5, 6, 3, 2, 1],
-  [1, 2, 0, 1, 5],
-  [4, 1, 0, 1, 7],
-  [1, 0, 3, 0, 5]
-]
-
-sumRegion(2, 1, 4, 3) -> 8
-sumRegion(1, 1, 2, 2) -> 11
-sumRegion(1, 2, 2, 4) -> 12
-
-Note:
-
-    You may assume that the matrix does not change.
-    There are many calls to sumRegion function.
-    You may assume that row1 ≤ row2 and col1 ≤ col2.
-*/
-
-// Your NumMatrix object will be instantiated and called as such:
-// NumMatrix numMatrix(matrix);
-// numMatrix.sumRegion(0, 1, 2, 3);
-// numMatrix.sumRegion(1, 2, 3, 4);
-
-// DP solution similar to the 1D problem (303).
-
-class NumMatrix {
-public:
-    NumMatrix(vector<vector<int>> &matrix) {
-        if(matrix.empty() || matrix[0].empty()) {
-            m = n = 0;
-            return;
-        }
-        m = matrix.size(); n = matrix[0].size();
-        sum.resize(m+1, vector<int>(n+1, 0));
-        for(int i = 1; i <= m; ++i)
-            for(int j = 1; j <= n; ++j)
-                sum[i][j] = sum[i-1][j] + sum[i][j-1] - sum[i-1][j-1] + matrix[i-1][j-1];
-    }
-
-    int sumRegion(int row1, int col1, int row2, int col2) {
-        if(row1 < 0 || row1 >= m || col1 < 0 || col1 >= n) return 0;
-        if(row2 < 0 || row2 >= m || col2 < 0 || col2 >= n) return 0;
-        return sum[row2+1][col2+1] - sum[row1][col2+1] - sum[row2+1][col1] + sum[row1][col1];
-    }
-    vector<vector<int> > sum;
-    int m, n;
-};
-
-
-/**************************************************** 
- ***    307,Medium,Range Sum Query - Mutable 
- ****************************************************/
-
-/*
-Given an integer array nums, find the sum of the elements between indices i and j (i ≤ j), inclusive.
-The update(i, val) function modifies nums by updating the element at index i to val.
-
-Example:
-
-Given nums = [1, 3, 5]
-
-sumRange(0, 2) -> 9
-update(1, 2)
-sumRange(0, 2) -> 8
-
-Note:
-
-    The array is only modifiable by the update function.
-    You may assume the number of calls to update and sumRange function is distributed evenly.
-*/
-
-// Your NumArray object will be instantiated and called as such:
-// NumArray numArray(nums);
-// numArray.sumRange(0, 1);
-// numArray.update(1, 10);
-// numArray.sumRange(1, 2);
-
-// Solution using binary indexed tree, find and update both O(logn).
-// A little tricky in update function. Need to calculate the difference between current value and old value.
-// Also uses 1-based indexing, so need to take care of the offset.
-
-class NumArray {
-public:
-    NumArray(vector<int> &nums) {
-        n = nums.size(); //0 is dummy node
-        bitsum.resize(n+1, 0);
-        num.resize(n+1, 0);
-        for(int i = 0; i < n; ++i) {
-           update(i, nums[i]); //i is index in nums
-        }
-    }
-
-    int sumRange(int i, int j) {
-        if(i > j || i < 0 || j >= n) return 0;
-        if(i == j) return num[i+1];
-        return getSum(j) - getSum(i-1);
-    }
-
-    void update(int i, int val) {
-        int error = val - num[++i];
-        num[i] = val;
-        while(i <= n) {
-            bitsum[i] += error;
-            i += (i & (-i)); 
-        }
-    }
-private:
-    //accumulated sum from nums[0 .. i]
-    int getSum(int i) {
-        if(i < 0 || i >= n) return 0;
-        i++;
-        int sum = 0;
-        while(i > 0) {
-            sum += bitsum[i];
-            i -= (i & (-i));
-        }
-        return sum;
-    }
-    vector<int> num;
-    vector<int> bitsum;
-    int n;
-};
-
-
-/**************************************************** 
- ***    313,Medium,Super Ugly Number 
- ****************************************************/
-
-/*
-Write a program to find the nth super ugly number.
-
-Super ugly numbers are positive numbers whose all prime factors are in the given prime list primes of size k. For example, [1, 2, 4, 7, 8, 13, 14, 16, 19, 26, 28, 32] is the sequence of the first 12 super ugly numbers given primes = [2, 7, 13, 19] of size 4.
-
-Note:
-(1) 1 is a super ugly number for any given primes.
-(2) The given numbers in primes are in ascending order.
-(3) 0 < k ≤ 100, 0 < n ≤ 106, 0 < primes[i] < 1000.
-*/
-
-// Solution 1. Similar to ugly number.
-class Solution {
-public:
-    int nthSuperUglyNumber(int n, vector<int>& primes) {
-        if(n == 1) return 1;
-        vector<int> ugly(n, 0);
-        int np = primes.size(); //number of primes
-        vector<int> idx(np, 0); //indices in ugly for numbers being multiplied by each prime
-        vector<int> val(np, 1); //next values for each prime
-        int next = 1;
-        for(int i = 0; i < n; ++i) {
-            ugly[i] = next; 
-            next = INT_MAX; //to find minimum for next
-            for(int j = 0; j < np; ++j) { //scan possible values for next
-                if(val[j] == ugly[i]) val[j] = ugly[idx[j]++] * primes[j]; //move to next index
-                next = min(val[j], next);
-            }
-        }
-        return ugly[n-1];        
-    }
-};
-
-// Solution 2. Using a min-queue
-
-struct Element {
-    int val;
-    int prime;
-    int index;
-    Element() : val(0), prime(0), index(0) {}
-    Element(int v, int p, int i) : val(v), prime(p), index(i) {}
-};
-
-class isGreater
-{
-public:
-    bool operator() (const Element& e1, const Element &e2) {
-        return e1.val > e2.val;    
-    }
-};
-
-class Solution {
-public:
-    int nthSuperUglyNumber(int n, vector<int>& primes) {
-        if(n == 1) return 1;
-        vector<int> ugly(n, 1);
-        priority_queue<Element, vector<Element>, isGreater> min_queue;
-        for(auto k : primes) {
-            min_queue.push(Element(k, k, 0));
-        }
-        for(int i = 1; i < n; ++i) {
-            int val = min_queue.top().val;
-            while(min_queue.top().val == val) { //remove all duplicates
-                Element next = min_queue.top();
-                min_queue.pop();
-                ugly[i] = next.val;
-                next.val = ugly[++next.index]*next.prime;
-                min_queue.push(next);
-            }
-        }
-        return ugly[n-1];
-    }
-};
-
 

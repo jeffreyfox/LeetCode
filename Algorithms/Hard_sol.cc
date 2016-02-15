@@ -49,12 +49,12 @@ public:
         int mid1 = lo1 + (hi1-lo1)/2;
         int mid2 = lo2 + (hi2-lo2)/2;
         int hlen1 = mid1 - lo1, hlen2 = mid2 - lo2; //number of elements before mid
-        if(nums1[mid1] <= nums2[mid2]) {
-            if(k <= hlen1 + hlen2) return findKth(nums1, lo1, hi1, nums2, lo2, mid2-1, k); //drop elements after mid2 (inclusive)
-            else return findKth(nums1, mid1+1, hi1, nums2, lo2, hi2, k-hlen1-1); //drop elements before mid1 (inclusive)
+        if(k <= hlen1 + hlen2) {
+            if(nums1[mid1] <= nums2[mid2]) return findKth(nums1, lo1, hi1, nums2, lo2, mid2-1, k); //drop elements [mid2, hi2]
+            else return findKth(nums1, lo1, mid1-1, nums2, lo2, hi2, k); //drop elements after [mid1, hi1]
         } else {
-            if(k <= hlen1 + hlen2) return findKth(nums1, lo1, mid1-1, nums2, lo2, hi2, k); //drop elements after mid1 (inclusive)
-            else return findKth(nums1, lo1, hi1, nums2, mid2+1, hi2, k-hlen2-1); //drop elements before mid2 (inclusive)
+            if(nums1[mid1] <= nums2[mid2]) return findKth(nums1, mid1+1, hi1, nums2, lo2, hi2, k-hlen1-1); //drop elements [lo1, mid1]
+            else return findKth(nums1, lo1, hi1, nums2, mid2+1, hi2, k-hlen2-1); //drop elements [lo2, mid2]
         }
     }
 };
@@ -592,44 +592,76 @@ You should return the indices: [0,9].
 //     b a r f o o t h e[f o o b a r]m a n  ,  i = 9, j = 15, occurs = {foo => 1, bar = 1}, found '9'
 //     b a r f o o t h e f o o[b a r m a n] ,  i = 12, j = 18, break since the is not in words, occurs = {}
 
+/*
+Only use one map to store the counts, when see the string, reduce the individual counts, when it reaches zero we know that we have exactly the amount we need.
+simpler than 074, since the window can only contain words in dictionary, and also the counts should not exceed the total counts in dictionary (no excessive words). 
+So here we keep this loop invariant and use it to simplify our routines.
+Maintain a dict that counts the occurrences of all words in word vector. the trick is to recover dict for each sub runs. 
+Each time we move i, we update dict, each time we move istart, we recover dict, in the end, when both i and istart reaches end, 
+we recovered the original dict.
+
+When seeing a new string at i, check several cases:
+1. if not seen in dict, then the previous searches [istart, i) are invalid, just move istart forward to i and pop all words seen, 
+and update count properly.
+2. if in dict, then decrement the count, if it is excessive word, then move istart to pop out words until the count is zero 
+(meaning no excessive). 
+3. if not excessive, simply go on.
+4. if count == 0, then we have found one window, insert to result.
+*/
+
 class Solution {
 public:
     vector<int> findSubstring(string s, vector<string>& words) {
-        vector<int> ret;
-        if(words.empty()) return ret;
-        map<string, int> counts; //counts of each unique word
-        map<string, int> occurs; //occurrences of each word in s
-        for(int i = 0; i < words.size(); ++i) {
-            counts[words[i]]++;
-        }
-        int L = words[0].size(); //word length
-        for (int l = 0; l < L; ++l) { //do L passes
-            int i = l, j = l;
-            occurs.clear(); // clear occurences map
-            //scan each substring of length L
-            while(j+L <= s.size()) {
-                string t = s.substr(j, L);
-                if(counts.count(t) == 0) { //not found such word
-                    i = j = j+L;
-                    occurs.clear();
+        vector<int> result;
+        if(s.empty() || words.empty()) return result;
+        int wl = words[0].size();
+        if(wl == 0) return result;
+        int slen = s.size();
+        
+        unordered_map<string, int> dict;
+        for(auto s : words) dict[s]++;
+        
+        for(int j = 0; j < wl; j++) {
+            int i = j, istart = j, count = words.size();
+            //loop invariant: [istart, i) contains no words not in dict, no excessive words
+            while(i + wl <= slen) {
+                string str = s.substr(i, wl);
+                if(!dict.count(str)) { //not found, reset start, i, and count
+                    while(istart < i) { //for sure istart is contained in dict
+                        ++dict[s.substr(istart, wl)];
+                        istart += wl;
+                    }
+                    i += wl;
+                    istart = i;
+                    count = words.size();
                     continue;
                 }
-                occurs[t] ++; //found such word
-                if(j == i + L*words.size()) { //reached max size of window
-                    string t2 = s.substr(i, L);
-                    if(counts.count(t2) > 0) occurs[t2] --;
-                    i += L; //move left side of window forward by L
+                dict[str]--;
+                if(dict[str] >= 0) count--;
+                while(dict[str] < 0) {
+                    if(++dict[s.substr(istart, wl)] > 0) count++;
+                    istart += wl;
                 }
-                if(occurs == counts) ret.push_back(i);
-                j += L;
+
+                if(count == 0) {
+                    result.push_back(istart);
+                    dict[s.substr(istart, wl)]++;
+                    istart += wl; //move forward
+                    count = 1;
+                }
+                i += wl;  //move forward
+            }
+            //increment istart to mantain correct counting in dict and count
+            while(istart + wl <= slen) {
+                ++dict[s.substr(istart, wl)];
+                istart += wl;
             }
         }
-        return ret;
+        return result;
     }
 };
 
-// Can further optimize and only use one map to store the counts, when see the string, reduce the individual counts, when it reaches zero we know that we have exactly the amount we need.
-// similar to min window, use only one dict to store the counting information. The key is to restore the information after each run.
+// an old solution, similar to min window, use only one dict to store the counting information. The key is to restore the information after each run.
 
 class Solution {
 public:
@@ -1899,16 +1931,27 @@ If there are multiple such windows, you are guaranteed that there will always be
 */
 
 /*
-The string T can have duplicated characters, so need to maintain a count for each unique character. We also need to keep track of which characters have been seen during the scan. We could use two maps, but a more elegant way is to use one map intialized as the count in T, and as we scan S and see a character in T, we decrement the individual count. As we scan the S, we also maintain the left side of the window as "istart", and increment it as needed. There are several things to consider:
+The string T can have duplicated characters, so need to maintain a count for each unique character. 
+We also need to keep track of which characters have been seen during the scan. We could use two maps, 
+but a more elegant way is to use one map intialized as the count in T, and as we scan S and see a character in T, 
+we decrement the individual count. As we scan the S, we also maintain the left side of the window as "istart", 
+and increment it as needed. There are several things to consider:
 1. how to distinguish between characters appearing in T and not? (e.g. "D" v.s. "A")
 2. how to know whether we have all the characters we need to construct T?
 
-For Q1, we can use an index vector (dict[256]) to store the occurrences of each alphabet in T, and for other alphabets, initialized as -s.len(). When scanning, if we see the individual count of a char to be smaller or equal than -s.len(), we know that it does not appear in T.
-For Q2, we maintain another variable "count", initialized as T.len(), and decremented only when we have seen a "useful" character. "useful" means character appearing in T and also not redundant. How to know if it is redundant or not? We can check the individual count is negative or not. When count == 0, we know that s[istart, i] covers T.
-The next step is to check if we could move istart to the right and remove some redundant characters. This can be checked by individual count ++dict[s[istart]] <= 0. After this step, s[istart, i] is the minimum window seen so far containing T, by definition, s[istart] for sure is needed for T.
-Next is to continue scanning forward. This gives 16ms solution.
+For Q1, we can use an index vector (dict[256]) to store the occurrences of each alphabet in T, and for other alphabets,  initialized as 0. 
+When scanning, we have two pointers i and istart, i will decrement dict, and istart will increment dict, we can prove that 
+the dict[c] entries for characters not in T will never become positive. 
+For Q2, we maintain another variable "count", initialized as T.len(), and decremented only when we have seen a "useful" character. 
+"useful" means character appearing in T and also not redundant. How to know if it is redundant or not? We can check the individual 
+count is negative or not. When count == 0, we know that s[istart, i] covers T.
+The next step is to check if we could move istart to the right and remove some redundant characters. This can be checked by individual 
+count ++dict[s[istart]] <= 0. After this step, s[istart, i] is the minimum window seen so far containing T, by definition, 
+s[istart] for sure is needed for T. Next is to continue scanning forward. This gives 16ms solution.
 
-An optimization (16ms=>12ms): we remove s[istart], update the counts (dict and count), and move on. Once count == 0 again, we go back to previous step again. Because we know for sure that we don't need s[istart] in layer searches, so we can remove it and update count. This can avoid many uncessary executiong of if(count == 0) part.
+An optimization (16ms=>12ms): we remove s[istart], update the counts (dict and count), and move on. Once count == 0 again, 
+we go back to previous step again. Because we know for sure that we don't need s[istart] in later searches, so we can remove it 
+and update count. This can avoid many uncessary executiong of if(count == 0) part.
 
 The code can be further shortened: in the while loop:
 while(++dict[s[istart] <= 0) istart++;
@@ -1918,27 +1961,59 @@ and then only do: istart++;
 class Solution {
 public:
     string minWindow(string s, string t) {
+        if(t.empty() || s.empty()) return "";
         int slen = s.size();
-        vector<int> dict(256, -slen);
-        int nc = t.size();
-        for(int i = 0; i < nc; ++i) {
-            if(dict[t[i]] < 0) dict[t[i]] = 1;
-            else dict[t[i]]++;
+        vector<int> dict(256, 0);
+        for(auto c : t) {
+            if(dict[c] < 0) dict[c] = 1;
+            else dict[c] ++;
         }
-        int istart = 0, count = nc;
-        int min_len = INT_MAX, min_start = -1;
-        for(size_t i = 0; i < s.size(); ++i) {
-            if(--dict[s[i]] >= 0) count--;
+        int count = t.size();
+        int istart = 0, minS = -1, minL = INT_MAX;
+        for(int i = 0; i < slen; i++) {
+            char c = s[i];
+            --dict[c];
+            if(dict[c] >= 0) count--;
             if(count == 0) {
                 while(dict[s[istart]] < 0) {
-                    dict[s[istart++]]++;
+                    dict[s[istart]]++;
+                    istart++;
                 }
-                int len = i-istart+1;
-                if(len < min_len) { min_len = len; min_start = istart; }
-                dict[s[istart++]]++; count = 1;
+                //dict[s[istart]] == 0
+                if(minL > i-istart+1) { minS = istart, minL = i-istart+1; }
+                //remove first char (for sure it is in s)
+                dict[s[istart]]++;   istart++;
+                count = 1;
             }
         }
-        return min_start == -1 ? "" : s.substr(min_start, min_len);        
+        return (minS == -1) ? "" : s.substr(minS, minL);
+    }
+};
+
+// Solution 2, similar idea to solution 1, but use a map
+class Solution {
+public:
+    string minWindow(string s, string t) {
+        unordered_map<char, int> dict;
+        int count = t.size(), istart = 0, minL = INT_MAX, minS = -1;
+        for(auto c : t) dict[c]++;
+        for(int i = 0; i < s.size(); i++) {
+            char c = s[i];
+            if(!dict.count(c)) continue; //not a character in t
+            
+            if(--dict[c] >= 0) --count;
+            if(count == 0) { //found one
+                while(!dict.count(s[istart]) || dict[s[istart]] < 0) {
+                    if(dict.count(s[istart])) dict[s[istart]]++;
+                    istart++; //remove characters not in t, or redundant ones
+                }
+                int len = i-istart+1;
+                if(len < minL) { minS = istart;  minL = len; }
+                dict[s[istart++]]++;  //remove istart
+                count = 1; //update count
+            }
+        }
+        return minS == -1 ? "" : s.substr(minS, minL);
     }
 };
 
@@ -3988,11 +4063,13 @@ public:
     }
 };
 
-// Iterative solution without tag in each node, instead use a pre pointer pointing to the previous node visited, by checking (1) whether previous node is the nodes left or right child, and (2) whether left or right child exist, we determine what we do next.
+// Iterative solution without tag in each node, instead use a pre pointer pointing to the previous node visited, by checking 
+// (1) whether previous node is the node's left or right child, and 
+// (2) whether left or right child exist, we determine what we do next.
 // There are three cases typically:
 // 1. 1st time a node is checked, pre does not equal either children (if any).
 // 2. 2nd time a node is checked, we just visited left sub-tree, so pre == node->left
-// 3. 3rd time a node is checked, we just visited right sub-tree, so pre == node->rights
+// 3. 3rd time a node is checked, we just visited right sub-tree, so pre == node->right
 // There are also cases where left and/or right child is empty.
 // If left child exists and pre is not equal to either children, then we push
 // For correct comparison, pre should be initialized as not a NULL value, so we can initialize it as root.
@@ -4002,19 +4079,19 @@ public:
     vector<int> postorderTraversal(TreeNode* root) {
         vector<int> result;
         if(!root) return result;
-        deque<TreeNode*> st;
-        st.push_back(root);
+        stack<TreeNode*> st;
+        st.push(root);
         TreeNode *pre = root, *node = NULL;
         while(!st.empty()) {
-            node = st.back();
+            node = st.top();
             if(node->left && node->left != pre && node->right != pre) {
-                st.push_back(node->left);
+                st.push(node->left);
             } else if(node->right && node->right != pre) {
-                st.push_back(node->right);
+                st.push(node->right);
             } else {
                 result.push_back(node->val);
                 pre = node;
-                st.pop_back();
+                st.pop();
             }
         }
         return result;
@@ -4122,20 +4199,7 @@ private:
     unordered_map<int, ListNode*> dict;
     ListNode *head, *tail;
 };
-    void appendToTail(ListNode* node) {
-        node->prev = tail->prev;
-        node->next = tail;
-        node->prev->next = node;
-        node->next->prev = node;
-    }
-    void deleteHead() {
-        ListNode *tmp = head->next;
-        st.erase(tmp->key);
-        head->next = tmp->next;
-        tmp->next->prev = head;
-        delete tmp;
-    }
-};
+
 
 /**************************************************** 
  ***    149,Hard,Max Points on a Line 
@@ -4750,7 +4814,6 @@ private:
     Node* head;
 };
 
-
 class Solution {
 public:
     vector<string> findWords(vector<vector<char>>& board, vector<string>& words) {
@@ -4790,125 +4853,92 @@ public:
     Trie t;
 };
 
-// Solution 2.
+// Solution 2 (100ms)
+class TrieNode {
+public:
+    TrieNode() {
+        isKey = false;
+        for(int i = 0; i < 26; i++) next[i] = NULL;
+    }
+    bool isKey;
+    TrieNode* next[26];
+};
+
 class Trie {
 public:
-    struct Node {
-        bool isKey;
-        vector<Node*> links;
-        Node() : isKey(false) {
-            links.resize(26, NULL);
-        }
-    };
-
     Trie() {
-        root = new Node();
+        root = new TrieNode();
     }
 
-    ~Trie() {
-        eraseNode(root);
-    }
-    void insert(const string& s) {
-        insertUtil(root, s, 0);
+    void insert(const string& word) {
+        insert(root, word, 0);
     }
 
-    bool exist(const string& s) {
-        Node *node = find(root, s, 0);
+    bool search(const string& word) {
+        TrieNode * node = search(root, word, 0);
         return node != NULL && node->isKey;
     }
-    bool existPrefix(const string& s) {
-        Node *node = find(root, s, 0);
+
+    // Returns if there is any word in the trie that starts with the given prefix.
+    bool containsPrefix(const string& prefix) {
+        TrieNode* node = search(root, prefix, 0);
         return node != NULL;
     }
-    void erase(const string& s) {
-        eraseUtil(root, s, 0);
-    }
-private:
-    void insertUtil(Node* node, const string& s, int k) {
-        if(k == s.size()) { node->isKey = true; return; }
-        int i = s[k] - 'a';
-        if(node->links[i] == NULL) node->links[i] = new Node();
-        insertUtil(node->links[i], s, k+1);
-    }
 
-    Node* eraseUtil(Node* node, const string& s, int k) {
-        if(node == NULL) return NULL;
-        if(k == s.size()) {
-            node->isKey = false;
-        } else {
-            int c = s[k] - 'a';
-            node->links[c] = eraseUtil(node->links[c], s, k+1);
-        }
-        if(node != root && !hasLinks(node) && !node->isKey) {
-            delete node; //no nodes below it
-            node = NULL;
-        }
-        return node;
+private:
+    void insert(TrieNode* x, const string& word, int d) {
+        if(d == word.size()) { x->isKey = true; return; }
+        //if link not exist, create it before descending
+        int idx = word[d] - 'a';
+        if(x->next[idx] == NULL) x->next[idx] = new TrieNode;
+        insert(x->next[idx], word, d+1);
     }
-    bool hasLinks(Node* node) {
-        if(node == NULL) return false;
-        for(int i = 0; i < 26; ++i) 
-            if(node->links[i]) return true;
-        return false;
+    TrieNode* search(TrieNode* x, const string& word, int d) {
+        if(d == word.size()) return x;
+        int idx = word[d] - 'a';
+        //if link is null, return null;
+        if(x->next[idx] == NULL) return NULL;
+        return search(x->next[idx], word, d+1);
     }
-    Node* find(Node* node, const string& s, int k) {
-        if(node == NULL || k == s.size()) return node;
-        int i = s[k] - 'a';
-        return find(node->links[i], s, k+1);
-    }
-    void eraseNode(Node* node) {
-        if(!node) return;
-        for(int i = 0; i < 26; ++i) eraseNode(node->links[i]);
-        delete node;
-    }
-    Node* root;
+    TrieNode* root;
 };
 
 class Solution {
 public:
     vector<string> findWords(vector<vector<char>>& board, vector<string>& words) {
         vector<string> result;
-        if(board.empty() || board[0].empty()) return result;
-        int m = board.size(), n = board[0].size();
+        if(board.empty() || board[0].empty() || words.empty()) return result;
+        for(auto w : words) t.insert(w);
         string tmp;
-        for(auto it : words) t.insert(it);
-        for(int i = 0; i < m; ++i) {
-            for(int j = 0; j < n; ++j) {
+        int m = board.size(), n = board[0].size();
+        for(int i = 0; i < m; i++) {
+            for(int j = 0; j < n; j++) {
                 dfs(board, i, j, tmp, result);
             }
         }
         return result;
     }
-
     void dfs(vector<vector<char>>& board, int i, int j, string& tmp, vector<string>& result) {
         int m = board.size(), n = board[0].size();
-        if(i < 0 || i >= m || j < 0 || j >= n) return; //illegal position
-        if(board[i][j] == '*') return; //visited
+        tmp += board[i][j];
         char c = board[i][j];
-        tmp = tmp + c;
-        if(t.exist(tmp) && !found(result, tmp)) {
-            result.push_back(tmp);
+        board[i][j] = '*'; //mark as visited
+        if(t.search(tmp)) { //found a word
+            int k = 0, size = result.size(); //avoid duplicates
+            for(; k < size; k++) if(result[k] == tmp) break;
+            if(k == size) result.push_back(tmp); 
         }
-        board[i][j] = '*';
-        if(t.existPrefix(tmp)) {
-            dfs(board, i, j+1, tmp, result);
-            dfs(board, i, j-1, tmp, result);
-            dfs(board, i+1, j, tmp, result);
-            dfs(board, i-1, j, tmp, result);
+        if(t.containsPrefix(tmp)) {
+            if(i < m-1 && board[i+1][j] != '*') dfs(board, i+1, j, tmp, result);
+            if(j < n-1 && board[i][j+1] != '*') dfs(board, i, j+1, tmp, result);
+            if(i > 0 && board[i-1][j] != '*') dfs(board, i-1, j, tmp, result);
+            if(j > 0 && board[i][j-1] != '*') dfs(board, i, j-1, tmp, result);
         }
-        board[i][j] = c;
+        board[i][j] = c; //reset back to original
         tmp.pop_back();
-    }
-    
-    bool found(vector<string>& result, string& tmp) {
-        for(auto it : result) {
-            if(tmp == it) return true;
-        }
-        return false;
     }
     Trie t;
 };
-
 
 
 /**************************************************** 
@@ -5164,11 +5194,12 @@ Note:
 You may assume k is always valid, ie: 1 ≤ k ≤ input array's size for non-empty array.
 */
 
-// Linear time (one pass) solution
+// Solution 1. Linear time (one pass) solution
 // Maintain a doubly-ended queue. add newly seen numbers to end of queue. Several operations:
-// 1. when we see a new number, pop all the smaller numbers from the back of queue, and then insert the new value. (the new number makes these smaller numbers values stale)
+// 1. when we see a new number, pop all the smaller numbers from the back of queue, and then insert the new value (the new number makes these smaller numbers values stale).
 // 2. also check if front of queque is out of the sliding window, if yes then remove front.
 // 3. the maximum is simply the front element of queue.
+// This method has time complexity of amortized O(1) per element, and worst case O(n) per element. Space complexity is O(k) (not counting result vector).
 
 class Solution {
 public:
@@ -5191,7 +5222,101 @@ public:
     }
 };
 
-// A O(k*n) solution.
+// Solution 2 using an indexed priority queue. Think of the input as a vector of size k. Each time window moves forward, a number in it
+// gets updated. The PQ maintains three vectors:
+// nums: values as key for sorting,
+// pq: pq[i] stores the index in input vector for the i-th element in PQ (1-based)
+// qp: qp[i] stores the index in PQ for the i-th element in input vector (1-based)
+// properly update the vectors when doing swapping.
+
+class IndexedPQ {
+public:
+    IndexedPQ(int cap) : capacity(cap), N(0) {
+        pq.resize(cap+1, 0);
+        qp.resize(cap+1, 0);
+        nums.resize(cap+1, 0);
+    }
+    IndexedPQ(vector<int>::iterator beg, vector<int>::iterator end) {
+        N = end-beg;
+        capacity = N+1;
+        pq.resize(capacity, 0);
+        qp.resize(capacity, 0);
+        nums.resize(capacity, 0);
+        for(int i = 1; i <= N; i++) {
+            pq[i] = qp[i] = i;
+            nums[i] = *(beg + (i-1));
+        }
+        for(int i = N/2; i >= 1; i--) fixDown(i);
+    }
+    //insert key with index i in input vector (1-based)
+    void insert(int i, int key) {
+        N++;
+        pq[N] = i; //index in pq => index in input
+        qp[i] = N;
+        nums[N] = key;
+        fixUp(N);
+    }
+    //update value associated with input index i 
+    void update(int i, int key) {
+        int k = qp[i]; //index in heap
+        int old_key = nums[k];
+        nums[k] = key;
+        if(old_key < key) fixUp(k);
+        else if(old_key > key) fixDown(k);
+    }
+    int extractMin() {
+        return nums[1];
+    }
+    bool empty() { return N == 0; }
+
+private:
+    void fixUp(int k) {
+        while(k > 1 && nums[k/2] < nums[k]) {
+            swap(k, k/2);
+            k /= 2;
+        }
+    }
+    void fixDown(int k) {
+        while(2*k <= N) {
+            int j = 2*k;
+            if(j < N && nums[j+1] > nums[j]) j++;
+            if(nums[j] <= nums[k]) break;
+            swap(j, k);
+            k = j;
+        }
+    }
+    //swap two elements with indices in pq
+    void swap(int i, int j) {
+        int t = 0;
+        t = qp[pq[i]]; qp[pq[i]] = qp[pq[j]]; qp[pq[j]] = t;
+        t = pq[i]; pq[i] = pq[j]; pq[j] = t;
+        t = nums[i]; nums[i] = nums[j]; nums[j] = t;
+    }
+    int N; //number of elements
+    int capacity; //capacity
+    vector<int> pq; //index in PQ => index in input array
+    vector<int> qp; //index in input array => index in PQ
+    vector<int> nums; //keys (actual values)
+};
+
+class Solution {
+public:
+    vector<int> maxSlidingWindow(vector<int>& nums, int k) {
+        vector<int> result;
+        int n = nums.size();
+        if(nums.empty() || n < k || k <= 0) return result;
+        IndexedPQ q(nums.begin(), nums.begin()+k);
+        result.push_back(q.extractMin());
+        for(int i = k; i < n; i++) {
+            int idx = (i-k) % k + 1;
+            q.update(idx, nums[i]);
+            result.push_back(q.extractMin());
+        }
+        return result;        
+    }
+};
+
+// Solution 3. A O(k*n) solution.
 // For each new number, look further and predict the maximum for the next k steps
 
 class Solution {
@@ -6042,384 +6167,6 @@ public:
         }
         
         return distance;
-    }
-};
-
-
-/**************************************************** 
- ***    302,Hard,Smallest Rectangle Enclosing Black Pixels 
- ****************************************************/
-
-/*
-An image is represented by a binary matrix with 0 as a white pixel and 1 as a black pixel. The black pixels are connected, i.e., there is only one black region. Pixels are connected horizontally and vertically. Given the location (x, y) of one of the black pixels, return the area of the smallest (axis-aligned) rectangle that encloses all black pixels.
-
-For example, given the following image:
-
-[
-  "0010",
-  "0110",
-  "0100"
-]
-
-and x = 0, y = 2,
-
-Return 6. 
-*/
-
-// Standard BFS solution.
-class Solution {
-public:
-    int minArea(vector<vector<char>>& image, int x, int y) {
-        if(image.empty() || image[0].empty()) return 0;
-        xmin = x, xmax = x, ymin = y, ymax = y;
-        pixels.push_back(make_pair(x, y));
-        image[x][y] = '.'; //sign for visited
-        int m = image.size(), n = image[0].size();
-        while(!pixels.empty()) {
-            x = pixels.front().first;
-            y = pixels.front().second;
-            pixels.pop_front();
-            if(x > 0 && image[x-1][y] == '1') {
-                pixels.push_back(make_pair(x-1, y));
-                image[x-1][y] = '.';
-                xmin = min(xmin, x-1);
-            }
-            if(x < m-1 && image[x+1][y] == '1') {
-                pixels.push_back(make_pair(x+1, y));
-                image[x+1][y] = '.';
-                xmax = max(xmax, x+1);
-            }
-            if(y > 0 && image[x][y-1] == '1') {
-                pixels.push_back(make_pair(x, y-1));
-                image[x][y-1] = '.';
-                ymin = min(ymin, y-1);
-            }
-            if(y < n-1 && image[x][y+1] == '1') {
-                pixels.push_back(make_pair(x, y+1));
-                image[x][y+1] = '.';
-                ymax = max(ymax, y+1);
-            }
-        }
-      /*  for(int i = xmin; i <= xmax; ++i) {
-            for(int j = ymin; j <= ymax; ++j) {
-                if(image[i][j] == '.') image[i][j] = '1';
-            }
-        } */
-        return (xmax-xmin+1)*(ymax-ymin+1);
-    }
-
-    int xmin, xmax, ymin, ymax;
-    deque<pair<int, int> > pixels;
-};
-
-/*
-Binary search solution. There is only one connected region, and we are given a position inside it. If we project the region to 1D (x, or y), we end up with: 00000111110000, where we have a one when there is at least one '1' in the same colum or row.
-The starting position is guaranteed to be one of the '1's. So we do two binary searches, once left and once right, to find the boundary between 0 and 1's. We carry out the same algorithm for both row and column, and we get the maximum area.
-
-Use a function to perform the same task for row and colume, and a helper function foundOne.
-*/
-
-class Solution {
-public:
-    int minArea(vector<vector<char>>& image, int x, int y) {
-        if(image.empty() || image[0].empty()) return 0;
-        int xmin(0), xmax(0), ymin(0), ymax(0);
-        //'r' means row, 'c' means col
-        getBoundaries(image, y, xmin, xmax, 'r');
-        getBoundaries(image, x, ymin, ymax, 'c');
-        return (xmax-xmin+1)*(ymax-ymin+1);
-    }
-
-    void getBoundaries(vector<vector<char> >& image, int pos, int& lb, int& hb, char rc) {
-        //binary search, first left then right
-        int lo(0), hi(0), mid(0);
-
-        lo = 0, hi = pos-1;
-        // [0 .. lo): 0, [lo .. hi] TBD, (hi, pos) 1
-        while(lo <= hi) {
-            mid = lo + (hi-lo)/2;
-            if(foundOne(image, mid, rc)) hi = mid-1;
-            else lo = mid+1;
-        }
-        lb = lo;
-
-        lo = pos+1, hi = (rc == 'r') ? image[0].size()-1 : image.size()-1;
-        // [0 .. lo): 1, [lo .. hi] TBD, (hi, pos) 0
-        while(lo <= hi) {
-            mid = lo + (hi-lo)/2;
-            if(foundOne(image, mid, rc)) lo = mid+1;
-            else hi = mid-1;
-        }
-        hb = hi;
-    }
-    bool foundOne(vector<vector<char> >& image, int pos, char rc) {
-        int m = image.size(), n = image[0].size();
-        if(rc == 'r') { //we need to search along column
-            for(int k = 0; k < m; ++k)
-               if(image[k][pos] == '1') return true;
-            return false;
-         } else { //we need to search along row
-            for(int k = 0; k < n; ++k)
-               if(image[pos][k] == '1') return true;
-            return false;
-         }
-    }
-};
-
-*/
-
-
-/**************************************************** 
- ***    305,Hard,Number of Islands II 
- ****************************************************/
-
-/*
-A 2d grid map of m rows and n columns is initially filled with water. We may perform an addLand operation which turns the water at position (row, col) into a land. Given a list of positions to operate, count the number of islands after each addLand operation. An island is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are all surrounded by water.
-
-Example:
-
-Given m = 3, n = 3, positions = [[0,0], [0,1], [1,2], [2,1]].
-Initially, the 2d grid grid is filled with water. (Assume 0 represents water and 1 represents land).
-
-0 0 0
-0 0 0
-0 0 0
-
-Operation #1: addLand(0, 0) turns the water at grid[0][0] into a land.
-
-1 0 0
-0 0 0   Number of islands = 1
-0 0 0
-
-Operation #2: addLand(0, 1) turns the water at grid[0][1] into a land.
-
-1 1 0
-0 0 0   Number of islands = 1
-0 0 0
-
-Operation #3: addLand(1, 2) turns the water at grid[1][2] into a land.
-
-1 1 0
-0 0 1   Number of islands = 2
-0 0 0
-
-Operation #4: addLand(2, 1) turns the water at grid[2][1] into a land.
-
-1 1 0
-0 0 1   Number of islands = 3
-0 1 0
-
-We return the result as an array: [1, 1, 2, 3]
-
-Challenge:
-
-Can you do it in time complexity O(k log mn), where k is the length of the positions?
-*/
-
-// Weighted union find with path compression by halving.
-// See Solution to Problem 200 for details.
-
-class UnionFind {
-public:
-    UnionFind(int N) : n(0) {
-        id.resize(N, -1);
-        size.resize(N, 0);
-    }
-    void add(int i) {
-        id[i] = i; size[i] = 1;
-        n++;
-    }
-    void uni(int i, int j) {
-        if(id[j] == -1) return; //only add valid ones
-        while(id[i] != i) { id[i] = id[id[i]]; i = id[i]; }
-        while(id[j] != j) { id[j] = id[id[j]]; j = id[j]; }
-        if(i != j) {
-            if(size[i] < size[j]) { id[i] = j; size[j] += size[i]; }
-            else { id[j] = i; size[i] += size[j]; }
-            n--;
-        }
-    }
-
-    int count() const { return n; }
-
-private:
-    vector<int> id;
-    vector<int> size;
-    int n;
-};
-
-class Solution {
-public:
-    vector<int> numIslands2(int m, int n, vector<pair<int, int>>& positions) {
-        int size = positions.size();
-        vector<int> result(size, 0);
-        UnionFind uf(m*n);
-        for(int i = 0; i < size; ++i) {
-            const int &x = positions[i].first, &y = positions[i].second;
-            int idx = x*n+y;
-            uf.add(idx);
-            //check four neighbors
-            if(x > 0) uf.uni(idx, idx-n);
-            if(x < m-1) uf.uni(idx, idx+n);
-            if(y > 0) uf.uni(idx, idx-1);
-            if(y < n-1) uf.uni(idx, idx+1);
-            result[i] = uf.count();
-        }
-        return result;
-    }
-};
-
-
-/**************************************************** 
- ***    308,Hard,Range Sum Query 2D - Mutable 
- ****************************************************/
-
-/*
-Given a 2D matrix matrix, find the sum of the elements inside the rectangle defined by its upper left corner (row1, col1) and lower right corner (row2, col2).
-
-Range Sum Query 2D
-The above rectangle (with the red border) is defined by (row1, col1) = (2, 1) and (row2, col2) = (4, 3), which contains sum = 8.
-
-Example:
-
-Given matrix = [
-  [3, 0, 1, 4, 2],
-  [5, 6, 3, 2, 1],
-  [1, 2, 0, 1, 5],
-  [4, 1, 0, 1, 7],
-  [1, 0, 3, 0, 5]
-]
-
-sumRegion(2, 1, 4, 3) -> 8
-update(3, 2, 2)
-sumRegion(2, 1, 4, 3) -> 10
-
-Note:
-
-    The matrix is only modifiable by the update function.
-    You may assume the number of calls to update and sumRegion function is distributed evenly.
-    You may assume that row1 ≤ row2 and col1 ≤ col2.
-*/
-
-// Your NumMatrix object will be instantiated and called as such:
-// NumMatrix numMatrix(matrix);
-// numMatrix.sumRegion(0, 1, 2, 3);
-// numMatrix.update(1, 1, 10);
-// numMatrix.sumRegion(1, 2, 3, 4);
-
-// 2D binary indexed tree.
-
-class NumMatrix {
-public:
-    NumMatrix(vector<vector<int>> &matrix) {
-        if(matrix.empty() || matrix[0].empty()) {
-            m = n = 0;
-            return;
-        }
-        m = matrix.size(); n = matrix[0].size();
-        bitsum.resize(m+1, vector<int>(n+1, 0));
-        num.resize(m+1, vector<int>(n+1, 0));
-        for(int i = 0; i < m; ++i) 
-            for(int j = 0; j < n; ++j)
-                update(i, j, matrix[i][j]);
-    }
-
-    void update(int row, int col, int val) {
-        int delta = val - num[++row][++col];
-        num[row][col] = val;
-        int irow = row, jcol = col;
-        while(irow <= m) {
-           jcol = col;
-           while(jcol <= n) {
-               bitsum[irow][jcol] += delta;
-               jcol += (jcol & (-jcol));
-           }
-           irow += (irow & (-irow));
-        }
-    }
-
-    int sumRegion(int row1, int col1, int row2, int col2) {
-        return getSum(row2, col2) - getSum(row1-1, col2) - getSum(row2, col1-1) + getSum(row1-1, col1-1);
-    }
-
-private:
-    //get sum from [0, 0] to [row, col]
-    int getSum(int row, int col) {
-        if(row < 0 || row >= m || col < 0 || col >= n) return 0;
-        row++; col++;
-        int sum = 0;
-        int irow = row, jcol = col;
-        while(irow > 0) {
-            jcol = col;
-            while(jcol > 0) {
-                sum += bitsum[irow][jcol];
-                jcol -= (jcol & (-jcol));
-            }
-            irow -= (irow & (-irow));
-        }
-        return sum;
-        
-    }
-    int m, n;
-    vector<vector<int> > bitsum, num;
-};
-
-
-/**************************************************** 
- ***    312,Hard,Burst Balloons 
- ****************************************************/
-
-/*
-Given n balloons, indexed from 0 to n-1. Each balloon is painted with a number on it represented by array nums. You are asked to burst all the balloons. If the you burst balloon i you will get nums[left] * nums[i] * nums[right] coins. Here left and right are adjacent indices of i. After the burst, the left and right then becomes adjacent.
-
-Find the maximum coins you can collect by bursting the balloons wisely.
-
-Note:
-(1) You may imagine nums[-1] = nums[n] = 1. They are not real therefore you can not burst them.
-(2) 0 ≤ n ≤ 500, 0 ≤ nums[i] ≤ 100
-
-Example:
-
-Given [3, 1, 5, 8]
-
-Return 167
-
-    nums = [3,1,5,8] --> [3,5,8] -->   [3,8]   -->  [8]  --> []
-   coins =  3*1*5      +  3*5*8    +  1*3*8      + 1*8*1   = 167
-
-Credits:
-Special thanks to @dietpepsi for adding this problem and creating all test cases.
-*/
-
-/*
-Standard dynamic programming. Use dp[i][j] to store the maximum coins for popping balloons [i .. j]. There are l = j-i+1 possibilities, each corresponds to popping k-th balloon at last ( i <= k <= j). The points obtained in this scenario is:
-
-  i-1 i ... k-1 k k+1 ... j j+1
-We keep k until the last step, so the coins we get will be the coins won from breaking [i .. k-1], and [k+1 .. j], and in the end, we are left with [i-1, k, j+1], so the last step we get nums[i-1]*nums[k]*nums[j+1].
-
-To avoid array bounds checking, we insert 1 to front and end of the nums array.
-
-We also need to have n+2 dimension for the dp vector.
-*/
-
-class Solution {
-public:
-    int maxCoins(vector<int>& nums) {
-        int n = nums.size();
-        nums.push_back(1);
-        nums.insert(nums.begin(), 1);
-        //dp[i][j]:  the maximum coins for nums[i .. j], 1 <= i <= j <= n
-        vector<vector<int> > dp(n+2, vector<int>(n+2, 0));
-        for(int len = 1; len <= n; ++len) {
-            for(int i = 1; i + len <= n+1; ++i) {
-                int j = i+len-1;
-                //now check max for nums[i .. j], try all cases where k breaks last (i <= k <= j)
-                for(int k = i; k <= j; ++k) {
-                    dp[i][j] = max(dp[i][j], dp[i][k-1] + dp[k+1][j] + nums[i-1]*nums[k]*nums[j+1]);
-                }
-            }
-        }
-        return dp[1][n];
     }
 };
 
