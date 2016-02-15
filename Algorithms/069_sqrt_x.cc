@@ -1,3 +1,9 @@
+/*
+Implement int sqrt(int x).
+
+Compute and return the square root of x.
+*/
+
 /// Binary search. Loop invariant:
 /// [1 .. lo-1]: < sqrt(x)
 /// [lo .. hi]: to be checked
