@@ -22,3 +22,23 @@ public:
         return max_all;
     }
 };
+
+// Keeps track of the lowest price we see so far and see how much profit we can get by selling at the current price.
+
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        if (prices.empty() || prices.size() == 1) return 0;
+        int min = prices[0];
+        int n = prices.size();
+        int result = 0;
+        for (int i = 1; i < n; ++i) {
+            if (prices[i] < min) {
+                min = prices[i];
+            } else {
+                result = max(result, prices[i] - min);
+            }
+        }
+        return result;
+    }
+};
