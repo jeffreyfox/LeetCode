@@ -49,3 +49,34 @@ public:
     }
 };
 
+// 2021.11
+// Recursive solution.
+class Solution {
+public:
+    vector<vector<int>> combinationSum2(vector<int>& candidates, int target) {
+        vector<vector<int>> result;
+        vector<int> tmp;
+        sort(candidates.begin(), candidates.end());
+        helper(candidates, 0, candidates.size(), target, &tmp, &result);
+        return result;
+    }
+private:
+    void helper(vector<int>& candidates, int beg, int end, int residue, vector<int> *tmp, vector<vector<int>> *result) {
+        if (residue < 0) {
+            return;
+        }
+        if (residue == 0) {
+            result->push_back(*tmp);
+            return;
+        }
+        for (int j = beg; j < end; ++j) {
+            // Avoid duplicate combinations
+            if (j > beg && candidates[j] == candidates[j-1]) continue;
+            // pick candidates[j]
+            tmp->push_back(candidates[j]);
+            // Avoid picking the same number again
+            helper(candidates, j+1, end, residue - candidates[j], tmp, result);
+            tmp->pop_back();
+        }
+    }
+};
