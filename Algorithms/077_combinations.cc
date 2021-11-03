@@ -83,7 +83,7 @@ public:
     }
 };
 
-// Solution 3. Iterative, optmized and simpler. Save results at i == k-1. (8ms)
+// Solution 4. Iterative, optmized and simpler. Save results at i == k-1. (8ms)
 class Solution {
 public:
     vector<vector<int>> combine(int n, int k) {
@@ -104,3 +104,32 @@ public:
     }
 };
 
+// 2021.11
+// Solution 5. Recursive. Reuse intermediate vector instead of copying.
+class Solution {
+public:
+    vector<vector<int>> combine(int n, int k) {
+        vector<vector<int>> result;
+        vector<int> path;
+        path.reserve(k);
+        combine_helper(1, n, k, &path, &result);
+        return result;
+    }
+    
+private:
+    // Pick |num_left| numbers from [beg, end]. |path| is the partially constructed result.
+    // If |num_left| equals 0 it means no numbers to pick and we add the path to the result.
+    void combine_helper(int beg, int end, int num_left, vector<int> *path, vector<vector<int>> *result) {
+        if (num_left == 0) {
+            result->push_back(*path);
+            return;
+        }
+        for (int j = beg; j <= end; ++j) {
+            // pick j
+            path->push_back(j);
+            // Can further optimize to append path to the result here if num_left = 1.
+            combine_helper(j+1, end, num_left - 1, path, result);
+            path->pop_back();
+        }
+    }
+};
