@@ -117,3 +117,30 @@ public:
 	}
 };
 
+// 2021.11
+// Solution 3. Recursive solution.
+class Solution {
+public:
+    vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+        vector<vector<int>> result;
+        vector<int> tmp;
+        helper(candidates, 0, candidates.size(), target, &tmp, &result);
+        return result;
+    }
+private:
+    void helper(vector<int>& candidates, int beg, int end, int residue, vector<int> *tmp, vector<vector<int>> *result) {
+        if (residue < 0) {
+            return;
+        }
+        if (residue == 0) {
+            result->push_back(*tmp);
+            return;
+        }
+        for (int j = beg; j < end; ++j) {
+            // pick candidates[j]
+            tmp->push_back(candidates[j]);
+            helper(candidates, j, end, residue - candidates[j], tmp, result);
+            tmp->pop_back();
+        }
+    }
+};
