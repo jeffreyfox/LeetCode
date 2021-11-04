@@ -34,7 +34,7 @@ public:
 };
 
 // 2021.11
-// No tail pointer. One pass.
+// No tail pointer. One pass but creates new nodes instead of reusing existing ones. Wrong solution.
 class Solution {
 public:
     ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
