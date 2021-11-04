@@ -22,30 +22,41 @@ Try to do this in one pass.
  */
 
 /// Solution 1. Use dummy head node. Two while loops.
-/// Two pointers, first and last. Let last move forward by n steps. And then left first and last move together until last reaches the tail.
-/// Then the node to be removed is first-next.
-
+/// The idea is to use two pointers, front and back.
+/// First, let front pointer move n steps forward.
+/// Then, let both front and back pointers move at the same pace. When the front reaches the tail, the back->next is the one to be removed.
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
 class Solution {
 public:
     ListNode* removeNthFromEnd(ListNode* head, int n) {
-        ListNode *dummy = new ListNode(0);
+        ListNode tmp(0);
+        ListNode *dummy = &tmp;
         dummy->next = head;
-        ListNode *first(dummy), *last(dummy);
-        while(n) {
-            last = last->next;
-            n--;
+        ListNode *front = dummy, *back = dummy;
+        // Let front move n steps forward.
+        while (n > 0) {
+            front = front->next;
+            --n;
         }
-        while(last->next) {
-            first = first->next; last = last->next;
+        // Now move front and back together until front reaches the tail, then back->next is the node to be removed.
+        while (front->next) {
+            front = front->next;
+            back = back->next;
         }
-        //delete first->next;
-        ListNode* tmp = first->next;
-        first->next = tmp->next;
-        delete tmp;
-        //return new head
-        head = dummy->next;
-        delete dummy;
-        return head;
+        // Remove back->next
+        ListNode *p = back->next;
+        back->next = p->next;
+        delete p;
+        return dummy->next;
     }
 };
 
