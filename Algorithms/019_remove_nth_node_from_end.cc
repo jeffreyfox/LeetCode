@@ -84,4 +84,37 @@ public:
     }
 };
 
+/// Solution 3. Do not use a dummy head node.
+/// The idea is to use two pointers, front and back.
+/// First, let front pointer move n-1 steps forward (not n in order to avoid front reaching beyond tail)
+/// Then, let both front and back pointers move at the same pace. When the front reaches the tail, the back is the one to be removed. Also keep track of its
+/// previous node to facilitate the removal.
+/// Need to pay special attention to the case when head is to be removed.
+
+class Solution {
+public:
+    ListNode* removeNthFromEnd(ListNode* head, int n) {
+        ListNode *front = head, *back = head, *prev = nullptr;
+        while (n > 1) {
+            front = front->next;
+            --n;
+        }
+        // Now move front and back together until front reaches the tail, then back is the node to be removed.
+        // prev is the node before back if not null.
+        while (front->next) {
+            front = front->next;
+            prev = back;
+            back = back->next;
+        }
+        // Remove back using prev. back could be head
+        if (back != head) {
+            prev->next = back->next;            
+        } else { // head to be removed. move head to the next node
+            head = back->next;
+        }
+        delete back;
+        return head;
+    }
+};
+
 
