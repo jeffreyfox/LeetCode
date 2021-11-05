@@ -141,8 +141,8 @@ public:
 };
 
 // 2021.11
-// First build a heap structure from nums[0] to nums[N-1]. N-1 is the last non-leaf node.
-// Then pop the max k times
+// First build a heap structure for nums[0] to nums[N-1]. N-1 is the last non-leaf node. We use the bottom-up approach with time complexity O(N).
+// Then pop the max k times, each of complexity lgN.
 class Solution {
 public:
     int findKthLargest(vector<int>& nums, int k) {
