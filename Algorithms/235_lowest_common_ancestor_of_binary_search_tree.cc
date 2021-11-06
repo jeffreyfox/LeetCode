@@ -45,4 +45,34 @@ public:
     }
 };
 
+// 2021.
+// Similar idea with iteration.
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        if (root == nullptr) return nullptr;
+        TreeNode *curr = root;
+        int lo = min(p->val, q->val);
+        int hi = max(p->val, q->val);
+        while (curr) {
+            if (curr == p) return p;
+            if (curr == q) return q;
+            if (curr->val < lo) curr = curr->right;
+            else if (curr->val > hi) curr = curr->left;
+            else return curr;
+        }
+        // Something wrong
+        return nullptr;
+    }
+};
 
