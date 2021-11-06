@@ -8,6 +8,59 @@ Note:
 You may assume k is always valid, 1 ≤ k ≤ array's length.
 */
 
+// 2021.11
+// Solution using STL priority queue.
+class Solution {
+public:
+    int findKthLargest(vector<int>& nums, int k) {
+        std::priority_queue<int> pq(nums.begin(), nums.end());
+        for (int i = 1; i < k; ++i) pq.pop();
+        return pq.top();
+    }
+};
+
+// Solution using a binary heap built from scratch.
+// First build a heap structure for nums[0] to nums[N-1]. N-1 is the last non-leaf node. We use the bottom-up approach with time complexity O(N).
+// Then pop the max k times, each of complexity lgN.
+class Solution {
+public:
+    int findKthLargest(vector<int>& nums, int k) {
+        // First build a heap structure. N/2 -1 is the last non-leaf node
+        int n = nums.size();
+        for (int i = n/2-1; i >= 0; i--) {
+            fixDown(nums, i, n);
+        }            
+        // Then pop the max k-1 times
+        for (int i = 1; i < k; ++i) {
+            swap(nums, 0, n-1);
+            n = n-1;
+            // Fix the root
+            fixDown(nums, 0, n);
+        }
+        // The at the k-th time, the root is the one we need.
+        return nums[0];
+    }
+    
+private:    
+    // i is the index to fix, n is the number of elements in the heap (num[0] .. num[n-1])
+    void fixDown(vector<int>& nums, int i, int n) {
+        while (2*i+1 < n) {
+            // j is the largest child
+            int j = 2*i+1;          
+            if (j < n-1 && nums[j] < nums[j+1]) j++;
+            if (nums[i] >= nums[j]) break;
+            swap(nums, i, j);
+            i = j;
+        }
+    }
+    void swap(vector<int>& nums, int i, int j) {
+        int tmp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = tmp;
+    }
+};
+
+// 2015.
 // Solution 1. Use a min-queue of k elements. 
 // First build the heap from first k elements of array, then insert another and remove the mininum.
 // Finally we end up with the k largest numbers of the array. Simple extract the minimum we get the k-th largest element.
@@ -137,46 +190,5 @@ public:
         }
         swap(nums[i], nums[r]);
         return i;
-    }
-};
-
-// 2021.11
-// First build a heap structure for nums[0] to nums[N-1]. N-1 is the last non-leaf node. We use the bottom-up approach with time complexity O(N).
-// Then pop the max k times, each of complexity lgN.
-class Solution {
-public:
-    int findKthLargest(vector<int>& nums, int k) {
-        // First build a heap structure. N/2 -1 is the last non-leaf node
-        int n = nums.size();
-        for (int i = n/2-1; i >= 0; i--) {
-            fixDown(nums, i, n);
-        }            
-        // Then pop the max k-1 times
-        for (int i = 1; i < k; ++i) {
-            swap(nums, 0, n-1);
-            n = n-1;
-            // Fix the root
-            fixDown(nums, 0, n);
-        }
-        // The at the k-th time, the root is the one we need.
-        return nums[0];
-    }
-    
-private:    
-    // i is the index to fix, n is the number of elements in the heap (num[0] .. num[n-1])
-    void fixDown(vector<int>& nums, int i, int n) {
-        while (2*i+1 < n) {
-            // j is the largest child
-            int j = 2*i+1;          
-            if (j < n-1 && nums[j] < nums[j+1]) j++;
-            if (nums[i] >= nums[j]) break;
-            swap(nums, i, j);
-            i = j;
-        }
-    }
-    void swap(vector<int>& nums, int i, int j) {
-        int tmp = nums[i];
-        nums[i] = nums[j];
-        nums[j] = tmp;
     }
 };
