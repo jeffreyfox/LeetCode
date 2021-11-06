@@ -25,6 +25,40 @@ Note: Recursive solution is trivial, could you do it iteratively?
  * };
  */
 
+// 2021. Iterative solution using a stack.
+class Solution {
+public:
+    struct Record {
+        TreeNode *node;
+        int counter;
+        Record(TreeNode *n) : node(n), counter(0) {}
+    };
+
+    vector<int> inorderTraversal(TreeNode* root) {        
+        if (!root) return {};
+        vector<int> result;
+        std::stack<Record> st;
+        st.push(Record(root));
+        while (!st.empty()) {
+            TreeNode *curr = st.top().node;
+            int counter = st.top().counter;
+            if (counter == 0) {
+                // First time, increment counter, and insert left child if any
+                st.top().counter++;
+                if (curr->left) st.push(Record(curr->left));
+            } else if (counter == 1) {
+                // Second time, visit this node and insert right child if any
+                result.push_back(curr->val);
+                st.pop();
+                if (curr->right) st.push(Record(curr->right));
+            }
+        }
+        return result;
+    }
+};
+
+
+// 2015.
 // Recursive solution (easy).
 
 class Solution {
