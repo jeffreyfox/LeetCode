@@ -14,13 +14,35 @@ Note: If the given node has no in-order successor in the tree, return null.
  * };
  */
 
+// 2021.
+// More elegant solution using BST property.
+// Traverse from root.
+// 1. If root is smaller than p, then discard the left subtree of root, directly go to its right subtree.
+// 2. If root equals p, same argument as above.
+// 3. If root is larger than p, then root is a potential candidate. Record it and then check its left subtree to see if there is a better candidate.
+class Solution {
+public:
+    TreeNode* inorderSuccessor(TreeNode* root, TreeNode* p) {
+        if (!root || !p) return nullptr;
+        TreeNode *successor = nullptr;
+        while (root) {
+            if (root->val <= p->val) root = root->right;
+            else {
+                successor = root;
+                root = root->left;
+            }
+        }
+        return successor;
+    }
+};
+
 /*
 Several cases:
 1. If p has right subtree, then just return the minimum in right subtree.
 2. Otherwise, need to go to its ancestors. First build a search path from root to p, then search backwards, if found a path going toward left, then the higher one is the successor.
 3. If not found such path, that means p is lying at bottom right of tree, and there is no successor. Return NULL.
 Caveats:
-tree is BST! So don't use backtracking to seach for path, use O(logn) iterative approach utilizing BST properly!
+tree is BST! So don't use backtracking to seach for path, use O(logn) iterative approach utilizing BST property!
 
 */
 
