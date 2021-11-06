@@ -7,10 +7,44 @@ Merge k sorted linked lists and return it as one sorted list. Analyze and descri
  * struct ListNode {
  *     int val;
  *     ListNode *next;
- *     ListNode(int x) : val(x), next(NULL) {}
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
  * };
  */
- 
+
+// 2021.11
+class Solution {
+public:
+    // Puts the head of each list into a minimum-oriented priority queue. Then pop the minimum and insert the next one in the list.
+    // Complexity is Nklgk where N is the average length of each individual list. k is the number of lists.
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        // A customized comparator for the minimum-oriented priority queue.
+        auto compare = [](ListNode *a, ListNode *b) {
+            // Should throw an exception when a or b is nullptr.
+            return a->val > b->val;
+        };
+        std::priority_queue<ListNode*, std::vector<ListNode *>, decltype(compare)> pq(compare);
+        // Construct the priority queue from the heads.        
+        for (auto head : lists) {
+            if (head == nullptr) continue;
+            pq.push(head);
+        }
+        
+        ListNode tmp(0), *dummy(&tmp);
+        ListNode *tail = dummy; // tail of the merged list
+        while (!pq.empty()) {
+            ListNode *curr = pq.top();
+            pq.pop();
+            tail->next = curr;
+            if (curr->next) pq.push(curr->next);
+            tail = tail->next;
+        }
+        return dummy->next;
+    }
+};
+
+// 2015.
 // Divide and conquer solution. Use the merge-two-list function.
 class Solution {
 public:
