@@ -18,25 +18,30 @@ return [3, 4].
 class Solution {
 public:
     vector<int> searchRange(vector<int>& nums, int target) {
-        vector<int> ret(2, -1);
-        if(nums.empty()) return ret;
-        int n = nums.size();
-        int lo(0), hi(n-1);
-        while(lo <= hi) {
-            int mid = lo + (hi-lo)/2;
-            if(nums[mid] < target) lo = mid+1;
+        vector<int> result(2, -1);
+        if (nums.empty()) return result;
+        
+        int lo = 0, hi = nums.size()-1;
+        // First find the first element >= target.
+        // If search suceeds, lo will be the first element >= target, and hi will be the last element < target, and lo = hi+1
+        while (lo <= hi) {
+            int mid = (lo + hi) / 2;
+            if (nums[mid] < target) lo = mid+1;
             else hi = mid-1;
         }
-        ret[0] = lo;
+        result[0] = lo;
+        
+        // Second find the last element <= target.
+        // If search suceeds, lo will be the first element > target, and hi will be the last element <= target, and lo = hi+1
+        lo = 0; hi = nums.size()-1;
+        while (lo <= hi) {
+            int mid = (lo + hi) / 2;
+            if (nums[mid] <= target) lo = mid+1;
+            else hi = mid-1;
+        }
+        result[1] = hi;
 
-        lo = 0, hi = n-1;
-        while(lo <= hi) {
-            int mid = lo + (hi-lo)/2;
-            if(nums[mid] <= target) lo = mid+1;
-            else hi = mid-1;
-        }
-        ret[1] = hi;
-        if(ret[0] > ret[1]) ret[0] = ret[1] = -1;
-        return ret;
+        if (result[0] <= result[1]) return result;
+        return {-1, -1};
     }
 };
