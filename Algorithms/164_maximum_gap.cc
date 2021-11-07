@@ -8,6 +8,54 @@ Return 0 if the array contains less than 2 elements.
 You may assume all elements in the array are non-negative integers and fit in the 32-bit signed integer range.
 */
 
+// 2021.
+// Solution using radix sort.
+// Caveats:
+// Integer overflow. Needs to use long long.
+class Solution {
+public:
+    int maximumGap(vector<int>& nums) { 
+        vector<int> sorted = nums;
+        
+        // radix sort
+        for (long long base = 1; base <= kMax; base *= 10) {
+            sorted = countingSort(sorted, base);
+        }
+        
+        // Linear scan
+        int result = 0;
+        for (int i = 1; i < sorted.size(); ++i) {
+            result = max(result, sorted[i] - sorted[i-1]);
+        }
+        return result;
+    }
+    
+    vector<int> countingSort(vector<int>& nums, long long base) {
+        vector<int> counts(10);        
+        // Construct counts
+        for (const int num : nums) {
+            int digit = (num / base) % 10;
+            counts[digit] ++;
+        }
+        // Accumulate
+        for (int i = 1; i < counts.size(); ++i) {
+            counts[i] += counts[i-1];
+        }
+        // Put integers into the correct location
+        vector<int> result(nums.size());
+        for (int k = nums.size()-1; k >= 0; --k) {
+            int digit = (nums[k] / base) % 10;
+            int idx = --counts[digit];
+            result[idx] = nums[k];
+        }
+        return result; 
+    }
+    
+private:
+    const long long kMax = 1000'000'000LL;
+};
+
+// 2015.
 // Solution using bucket sort.
 /*
 1. first find the maximum and minimum of the array
