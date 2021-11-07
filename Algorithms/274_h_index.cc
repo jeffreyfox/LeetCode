@@ -14,6 +14,35 @@ What are the possible values of h-index?
 A faster approach is to use extra space.
 */
 
+// 2021. Solution using the idea of counting sort. The only difference is in step 2 when accumulating counts, we need to start from right and move backwards. 
+// This is due to the definition of the H-index.
+// Can optimize and merge step 3 and step 2 into a single loop.
+// Also, the size of the counting matrix doesn't need to be kMax. Only citations.size() + 1 is enough (again due to the definition of the H-index).
+class Solution {
+public:
+    int hIndex(vector<int>& citations) {
+        vector<int> counts(kMax);
+        // Build counts
+        for (const auto c : citations) {
+            counts[c] ++;
+        }
+        // Accumulate counts
+        for (int j = kMax - 2; j >= 0; --j) {
+            counts[j] += counts[j+1];
+        }
+        // Search counts
+        int result = 0;
+        for (int j = 0; j < kMax; ++j) {
+            if (counts[j] >= j) result = j;
+            else break;
+        }
+        return result;
+    }
+private:
+    const int kMax = 1001;
+};
+
+// 2015.
 // Solution using binary search. First sort array in descending order. Then find the largest index i such that nums[i] >= i+1.
 
 class Solution {
