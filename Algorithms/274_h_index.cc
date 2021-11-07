@@ -18,6 +18,7 @@ A faster approach is to use extra space.
 // This is due to the definition of the H-index.
 // Can optimize and merge step 3 and step 2 into a single loop.
 // Also, the size of the counting matrix doesn't need to be kMax. Only citations.size() + 1 is enough (again due to the definition of the H-index).
+// See optimized solution in the Solution 2 below.
 class Solution {
 public:
     int hIndex(vector<int>& citations) {
