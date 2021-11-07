@@ -10,6 +10,62 @@ You may assume that all inputs are consist of lowercase letters a-z.
 // trie.insert("somestring");
 // trie.search("key");
 
+// 2021.
+// Caveats: When inserting, only creates new nodes when the link doesn't exist!
+class Trie {
+public:   
+    struct TriNode {
+        bool isKey;
+        std::vector<TriNode*> next;
+        TriNode() : isKey(false) {
+            next.resize(26, nullptr);
+        }
+    };
+
+    Trie() {
+        root = new TriNode;
+    }
+    
+    void insert(string word) {
+        TriNode *curr = root;
+        for (const auto c : word) {
+            int idx = c-'a';
+            if (!curr->next[idx]) curr->next[idx] = new TriNode;
+            curr = curr->next[idx];  
+        }
+        curr->isKey = true;
+    }
+    
+    bool search(string word) {
+        TriNode *curr = root;
+        for (const auto c : word) {
+            if (!curr->next[c - 'a']) return false;
+            curr = curr->next[c - 'a'];
+        }
+        return curr->isKey;
+    }
+    
+    bool startsWith(string prefix) {
+        TriNode *curr = root;
+        for (const auto c : prefix) {
+            if (!curr->next[c - 'a']) return false;
+            curr = curr->next[c - 'a'];
+        }
+        return true;
+    }
+private:
+    TriNode *root;
+};
+
+/**
+ * Your Trie object will be instantiated and called as such:
+ * Trie* obj = new Trie();
+ * obj->insert(word);
+ * bool param_2 = obj->search(word);
+ * bool param_3 = obj->startsWith(prefix);
+ */
+
+// 2015.
 /// Solution 1. Follows the Java implementation from the Sedgewick book.
 /// The character we are currently at does not correpsond to the node itself, but one of its links!
 
