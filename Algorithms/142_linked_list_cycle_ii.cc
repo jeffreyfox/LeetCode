@@ -16,6 +16,23 @@ Can you solve it without using extra space?
  * };
  */
 
+// 2021. Use a hashtable to store the address of already visited nodes.
+class Solution {
+public:
+    ListNode *detectCycle(ListNode *head) {
+        if (!head) return nullptr;
+        unordered_set<ListNode*> dict;
+        ListNode *curr = head;
+        while (curr) {
+            if (dict.count(curr)) return curr;
+            dict.insert(curr);
+            curr = curr->next;
+        }
+        return nullptr;
+    }
+};
+
+// 2015.
 // Floyd's algorithm. Maintain a slow and a fast pointer
 // see http://keithschwarz.com/interesting/code/?dir=find-duplicate
 
