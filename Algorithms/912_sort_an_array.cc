@@ -43,4 +43,50 @@ private:
     const int kMax = 100'001;
     const int kOffset = 50'000;
 };
+
+// Solution using radix sort with base 10.
+class Solution {
+public:
+    vector<int> sortArray(vector<int>& nums) {
+        vector<int> shifted = nums;
+        // Shift values so they start at 0.
+        for (int i = 0; i < shifted.size(); ++i) {
+            shifted[i] += kOffset;
+        }
+        // radix sort
+        for (int base = 1; base <= kMax; base *= 10) {
+            shifted = countingSort(shifted, base);
+        }
+        // Shift back
+        for (int i = 0; i < shifted.size(); ++i) {
+            shifted[i] -= kOffset;
+        }        
+        return shifted;
+    }
+    
+    vector<int> countingSort(vector<int>& nums, int base) {
+        vector<int> counts(10);        
+        // Construct counts
+        for (const int num : nums) {
+            int digit = (num / base) % 10;
+            counts[digit] ++;
+        }
+        // Accumulate
+        for (int i = 1; i < counts.size(); ++i) {
+            counts[i] += counts[i-1];
+        }
+        // Put integers into the correct location
+        vector<int> result(nums.size());
+        for (int k = nums.size()-1; k >= 0; --k) {
+            int digit = (nums[k] / base) % 10;
+            int idx = --counts[digit];
+            result[idx] = nums[k];
+        }
+        return result; 
+    }
+    
+private:
+    const int kMax = 100'000;
+    const int kOffset = 50'000;
+};
       
