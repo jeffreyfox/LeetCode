@@ -5,6 +5,95 @@ get(key) - Get the value (will always be positive) of the key if the key exists 
 set(key, value) - Set or insert the value if the key is not already present. When the cache reached its capacity, it should invalidate the least recently used item before inserting a new item. 
 */
 
+// 2021. Same idea as before, but with cleaner code.
+class LRUCache {
+public:
+    // Uses a double-linked list for O(1) deletion
+    struct DLLNode {
+        DLLNode *prev;
+        DLLNode *next;
+        int key;
+        int value;
+        DLLNode() : prev(nullptr), next(nullptr), key(-1), value(-1) {}
+        DLLNode(int k, int v) : prev(nullptr), next(nullptr), key(k), value(v) {} 
+    };
+    
+    LRUCache(int capacity) {
+        N = 0;
+        maxN = capacity;
+        head = new DLLNode();
+        tail = new DLLNode();
+        head->next = tail;
+        tail->prev = head;
+    }
+    
+    int get(int key) {
+        auto iter = dict.find(key);
+        if (iter == dict.end()) {
+            return -1;
+        }
+        DLLNode *node = iter->second;
+        remove(node);
+        push_back(node);
+        return node->value;
+    }
+    
+    void put(int key, int value) {        
+        auto iter = dict.find(key);
+        if (iter != dict.end()) {
+            // key already exists, updates value and move to the end of the list
+            auto *node = iter->second;            
+            node->value = value;            
+            // Move the node to the end of the list
+            remove(node);
+            push_back(node);
+        } else {
+            // key does not exist, create a record in hashtable and add it to the end of the list
+            DLLNode *new_node = new DLLNode(key, value);
+            push_back(new_node);
+            dict[key] = new_node;
+            N++;
+            // If reaching capacity, remove the LRU element from cache and list
+            if (N > maxN) {
+                DLLNode *old_node = head->next;
+                dict.erase(old_node->key);
+                remove(old_node);
+                delete old_node;
+                N--;
+            }
+        }
+    }
+    // Remove node from the list.
+    void remove(DLLNode *node) {
+        DLLNode *prev = node->prev;
+        DLLNode *next = node->next;
+        prev->next = next;
+        next->prev = prev;
+    }
+    // Add node to the tail of the list
+    void push_back(DLLNode *node) {
+        DLLNode *prev = tail->prev;
+        prev->next = node;
+        tail->prev = node;
+        node->prev = prev;
+        node->next = tail;
+    }
+
+private:
+    int maxN;  // capacity of the cache
+    int N;  // number of keys in the cache
+    unordered_map<int, DLLNode*> dict;
+    DLLNode *head, *tail;  // dummy head and tail
+};
+
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * LRUCache* obj = new LRUCache(capacity);
+ * int param_1 = obj->get(key);
+ * obj->put(key,value);
+ */
+
+// 2015.
 /*
  Use a double-linked list, and use a dummy head and tail.
  Maintain a count of elements and capiticy.
@@ -16,7 +105,6 @@ set(key, value) - Set or insert the value if the key is not already present. Whe
    ListNode dum1(0), *head = &dum1
   It will cause failure in the set routine when head is referenced. This is because dum1 is a local variable in constructor, and outside this function it will be out-of-scope and later referencing will give segmentation fault error. The correct way is to use new to allocate space on the heap: ListNode *head = new ListNode(-1, 0);
   2. The ListNode should have two data entries, key and value. Value is obvious, key is also needed to find the entry in the map when the entry needs to be erased.
- 
 */
 
 class LRUCache{
