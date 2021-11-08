@@ -139,6 +139,22 @@ public:
     }
 };
 
+// Solution using heap sort with the STL priority queue. Time complexity O(nlgn). Space complexity O(n) from the prioirty queue.
+class Solution {
+public:
+    vector<int> sortArray(vector<int>& nums) {
+        int n = nums.size();
+        if (n <= 1) return nums;
+        
+        priority_queue<int> pq(nums.begin(), nums.end());
+        for (int i = n-1; i >= 0; --i) {
+            nums[i] = pq.top();
+            pq.pop();
+        }
+        return nums;
+    }
+};
+
 // Solution using counting sort because the values lie in a range comparable to n. Time complexity O(n). Space complexity O(n) as it needs 2 additional vectors.
 class Solution {
 public:
