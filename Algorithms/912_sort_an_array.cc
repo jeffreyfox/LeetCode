@@ -291,4 +291,28 @@ private:
     const int kMax = 100'000;
     const int kOffset = 50'000;
 };
-      
+
+// Solution using a simplified version of bucket sort. Time complexity O(n).
+class Solution {
+public:
+    vector<int> sortArray(vector<int>& nums) {
+        // Maintain a bucket of vocab size to store the counts of each possible value.
+        // Since we don't need the handle of the elements we don't need a linked list.    
+        vector<int> buckets(kBucketSize);
+        for (const int val: nums) {
+            buckets[val + kOffset] ++;
+        }
+        for (int i = 0, k = 0; i < kBucketSize; ++i) {
+            int count = buckets[i];
+            while (count > 0) {
+                nums[k++] = i - kOffset;
+                count--;
+            }
+        }
+        return nums;
+    }
+    
+private:
+    int kBucketSize = 100'001;
+    int kOffset = 50'000;
+};
