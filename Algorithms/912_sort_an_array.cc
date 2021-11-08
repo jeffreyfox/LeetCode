@@ -139,7 +139,7 @@ public:
     }
 };
 
-// Solution using heap sort with the STL priority queue. Time complexity O(nlgn). Space complexity O(n) from the prioirty queue.
+// Solution using heap sort with a priority queue built from scratch. Time complexity O(nlgn). Space complexity O(n) from the prioirty queue.
 class Solution {
 public:
     vector<int> sortArray(vector<int>& nums) {
@@ -147,6 +147,70 @@ public:
         if (n <= 1) return nums;
         
         priority_queue<int> pq(nums.begin(), nums.end());
+        for (int i = n-1; i >= 0; --i) {
+            nums[i] = pq.top();
+            pq.pop();
+        }
+        return nums;
+    }
+};
+
+class PQ {
+public:
+    PQ() {
+        pq.reserve(50000);
+        N = 0;
+    }
+  
+    PQ(const vector<int> &nums) {
+        pq = nums;
+        N = nums.size();
+        for (int k = N / 2 - 1; k >= 0; --k) {
+            fixDown(k);
+        }
+    }
+    
+    int top() {
+        return pq[0];
+    }
+    
+    void pop() {
+        swap(pq[0], pq[--N]);
+        fixDown(0);
+    }
+    
+private:    
+    void fixDown(int i) {
+        // has at least a left child
+        while (2*i+1 < N) {
+            // Find the maximum child
+            int j = 2*i+1;
+            if (j < N-1 && pq[j+1] > pq[j]) j++;
+            // swap if child is larger than parent
+            if (pq[i] < pq[j]) {
+                swap(pq[i], pq[j]);
+                i = j;
+            } else break;            
+        }
+    }
+    
+    void swap(int &a, int &b) {
+        int tmp = a;
+        a = b;
+        b = tmp;
+    }
+
+    std::vector<int> pq;
+    int N; // number of elements    
+};
+
+class Solution {
+public:
+    vector<int> sortArray(vector<int>& nums) {
+        int n = nums.size();
+        if (n <= 1) return nums;
+        
+        PQ pq(nums);
         for (int i = n-1; i >= 0; --i) {
             nums[i] = pq.top();
             pq.pop();
