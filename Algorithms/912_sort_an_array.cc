@@ -17,6 +17,65 @@ Constraints:
     -5 * 104 <= nums[i] <= 5 * 104
 */
 
+// Solution using quicksort with randomized pivot. Time complexity O(nlgn). Space complexity O(lgn) from the recursion stack.
+// Two partition methods are provided.
+// Caveat: if not using randomlized pivot, the sorting with time out for an example with an already-sorted large array.
+class Solution {
+public:
+    vector<int> sortArray(vector<int>& nums) {
+        if (nums.empty() || nums.size() == 1) return nums;
+        quickSort(nums, 0, nums.size()-1);
+        return nums;
+    }
+    void quickSort(vector<int>& nums, int l, int r) {
+        if (r <= l) return;
+        int q = partition1(nums, l, r);
+        quickSort(nums, l, q-1);
+        quickSort(nums, q+1, r);
+    }
+    // Partition method from Algorithms, CLRS
+    int partition1(vector<int> &nums, int l, int r) {
+        // Randomly picks an element and swap it with nums[r] as pivot
+        int rdm_idx = rand() % (r - l + 1) + l;
+        swap(nums[rdm_idx], nums[r]);
+        
+        int i = l, j = l;
+        int val = nums[r];
+        for (; j < r; ++j) {
+            if (nums[j] < val) {
+                swap(nums[i], nums[j]);
+                i++;
+            }
+        }
+        swap(nums[i], nums[r]);        
+        return i;
+    }
+    // Partition method from Algorithms, Sedgewick
+    int partition2(vector<int> &nums, int l, int r) {
+        // Randomly picks an element and swap it with nums[r] as pivot
+        int rdm_idx = rand() % (r - l + 1) + l;
+        swap(nums[rdm_idx], nums[r]);
+        
+        int i = l-1, j = r;
+        int val = nums[r];
+        while (true) {
+            while (nums[++i] < val) {}
+            while (nums[--j] > val) {
+                if (j == l) break;
+            }
+            if (i >= j) break;
+            swap(nums[i], nums[j]);
+        }
+        swap(nums[i], nums[r]);
+        return i;
+    }
+    void swap(int &a, int &b) {
+       int tmp = a;
+        a = b;
+        b = tmp;
+    }
+};
+
 // Solution using counting sort because the values lie in a range comparable to n. Time complexity O(n). Space complexity O(n) as it needs 2 additional vectors.
 class Solution {
 public:
