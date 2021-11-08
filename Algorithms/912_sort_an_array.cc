@@ -49,6 +49,37 @@ public:
     }
 };
 
+// Solution using bottom-up merge sort. Time complexity O(nlgn). Space complexity O(n) from the auxiliary vector to hold intermediate result.
+class Solution {
+public:
+    vector<int> sortArray(vector<int>& nums) {
+        int n = nums.size();
+        if (n <= 1) return nums;
+        // bottom up.
+        for (int len = 1; len < n; len *= 2) {
+            for (int i = 0; i + len < n; i = i + 2*len) {
+                merge(nums, i, i+len-1, min(i+2*len-1, n-1));
+            }
+        }
+        return nums;
+    }
+  
+    // merges two sorted vectors: nums[l .. m] and nums[m+1 .. r]
+    void merge(vector<int>& nums, int l, int m, int r) {
+        vector<int> result(r-l+1);
+        for (int i = l, j = m+1, k = 0; i <= m || j <= r; ) {
+            if (i > m) result[k++] = nums[j++];
+            else if (j > r) result[k++] = nums[i++];
+            else if (nums[i] <= nums[j]) result[k++] = nums[i++];
+            else result[k++] = nums[j++];
+        }
+        // copy result back to nums
+        for (int k = l; k <= r; ++k) {
+            nums[k] = result[k-l];
+        }
+    }
+};
+
 // Solution using quicksort with randomized pivot. Time complexity O(nlgn). Space complexity O(lgn) from the recursion stack.
 // Two partition methods are provided.
 // Caveat: if not using randomlized pivot, the sorting with time out for an example with an already-sorted large array.
