@@ -31,26 +31,29 @@ Answer: 3
 class Solution {
 public:
     int numIslands(vector<vector<char>>& grid) {
-        if(grid.empty() || grid[0].empty()) return 0;
+        if (grid.empty() || grid[0].empty()) return 0;
         int m = grid.size(), n = grid[0].size();
         int count = 0;
-        for(int i = 0; i < m; ++i) {
+        for (int i = 0; i < m; ++i) {
             for (int j = 0; j < n; ++j) {
-                if(grid[i][j] == '1') {
-                    dfs(grid, i, j);
+                if (grid[i][j] == '1') {
                     count++;
+                    dfs(grid, m, n, i, j);
                 }
             }
         }
         return count;
     }
-    void dfs(vector<vector<char> >& grid, int i, int j) {
-        grid[i][j] = '0';
-        //check 4 neighbors
-        if(i > 0 && grid[i-1][j] == '1') dfs(grid, i-1, j); //top
-        if(j > 0 && grid[i][j-1] == '1') dfs(grid, i, j-1); //left
-        if(i < grid.size()-1    && grid[i+1][j] == '1') dfs(grid, i+1, j); //bottom
-        if(j < grid[i].size()-1 && grid[i][j+1] == '1') dfs(grid, i, j+1); //right
+    
+    void dfs(vector<vector<char>>&grid, int m, int n, int i, int j) {
+        if (i < 0 || i >= m || j < 0 || j >= n) return;
+        if (grid[i][j] != '1') return;
+        // mark as visited
+        grid[i][j] = 'x';
+        dfs(grid, m, n, i+1, j);
+        dfs(grid, m, n, i-1, j);
+        dfs(grid, m, n, i, j+1);
+        dfs(grid, m, n, i, j-1);        
     }
 };
 
