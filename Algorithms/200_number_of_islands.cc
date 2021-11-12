@@ -20,7 +20,7 @@ Example 2:
 Answer: 3
 */
 
-//Solution 1: Standard DFS
+// Solution 1: Standard DFS
 // Note that we have to check 4 neighbors! Only checking right and bottom is not enough! See the case below:
 
 // 1 1 1
@@ -88,6 +88,25 @@ public:
             if(ni < grid.size()-1    && grid[ni+1][nj] == '1') { grid[ni+1][nj] = '0'; q.push_back(make_pair(ni+1, nj)); } //bottom
             if(nj < grid[ni].size()-1 && grid[ni][nj+1] == '1') { grid[ni][nj+1] = '0'; q.push_back(make_pair(ni, nj+1)); } //right
         }
+    }
+    
+    // A slight variation with cleaner code but slightly longer runtime
+    void bfs2(vector<vector<char>>&grid, int m, int n, int i, int j) {
+        deque<pair<int, int>> q;
+        q.push_back(make_pair(i, j));
+        while (!q.empty()) {
+            int ni = q.front().first;
+            int nj = q.front().second;
+            q.pop_front();
+            if (ni < 0 || ni >= m || nj < 0 || nj >= n) continue;
+            if (grid[ni][nj] != '1') continue;
+            // mark as visited
+            grid[ni][nj] = 'x';
+            q.push_back(make_pair(ni+1, nj));
+            q.push_back(make_pair(ni-1, nj));
+            q.push_back(make_pair(ni, nj+1));
+            q.push_back(make_pair(ni, nj-1));
+        }        
     }
 };
 
