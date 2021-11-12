@@ -24,14 +24,26 @@ Visually, the graph looks like the following:
          \_/
 */
 
-/**
- * Definition for undirected graph.
- * struct UndirectedGraphNode {
- *     int label;
- *     vector<UndirectedGraphNode *> neighbors;
- *     UndirectedGraphNode(int x) : label(x) {};
- * };
- */
+/*
+// Definition for a Node.
+class Node {
+public:
+    int val;
+    vector<Node*> neighbors;
+    Node() {
+        val = 0;
+        neighbors = vector<Node*>();
+    }
+    Node(int _val) {
+        val = _val;
+        neighbors = vector<Node*>();
+    }
+    Node(int _val, vector<Node*> _neighbors) {
+        val = _val;
+        neighbors = _neighbors;
+    }
+};
+*/
 
 /// One pass solution using DFS. Make sure only visit unvisited nodes. First create a copy for current node, and then process its neighors,
 /// It neighbor already visited (indicated by the map), then use the copy as the new neighbor, otherwise dfs on the neighbor.
@@ -61,21 +73,19 @@ public:
 
 class Solution {
 public:
-    typedef UndirectedGraphNode Node;
-    UndirectedGraphNode *cloneGraph(UndirectedGraphNode *node) {
-        if(!node) return NULL;
+    Node* cloneGraph(Node* node) {
+        if (!node) return nullptr;
         return dfs(node);
     }
     Node* dfs(Node* node) {
         if(dict.count(node)) return dict[node];
-        Node* newnode = new Node(node->label);
-        dict[node] = newnode; //insert to map before processing neighbors (handle self-loops)
-        newnode->neighbors = node->neighbors;
+        Node* new_node = new Node(node->label);
+        dict[node] = new_node; //insert to map before processing neighbors (handle self-loops)
+        new_node->neighbors.resize(node->neighbors.size());
         for(int i = 0; i < node->neighbors.size(); i++) {
-            newnode->neighbors[i] = dfs(node->neighbors[i]);
+            new_node->neighbors[i] = dfs(node->neighbors[i]);
         }
-        return newnode;
+        return new_node;
     }
     unordered_map<Node*, Node*> dict;
 };
-
