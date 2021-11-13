@@ -92,3 +92,19 @@ public:
     }
 };
 
+// 2021. Recursive solution.
+class Solution {
+public:
+    int sumNumbers(TreeNode* root) {
+        if (!root) return 0;
+        return sumNumbersHelper(root, 0);
+    }
+    int sumNumbersHelper(TreeNode *root, int sum) {        
+        int val = root->val;
+        if (!root->left && !root->right) return sum*10 + val;
+        int sum_left = root->left ? sumNumbersHelper(root->left, sum*10 + val) : 0;
+        int sum_right = root->right ? sumNumbersHelper(root->right, sum*10 + val) : 0;
+        return sum_left + sum_right;
+    }
+};
+
