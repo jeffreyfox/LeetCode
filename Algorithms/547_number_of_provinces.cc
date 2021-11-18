@@ -31,7 +31,7 @@ isConnected[i][i] == 1
 isConnected[i][j] == isConnected[j][i]
 */
 
-// Solution using union find (weighted quick-union with path compression).
+// Solution using union find (weighted quick-union with path compression). Time Complexity: Close to O(n2) amortized.
 class UnionFind {
   public:
     UnionFind(int n) : count(n) {
