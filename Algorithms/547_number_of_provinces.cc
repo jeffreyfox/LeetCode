@@ -116,3 +116,37 @@ private:
         }
     }
 };
+
+// Solution using BFS to find connected components
+class Solution {
+public:
+    int findCircleNum(vector<vector<int>>& isConnected) {
+        int n = isConnected.size();
+        if (n == 0) return 0;
+        vector<int> visited(n, false);
+        int count = 0;
+        for (int i = 0; i < n; ++i) {
+            if (!visited[i]) {
+                bfs(i, n, isConnected, visited);
+                count ++;
+            }
+        }
+        return count;
+    }
+    
+    void bfs(int i, int n, vector<vector<int>>& isConnected, vector<int> &visited) {
+        std::deque<int> q;
+        q.push_back(i);
+        while(!q.empty()) {
+            int k = q.front(); q.pop_front();
+            visited[k] = true;       
+            // Check k's neighbors
+            for (int j = 0; j < n; ++j) {
+                if (k == j) continue;
+                if (isConnected[k][j] && !visited[j]) {
+                    q.push_back(j);
+                }
+            }             
+        }
+    }
+};
