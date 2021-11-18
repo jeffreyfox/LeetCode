@@ -85,3 +85,34 @@ public:
         return uf.Count();
     }
 };
+
+// Solution using DFS to find connected components.
+class Solution {
+public:
+    int findCircleNum(vector<vector<int>>& isConnected) {
+        int n = isConnected.size();
+        if (n == 0) return 0;
+        vector<int> visited(n, false);
+        int count = 0;
+        for (int i = 0; i < n; ++i) {
+            if (!visited[i]) {
+                dfs(i, n, isConnected, visited);
+                count++;
+            }
+        }
+        return count;
+    }
+    
+private:
+    // dfs on node j
+    void dfs(int i, int n, const vector<vector<int>> &isConnected, vector<int> &visited) {
+        if (visited[i]) return;
+        visited[i] = true;
+        for (int j = 0; j < n; ++j) {
+            if (j == i) continue;
+            if (isConnected[i][j] == 1) {
+                dfs(j, n, isConnected, visited);
+            }
+        }
+    }
+};
