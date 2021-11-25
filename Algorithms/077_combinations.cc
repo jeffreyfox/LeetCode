@@ -14,29 +14,40 @@ If n = 4 and k = 2, a solution is:
 ]
 */
 
-// Solution 1. Recursive solution. Start with k trials, every time decrement trials. Stop recursion when there is no trials left (k == 0). (12ms)
+// Solution 1. Recursive solution. We pick numbers from left to right and do not go back, e.g. 1, 2, 4, but not 1, 4, 2 (because they are the same combination). 
+// Each time we track how many numbers are left to pick. There are two variations with different return condition.
 class Solution {
 public:
     vector<vector<int>> combine(int n, int k) {
-        vector<vector<int> > result;
-        if(k > n || n <= 0) return result;
-        vector<int> tmp(k, 0);
-        dfs(1, n, k, tmp, result);
+        vector<vector<int>> result;
+        vector<int> tmp;
+        combine(1, n, k, tmp, result);
         return result;
     }
-    //k trials left, start from number i, maximum is n
-    void dfs(int i, int n, int k, vector<int>& tmp, vector<vector<int> >& result) {
-        if(k == 0) {
+    // Try to pick k numbers from i to n. tmp stores the partial results.
+    // Variation 1, return when there are no numbers left to pick.
+    void combine(int i, int n, int k, vector<int> &tmp, vector<vector<int>> &result) {
+        if (k == 0) {
             result.push_back(tmp);
             return;
         }
-        if(i > n) return; //no numbers available
-        int size = tmp.size();
-        for(int j = i; j <= n; ++j) { //choose number between i and n
-            tmp[size-k] = j; //choose number j
-            dfs(j+1, n, k-1, tmp, result); //dfs starting with j+1
+        for (int j = i; j <= n; ++j) {
+            tmp.push_back(j);            
+            // pick k-1 numbers from j+1 to n
+            combine(j+1, n, k-1, tmp, result);
+            tmp.pop_back();
         }
     }
+    // Variation 2. Return early to avoid unnecessary recursive calls.
+    void combine(int i, int n, int k, vector<int> &tmp, vector<vector<int>> &result) {
+        for (int j = i; j <= n; ++j) {
+            tmp.push_back(j);
+            if (k == 1) result.push_back(tmp); // Early return
+            // pick k-1 numbers from j+1 to n
+            else combine(j+1, n, k-1, tmp, result);
+            tmp.pop_back();
+        }
+    };
 };
 
 // Solution 2. Optimized recursive solution. Stop recursion after making the decision for the last trial (k == 1), also avoid uncessary trial when i > n.
