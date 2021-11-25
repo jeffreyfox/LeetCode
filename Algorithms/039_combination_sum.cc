@@ -19,26 +19,27 @@ A solution set is:
 class Solution {
 public:
     vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
-        vector<vector<int> > result;
-        int n = candidates.size();
-        if(n == 0) return result;
         sort(candidates.begin(), candidates.end());
         vector<int> tmp;
-        dfs(candidates, 0, target, tmp, result);
+        vector<vector<int>> result;
+        combinationSum(candidates, 0, candidates.size()-1, target, tmp, result);
         return result;
     }
-    void dfs(vector<int>& candidates, int i, int target, vector<int>& tmp, vector<vector<int> >& result) {
-        int n = candidates.size();
-        if(i == n || target < candidates[i]) return;
-        tmp.push_back(0);
-        //choose any number from i to n.
-        for(int j = i; j < n; ++j) {
-            tmp.back() = candidates[j];
-            if(target == candidates[j]) result.push_back(tmp);
-            else dfs(candidates, j, target-candidates[j], tmp, result);
+    // pick some numbers from [beg, end]
+    void combinationSum(const vector<int>& candidates, int beg, int end, int target, vector<int> &tmp, vector<vector<int>> &result) {
+        if (target < 0) return;
+        if (target == 0) {
+            result.push_back(tmp);
+            return;
         }
-        tmp.pop_back();
-    }
+        for (int j = beg; j <= end; ++j) {
+            if (candidates[j] > target) return;
+            // pick candidates[j]
+            tmp.push_back(candidates[j]);
+            combinationSum(candidates, j, end, target-candidates[j], tmp, result);
+            tmp.pop_back();
+        }
+    }        
 };
 
 // Solution 2. An old iterative solution. (faster)
