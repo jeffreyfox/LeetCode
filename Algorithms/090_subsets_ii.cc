@@ -19,35 +19,39 @@ If nums = [1,2,2], a solution is:
 ]
 */
 
-// Solution 1. Similar to #78, DFS backtracking with fan-out = 2.
+// Solution 1. Similar to #78 with recursive backtracking. We first sort the vector. Then for each number of occurrence K, we decide whether to pick it 0 times to K times.
+// 0 times means not picking the number. So the fan-out for each decision tree root is K+1 instead of 2 in the previous case.
 class Solution {
 public:
     vector<vector<int>> subsetsWithDup(vector<int>& nums) {
-        vector<vector<int> > result;
-        sort(nums.begin(), nums.end());
+        vector<vector<int>> result;
         vector<int> tmp;
-        dfs(nums, 0, tmp, result);
+        sort(nums.begin(), nums.end());
+        search(nums, 0, tmp, result);
         return result;
     }
-    void dfs(vector<int>& nums, int i, vector<int>& tmp, vector<vector<int> >& result) {
-        if(i == nums.size()) {
+    // Generating subsets from nums[i, n).
+    void search(const vector<int>& nums, int i, vector<int>& tmp, vector<vector<int>> &result) {
+        if (i >= nums.size()) {
             result.push_back(tmp);
             return;
         }
-        int j = i;
-        while(j < nums.size() && nums[j] == nums[i]) j++;
-        //j is index of first element != nums[i], or end
-        //not adding nums[i] to set
-        dfs(nums, j, tmp, result);
-        //adding 1 to j-i nums[i] to set
-        for(int k = 0; k < j-i; ++k) {
+        // j is the fist item whose value is not equal to nums[i]
+        int j = i+1;
+        while (j < nums.size() && nums[j] == nums[i]) j++;
+        int num_dup = j - i; // number of duplicates
+        // do not pick nums[i]
+        search(nums, j, tmp, result);
+        
+        // pick nums[i] 1 to num_dup times
+        for (int k = 1; k <= num_dup; ++k) {
             tmp.push_back(nums[i]);
-            dfs(nums, j, tmp, result);
+            search(nums, j, tmp, result);            
         }
-        //revert back
-        for(int k = 0; k < j-i; ++k) {
+        // backtrack
+        for (int k = 1; k <= num_dup; ++k) {
             tmp.pop_back();
-        }
+        }        
     }
 };
 
