@@ -21,7 +21,7 @@ If nums = [1,2,3], a solution is:
 ]
 */
 
-// Solution 1. Recursive backtracking using DFS. Fan-out is 2 (for each number, add or not add).
+// Solution 1. Recursive backtracking. Fan-out is 2 (for each number, add or not add).
 
 class Solution {
 public:
@@ -29,20 +29,21 @@ public:
         vector<vector<int> > result;
         sort(nums.begin(), nums.end());
         vector<int> tmp;
-        dfs(nums, 0, tmp, result);
+        search(nums, 0, tmp, result);
         return result;
     }
-    void dfs(vector<int>& nums, int i, vector<int>& tmp, vector<vector<int> >& result) {
+    // Generating subsets from nums[i, n).
+    void search(vector<int>& nums, int i, vector<int>& tmp, vector<vector<int> >& result) {
         if(i == nums.size()) {
             result.push_back(tmp);
             return;
         }
         // not taking nums[i]
-        dfs(nums, i+1, tmp, result);
+        search(nums, i+1, tmp, result);
         // taking nums[i]
         tmp.push_back(nums[i]);
-        dfs(nums, i+1, tmp, result);
-        tmp.pop_back(); //revert
+        search(nums, i+1, tmp, result);
+        tmp.pop_back(); // backtrack
     }
 };
 
