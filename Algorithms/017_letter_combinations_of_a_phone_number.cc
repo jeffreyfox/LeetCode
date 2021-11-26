@@ -10,6 +10,45 @@ Note:
 Although the above answer is in lexicographical order, your answer could be in any order you want. 
 */
 
+// 2021.11 Similar idea to below
+class Solution {
+public:
+    vector<string> letterCombinations(string digits) {
+        string tmp;
+        vector<string> result;
+        if (digits.empty()) return result;
+        search(digits, 0, tmp, result);
+        return result;
+    }
+    void search(const string& digits, int i, string &tmp, vector<string> &result) {
+        if (i == digits.size()) {
+            result.push_back(tmp);
+            return;
+        }
+        tmp.push_back(' ');
+        for (char c : convert(digits[i])) {
+            tmp.back() = c;
+            search(digits, i+1, tmp, result);            
+        }
+        tmp.pop_back();
+    }
+    
+    string convert(char num) {
+        switch (num) {
+            case '2': return "abc";
+            case '3': return "def";
+            case '4': return "ghi";
+            case '5': return "jkl";
+            case '6': return "mno";
+            case '7': return "pqrs";
+            case '8': return "tuv";
+            case '9': return "wxyz";
+            default: return "";                
+        }
+    }
+};
+
+// 2015
 // Solution 1. Recursive dfs solution. Use a dict storing the conversion rule. Terminate at i == n.
 // A variant is also given where termination is at i == n-1.
 
