@@ -77,23 +77,22 @@ public:
     }
 };
 
-// Solution 3. Similar to #78, dynamic programming.
+// Solution 3. Similar to #78, cascading.
 class Solution {
 public:
     vector<vector<int>> subsetsWithDup(vector<int>& nums) {
-        vector<vector<int> > result;
+        vector<vector<int>> result;
+        result.push_back({});
         sort(nums.begin(), nums.end());
-        result.push_back(vector<int>()); //empty set
-        int i = 0;
-        int n = nums.size();
-        while(i < n) {
-            int j = i;
-            while(j < n && nums[j] == nums[i]) j++;
-            int ndup = j-i; //number of duplicates
-            //add 1 - ndup nums[i] to existing solution
+        // for each element of occurrence n, incrementally add 1 to n of it to the existing set
+        for (unsigned int i = 0; i < nums.size(); ) {
+            int j = i+1;
+            while (j < nums.size() && nums[j] == nums[i]) j++;
+            int num_dup = j-i;
+            // add 1 to num_dup nums[i] to the existing set            
             int size = result.size();
-            for(int k = 0; k < ndup; ++k) {
-                for(int l = k*size; l < (k+1)*size; ++l) {
+            for (int k = 1; k <= num_dup; ++k) {
+                for (int l = (k-1)*size; l < k*size; ++l) {
                     result.push_back(result[l]);
                     result.back().push_back(nums[i]);
                 }
