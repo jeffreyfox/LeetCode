@@ -40,7 +40,8 @@ public:
     }
 };
 
-// Solution 2. Recursive solution using swapping. Does not work for duplicated cases. Developing a method that deals with duplicated cases are not straightforward, because the array order is destructed during the swapping! One hack is to introduce a table storing used elements, and avoid using them again in the same level of dfs search (see 047)
+// Solution 2. Recursive solution using swapping. Does not work for duplicated cases. Developing a method that deals with duplicated cases are not straightforward, because the
+// array order is destructed during the swapping! One hack is to introduce a table storing used elements, and avoid using them again in the same level of dfs search (see 047)
 // Note that this method does not print the permutations in lexigraphical order!
 
 class Solution {
@@ -68,7 +69,7 @@ public:
 // Solution 3. Recursive solution, each time take a number, use a bit status number indicating which number has been taken. Can be extended to duplicated cases (see 047).
 // Some bit operators:
 // checking if k-th number is used: if(state & (1 << k))
-// set the tag for the k-th number: state != (1 << k)
+// set the tag for the k-th number: state |= (1 << k)
 // unset the tag for the k-th number: state &= ~(1 << k)
 
 class Solution {
