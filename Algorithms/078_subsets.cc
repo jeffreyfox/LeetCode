@@ -68,7 +68,7 @@ public:
     }
 };
 
-// Solution 3. Incremental approach.
+// Solution 3. Using cascading.
 class Solution {
 public:
     vector<vector<int>> subsets(vector<int>& nums) {
