@@ -34,44 +34,53 @@ Use a matrix for string to prestore the solutions, when found solution, update s
 class Solution {
 public:
     vector<vector<string>> solveNQueens(int n) {
-        vector<vector<string> > result;
-        if(n == 0) return result;
-        vector<int> pos(n, -1); //position of queen in row[i], can be between 0 and n-1
-        vector<string> solstr(n, string(n, '.'));
-        solveNQueensHelper(0, pos, solstr, result);
+        vector<vector<string>> result;
+        // keeps track of the position of queens on each row
+        vector<int> queens(n, -1);
+        search(n, 0, queens, result);
         return result;
     }
-    //checking row i
-    void solveNQueensHelper(int i, vector<int>& pos, vector<string>& solstr, vector<vector<string> >& result) {
-        int n = pos.size();
-        if(i == n) {
-            //construct solution
-            for(size_t i = 0; i < pos.size(); ++i) {
-                solstr[i][pos[i]] = 'Q';
-            }
-            result.push_back(solstr);
-            //reset solstr
-            for(size_t i = 0; i < pos.size(); ++i) {
-                solstr[i][pos[i]] = '.';
-            }
-            return;
-        }
-        //try position j on row i (no queens will be on the same row)
-        for(int j = 0; j < n; ++j) {
-           if(canPlace(i, j, pos)) {
-              pos[i] = j;
-              solveNQueensHelper(i+1, pos, solstr, result);
-           }
-        }
-        pos[i] = -1; //reset value
-    }
-    //can place, check if Queen at [i][j] conflicts with queens in previous rows
-    bool canPlace(int i, int j, vector<int>& pos) {
-        for(int row = 0; row < i; ++row) {
-            int col = pos[row];
-            if(col == j || fabs(j - col) == i - row) return false;   //same col or diagonal
+
+    // Can we place a new queen at [row, col] position?
+    bool canPlace(const vector<int> &queens, int row, int col) {
+        // Check previous rows
+        for (int i = 0; i < row; ++i) {
+            int j = queens[i];
+            // same column
+            if (j == col) return false;
+            // diagonal
+            if (j - col == i - row) return false;
+            // anti-diagonal
+            if (j - col == row - i) return false;            
         }
         return true;
+    }
+    // Generates the solution string from the queen positions
+    vector<string> GenerateSolution(const vector<int> &queens) {
+        int n = queens.size();
+        vector<string> result;
+        result.reserve(n);        
+        for (int i = 0; i < n; ++i) {
+            string s(n, '.');
+            s[queens[i]] = 'Q';
+            result.push_back(s);
+        }
+        return result;
+    }
+    // place queens from row i
+    void search(int n, int i, vector<int>& queens, vector<vector<string>>& result) {
+        if (i == n) {
+            result.push_back(GenerateSolution(queens));
+            return;
+        }
+        // try all positions on row i
+        for (int j = 0; j < n; ++j) {
+            if (canPlace(queens, i, j)) {
+                queens[i] = j;
+                search(n, i+1, queens, result); 
+                // No need to set queens[i] back to -1 because in canPlace we only check rows before |row|.
+            }
+        }
     }
 };
 
