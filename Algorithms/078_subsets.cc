@@ -68,19 +68,18 @@ public:
     }
 };
 
-// Solution 3. Dynamic programming. For each number, add to previous solution.
+// Solution 3. Incremental approach.
 class Solution {
 public:
     vector<vector<int>> subsets(vector<int>& nums) {
-        vector<vector<int> > result;
-        sort(nums.begin(), nums.end());
-        result.push_back(vector<int>()); //empty set
-        for(int i = 0; i < nums.size(); ++i) {
-            //add nums[i] to all previous solutions
+        vector<vector<int>> result;
+        result.push_back({});
+        // incrementally add an element in nums to the existing sets
+        for (const int i : nums) {
             int size = result.size();
-            for(int j = 0; j < size; ++j) {
+            for (int j = 0; j < size; ++j) {
                 result.push_back(result[j]);
-                result.back().push_back(nums[i]);
+                result.back().push_back(i);
             }
         }
         return result;
