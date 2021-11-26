@@ -7,30 +7,30 @@ For example, given n = 3, a solution set is:
 */
 
 // Recursive solution. backtracking, DFS
-// pre-allocate string, pass reference and string index to avoid string copying. Keep track of number of open and close brackets left.
-
 class Solution {
 public:
     vector<string> generateParenthesis(int n) {
         vector<string> result;
-        if(n < 1) return result;
-        string str(2*n, '0');
-        dfs(n, n, 0, str, result);
+        string tmp;
+        search(n, n, tmp, result);   
         return result;
     }
-    void dfs(int nl, int nr, int i, string& str, vector<string>& result) {
-        if(i == str.size()) {
-            result.push_back(str);
+    // choose the next chars from num_left '(' and num_right ')'
+    void search(int num_left, int num_right, string &tmp, vector<string> &result) {
+        if (num_left == 0 && num_right == 0) {
+            result.push_back(tmp);
             return;
         }
-        if(nl > 0) {
-            str[i] = '(';
-            dfs(nl-1, nr, i+1, str, result);
+        tmp.push_back(' ');
+        if (num_left > 0) {
+            tmp.back() = '(';  // put '('
+            search(num_left - 1, num_right, tmp, result);
         }
-        if(nr > 0 && nl < nr) {
-            str[i] = ')';
-            dfs(nl, nr-1, i+1, str, result);
+        if (num_right > 0 && num_left < num_right) {
+            tmp.back() = ')';  // put ')'
+            search(num_left, num_right - 1, tmp, result);
         }
+        tmp.pop_back();
     }
 };
 
