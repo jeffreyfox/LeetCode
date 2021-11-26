@@ -6,6 +6,37 @@ For example,
 [1,2,3], [1,3,2], [2,1,3], [2,3,1], [3,1,2], and [3,2,1]. 
 */
 
+// 2021.
+// Solution using backtracking. Use a vector to track if each element has been used or not. An improved approach is to use bits to store used information.
+class Solution {
+public:
+    vector<vector<int>> permute(vector<int>& nums) {
+        if (nums.empty()) return {};
+        vector<int> tmp;
+        vector<vector<int>> result;
+        vector<bool> used(nums.size(), false);
+        search(nums, nums.size(), used, tmp, result);
+        return result;
+    }
+    // picking k numbers from unused numbers in |nums|.
+    void search(const vector<int> &nums, int k, vector<bool> &used, vector<int> &tmp, vector<vector<int>> &result) {
+        if (k == 0) {
+            result.push_back(tmp);
+            return;
+        }
+        tmp.push_back(0);
+        for (int j = 0; j < nums.size(); ++j) {
+            if (used[j]) continue;
+            // pick j
+            tmp.back() = nums[j];
+            used[j] = true;
+            search(nums, k-1, used, tmp, result);
+            used[j] = false;
+        }
+        tmp.pop_back();
+    }
+};
+
 // Solution 1. Use next permutation algorithm to print permutations in lexigraphical order (see 031)
 // use a tag to indicate the status of permutation. If reaching the last permutation (descending order), return false. 
 // Also works for cases when duplicated entries exist
