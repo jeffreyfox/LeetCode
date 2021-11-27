@@ -40,7 +40,47 @@ newInterval.length == 2
 0 <= start <= end <= 105
  */
 
-/// scan intervals from left to right:
+/// Solution 1.
+// First adds intervals with starting times <= that of the new interval to the result.
+// Then append the new interval to end of the result vector. the new interval can only overlap with at most one interval in the vector (the last one). Merge if there is overlap.
+// Then append the remaining intervals to the end of the result vector.
+// Write a function append to avoid code duplication.
+bool isOverlap(const vector<int> &a, const vector<int>& b) {
+    return a[1] >= b[0] && b[1] >= a[0];
+}
+
+vector<int> merge(const vector<int> &a, const vector<int>& b) {
+    return {min(a[0], b[0]), max(a[1], b[1])};
+}
+
+class Solution {
+public:
+    vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval) {
+        vector<vector<int>> result;
+        auto iter = intervals.begin();
+        for (; iter != intervals.end(); ++iter) {
+            if ((*iter)[0] <= newInterval[0]) result.push_back(*iter);
+            else break;
+        }
+        // Insert interval to end
+        append(result, newInterval);
+        // insert remaining
+        for (; iter != intervals.end(); ++iter) {
+            append(result, *iter);
+        }
+        return result;
+    }
+    // Appends the new interval to the end of the intervals. |intervals| have a starting time <= that of the new interval.
+    void append(vector<vector<int>>& intervals, vector<int>& newInterval) {
+        if (!intervals.empty() && isOverlap(intervals.back(), newInterval)) {
+            intervals.back() = merge(intervals.back(), newInterval);                
+        } else {
+            intervals.push_back(newInterval);
+        }
+    }
+};
+
+/// Solution 2. scan intervals from left to right:
 // 1. if current interval overlaps with newInterval, then merge the two and update newInterval
 // 2. if not overlap, then push-back the one with smaller start time to final array, and make the other one as newInterval.
 // Use a flag "new_inserted" to check if newInterval already inserted. If yes, then no need to perform interval comparison in later step (just copy and paste)
