@@ -6,6 +6,43 @@ For example,
 [1,1,2], [1,2,1], and [2,1,1]. 
 */
 
+// 2021.11
+// Recursive solution using a map from number to count.
+class Solution {
+public:
+    vector<vector<int>> permuteUnique(vector<int>& nums) {    
+        if (nums.empty()) return {};
+        vector<int> tmp;
+        vector<vector<int>> result;
+        
+        map<int, int> counts;
+        for (const int num : nums) {
+            counts[num] ++;
+        }
+        
+        search(nums.size(), counts, tmp, result);
+        return result;
+    }
+    // picking k numbers from counts 
+    void search(int k, map<int, int> &counts, vector<int> &tmp, vector<vector<int>> &result) {
+        if (k == 0) {
+            result.push_back(tmp);
+            return;
+        }
+        tmp.push_back(0);
+        for (auto &[num, count] : counts) {
+            if (count == 0) continue;
+            // pick num
+            tmp.back() = num;
+            count--;
+            search(k-1, counts, tmp, result);
+            count++;
+        }
+        tmp.pop_back();
+    }
+};
+
+// 2015.
 // Solution 1. Use next permutation algorithm to print permutations in lexigraphical order (see 031)
 // Copied from 046_permutation.cc
 
