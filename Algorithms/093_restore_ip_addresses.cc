@@ -7,6 +7,61 @@ Given "25525511135",
 return ["255.255.11.135", "255.255.111.35"]. (Order does not matter) 
 */
 
+// 2021. Recursive solution with cleaner clode.
+class Solution {
+public:
+    vector<string> restoreIpAddresses(string s) {
+        if (s.empty()) return {};
+        vector<string> result;
+        vector<int> tmp; // indices of breaks
+        search(s, 0, tmp, result);
+        return result;
+    }
+    string GenerateString(const string &s, const vector<int> &tmp) {
+        string res = s;
+        for (int k = 2; k >= 0; --k) {  // no need to add . for tmp[3]
+            res.insert(tmp[k], ".");
+        }
+        return res;
+    }
+    // Start searching from s[i]
+    void search(const string &s, int i, vector<int> &tmp, vector<string> &result) {
+        if (i == s.size() && tmp.size() == 4) {
+            result.push_back(GenerateString(s, tmp));
+            return;
+        }
+        if (tmp.size() == 4 || i == s.size()) return;
+        
+        tmp.push_back(0);
+        for (int len = 1; len <= 3; ++len) {
+            if (i + len > s.size()) break;
+            const string t = s.substr(i, len);
+            if (isValid(t)) {
+                tmp.back() = i + len;
+                search(s, i + len, tmp, result);
+            }
+        }
+        tmp.pop_back();
+    }
+    
+    int toInt(const string s) {
+        int v = 0;
+        for (const auto c: s) {
+            v = 10*v + (c - '0');
+        }
+        return v;
+    }
+        
+    bool isValid(const string s) {
+        int v = toInt(s);
+        if (s.size() == 1) return v >= 0 && v <= 9;
+        if (s.size() == 2) return v >= 10 && v <= 99;
+        if (s.size() == 3) return v >= 100 && v <= 255;
+        return false;        
+    }
+};
+
+// 2015
 // Recursive solution #1.
 class Solution {
 public:
