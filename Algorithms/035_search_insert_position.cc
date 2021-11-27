@@ -29,3 +29,11 @@ public:
         return lo;
     }
 }; 
+
+// Solution using STL lower_bound function.
+class Solution {
+public:
+    int searchInsert(vector<int>& nums, int target) {
+        return lower_bound(nums.begin(), nums.end(), target) - nums.begin();
+    }
+};
