@@ -14,9 +14,11 @@ Binary search. The array can be broken into two parts,
 for example, [4 5 6 7 0 1 2], first part is 4-7, second part is 0-2. If array is unrotated, then only first part exists (corner case). 
 
 There are three anchor points, lo, hi, and mid. Compare nums[mid] with nums[hi].
-1. If nums[mid] < nums[hi], then we know for sure that minimum lies on or before mid, so hi = mid (we excluding nums[mid+1, hi]).
-2. If nums[mid] > nums[hi], then we know for sure that mid is in first part of array, and array is rotated. This means that minimum lies between mid and hi, so lo = mid+1. Since nums[mid] > nums[hi], nums[mid] cannot be the minimum, so we can exlude it. 
-3. If nums[mid] = nums[hi], we can't say where mid lies. It could be left or right. But we can safely exclude nums[hi], since it is a duplicated entry apart from nums[mid]. Thus we simply decrement hi. 
+1. If nums[mid] < nums[hi], then the minimum index must be <= mid, so set hi to mid (excluding nums[mid+1] and to the right)
+2. If nums[mid] > nums[hi], then mid must be in first part of the sorted array. This means that minimum index > mid, so set lo to mid+1.
+   Since nums[mid] > nums[hi], nums[mid] cannot be the minimum, so we can exlude it. 
+3. If nums[mid] = nums[hi], we can't say where mid is. It could be left or right. But we can safely exclude nums[hi], since it is a duplicated entry apart from nums[mid].
+   Thus we simply decrement hi. 
 */
 
 class Solution {
