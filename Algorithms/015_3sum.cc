@@ -15,38 +15,28 @@ Note:
 
 /// O(n2) solution
 /// Need to consider duplicated entries.
-/// Optimization: break if nums[i] > 0, and also num[n-1] < 0 (52ms => 48ms)
-
 class Solution {
 public:
     vector<vector<int>> threeSum(vector<int>& nums) {
-        vector<vector<int> > ret;
-        int n = nums.size();
-        if(n <= 2) return ret;
-        vector<int> tmp(3, -1);
+        if (nums.size() <= 2) return {};
+        vector<vector<int>> result;
         sort(nums.begin(), nums.end());
-        if(nums[n-1] < 0) return ret; //no need to continue if largest value is < 0
-        for(int i = 0; i < n-2; i++) {
-            if(nums[i] > 0) break; //no need to continue if found a positive number
-            if(i > 0 && nums[i] == nums[i-1]) continue; //avoid duplicates
-            if(nums[i] + nums[i+1] + nums[i+2] > 0) break;
-            if(nums[i] + nums[n-2] + nums[n-1] < 0) continue;
-            int target = -nums[i];
+        int n = nums.size();
+        for (int i = 0; i < n; ++i) {
+            if (i > 0 && nums[i] == nums[i-1]) continue;
+            // pick j and k from nums[i+1.. n-1]
             int j = i+1, k = n-1;
-            while(j < k) {
-               int sum = nums[j] + nums[k];
-               if(sum < target) j++;
-               else if(sum > target) k--;
-               else {
-                   tmp[0] = nums[i]; tmp[1] = nums[j]; tmp[2] = nums[k];
-                   ret.push_back(tmp);
-                   j++; k--;
-                   while(j < k && nums[j] == nums[j-1]) j++; //avoid duplicates
-                   while(j < k && nums[k] == nums[k+1]) k--; //avoid duplicates
-               }
+            while (j < k) {
+                int sum = nums[i] + nums[j] + nums[k];
+                if (sum == 0) result.push_back({nums[i], nums[j], nums[k]});
+                if (sum < 0) {
+                    do { j++; } while (j < n && nums[j] == nums[j-1]);
+                } else {
+                    do { k--; } while (k >= 0 && nums[k] == nums[k+1]);
+                }                    
             }
         }
-        return ret;
+        return result;
     }
 };
 
