@@ -1,40 +1,35 @@
 /*
-Given an array of integers, find two numbers such that they add up to a specific target number.
+Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.
 
-The function twoSum should return indices of the two numbers such that they add up to the target, where index1 must be less than index2. Please note that your returned answers (both index1 and index2) are not zero-based.
+You may assume that each input would have exactly one solution, and you may not use the same element twice.
 
-You may assume that each input would have exactly one solution.
+You can return the answer in any order.
 
-Input: numbers={2, 7, 11, 15}, target=9
-Output: index1=1, index2=2
+Example 1:
+
+Input: nums = [2,7,11,15], target = 9
+Output: [0,1]
+Output: Because nums[0] + nums[1] == 9, we return [0, 1].
+
+Example 2:
+
+Input: nums = [3,2,4], target = 6
+Output: [1,2]
+
+Example 3:
+
+Input: nums = [3,3], target = 6
+Output: [0,1]
+
+Constraints:
+
+    2 <= nums.length <= 104
+    -109 <= nums[i] <= 109
+    -109 <= target <= 109
+    Only one valid answer exists.
 */
 
-// This solution uses a map to store the positions of each number in array. Uses two passes, first pass builds the map, second pass do the two-sum check. For each number if the other number is in then found.
-// There is a simpler way to do this, see solution 2.
-
-class Solution {
-public:
-    vector<int> twoSum(vector<int> &numbers, int target) {
-        map<int, int> s; //occurrence index
-        vector<int> ret(2, 0);
-        int n = numbers.size();
-        if(n == 0) return ret;
-        //build hash table first
-        for(int k = 0; k < n; ++k)  s[numbers[k]] = k;
-        //another sweep
-        for(int k = 0; k < n; ++k) { 
-            //find residue in map
-            map<int, int>::iterator it = s.find(target-numbers[k]);
-            if(it != s.end() && it->second != k) { //found and not the same entry
-                ret[0] = k+1;  ret[1] = it->second+1;
-                break;
-            }
-        }
-        return ret;
-    }
-};
-
-// This solution uses a map to store the positions of each number in array. Only one pass is needed.
+// Solution 1. This solution uses a hashtable to store the positions of each number in array. Only one pass is needed.
 // For each number in the array, see if the residue (target - number) already exists in the map, if yes then found; if no, then add it to map
 // This also properly handles duplicates, because checking residue happens before insertion. 
 // Unordered map (hash table) is faster than map (which is balanced tree) in this case.
@@ -42,23 +37,21 @@ public:
 class Solution {
 public:
     vector<int> twoSum(vector<int>& nums, int target) {
-      unordered_map<int, int> table;
-      vector<int> ret(2, -1);
-      int n = nums.size();
-      for(int i = 0; i < nums.size(); i++) {
-        int res = target - nums[i];
-        if(table.count(res)) {
-           ret[0] = table[res]+1; ret[1] = i+1;
-           break;
-        } else {
-           table[nums[i]] = i;
+        std::map<int, int> dict;
+        for (int i = 0; i < nums.size(); ++i) {
+            int res = target - nums[i];
+            auto iter = dict.find(res);
+            if (iter != dict.end()) {
+                return {iter->second, i + 1};
+            } else {
+                dict[nums[i]] = i + 1;
+            }
         }
-      }
-      return ret;
+        return {-1, -1};
     }
 };
 
-// This version uses insertion sort t sort nums, together with its positions as satellite data. Use two pointers to find the 
+// Solution 2 uses insertion sort to sort nums, together with its positions as satellite data. Use two pointers to find the 
 // target items, and return their positions. (No hash table is involved)
 // Insertion sort: O(n2), search for target: O(n).
 class Solution {
@@ -92,59 +85,5 @@ public:
             else r--;
         }
         return ret;
-    }
-};
-
-// 2021.11.01
-/*
-Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.
-
-You may assume that each input would have exactly one solution, and you may not use the same element twice.
-
-You can return the answer in any order.
-
- 
-
-Example 1:
-
-Input: nums = [2,7,11,15], target = 9
-Output: [0,1]
-Output: Because nums[0] + nums[1] == 9, we return [0, 1].
-
-Example 2:
-
-Input: nums = [3,2,4], target = 6
-Output: [1,2]
-
-Example 3:
-
-Input: nums = [3,3], target = 6
-Output: [0,1]
-
- 
-
-Constraints:
-
-    2 <= nums.length <= 104
-    -109 <= nums[i] <= 109
-    -109 <= target <= 109
-    Only one valid answer exists.
-*/
-
-// No need to check for duplicates because we search before insert.
-class Solution {
-public:
-    vector<int> twoSum(vector<int>& nums, int target) {
-        std::map<int, int> dict;
-        for (int i = 0; i < nums.size(); ++i) {
-            int res = target - nums[i];
-            auto iter = dict.find(res);
-            if (iter != dict.end()) {
-                return {iter->second, i + 1};
-            } else {
-                dict[nums[i]] = i + 1;
-            }
-        }
-        return {-1, -1};
     }
 };
