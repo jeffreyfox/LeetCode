@@ -10,6 +10,20 @@ More practice:
 If you have figured out the O(n) solution, try coding another solution using the divide and conquer approach, which is more subtle.
 */
 
+// An elegant simple O(n) solution with one pass. See https://www.youtube.com/watch?v=5WZl3MMT0Eg.
+class Solution {
+public:
+    int maxSubArray(vector<int>& nums) {
+        int max_sum = nums[0], sum = 0;
+        for (const int val : nums) {
+            if (sum < 0) sum = 0;
+            sum += val;
+            max_sum = max(max_sum, sum);
+        }
+        return max_sum;
+    }
+};
+
 // Solution 1. Divide and conquer.
 // Find max from left sub array, right sub array, and crossing arrays.
 class Solution {
