@@ -5,6 +5,30 @@ For example, given the array [2,3,-2,4],
 the contiguous subarray [2,3] has the largest product = 6. 
 */
 
+// An elegant simple O(n) solution with one pass. Track min and max product subarrays that end at each element v. Also need to handle corner case of 0.
+// See https://www.youtube.com/watch?v=lXVy6YWFcRM.
+class Solution {
+public:
+    int maxProduct(vector<int>& nums) {
+        int n = nums.size();
+        int max_product = 1, min_product = 1;
+        int result = nums[0];
+        for (int v : nums) {
+            if (v == 0) {
+                min_product = max_product = 1;
+                result = max(result, 0);
+            }
+            else {
+                int tmp = max_product;
+                max_product = max(max(tmp * v, min_product * v), v);
+                min_product = min(min(tmp * v, min_product * v), v);
+                result = max(result, max_product);
+            }
+        }
+        return result;
+    }
+};
+    
 // DP solution.
 // Keep track of maximum (in terms of absolute value) positive and negative values (initially set as 0)
 // Update the values based on the polarity of newly seen element. If max_pos_prod and max_neg_prod are 0, then they are considered uninitialized.
