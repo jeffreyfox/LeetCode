@@ -9,7 +9,7 @@ You may assume that there will be only one unique solution.
 /*
 DFS backtracking. Using a helper function canPlace.
 
-Have dfs return true or false so that once a solution is find, terminate search immediately.
+Have dfs return true or false so that once a solution is found and terminate search immediately.
 
 We use an iterative function to find the next unfilled position instead of recursively to reduce stack size.
 */
