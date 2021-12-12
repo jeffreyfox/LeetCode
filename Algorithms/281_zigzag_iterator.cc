@@ -26,6 +26,37 @@ It should return [1,4,8,2,5,9,3,6,7].
  * while (i.hasNext()) cout << i.next();
  */
 
+// 2021.12. Simple solution that only works for k=2 case.
+class ZigzagIterator {
+public:
+    ZigzagIterator(vector<int>& v1, vector<int>& v2) : v1(v1), v2(v2) {
+        i = 0; j = 0; reverse = false;        
+    }
+
+    int next() {
+        if (i == v1.size()) return v2[j++];
+        if (j == v2.size()) return v1[i++];
+        if (reverse) {
+            reverse = !reverse;
+            return v2[j++];        
+        } else {
+            reverse = !reverse;
+            return v1[i++];
+        }
+    }
+
+    bool hasNext() {
+        if (i == v1.size()) return j < v2.size();
+        if (j == v2.size()) return i < v1.size();
+        if (reverse) return j < v2.size();
+        else return i < v1.size();
+    }
+private:
+    int i, j;
+    bool reverse;
+    vector<int> &v1, &v2;
+};
+
 // Solution 1. Maintain an array of pointers, which always points to the the next valid value. After obtaining the next value, move pointer to next valid value.
 
 class ZigzagIterator {
