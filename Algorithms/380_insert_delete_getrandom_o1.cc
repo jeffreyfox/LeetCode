@@ -37,6 +37,8 @@ Constraints:
     There will be at least one element in the data structure when getRandom is called.
 */
 
+// Use an array to store the values. When inserting, insert to end of array. When deleting, swap the element with the last element of the array and remove the latter.
+// When getting random, generates a random number from 0 to n-1 as the index of the array.
 class RandomizedSet {
 public:
     RandomizedSet() {
