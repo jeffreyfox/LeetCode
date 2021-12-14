@@ -27,36 +27,34 @@ Note: Do not use the eval built-in library function.
 class Solution {
 public:
     int calculate(string s) {
-        int res = 0;
-        int num = 0;
-        char op = '+';
-        int sign = 1;
-        for (int i = 0; i < s.size(); ++i) {
-            char c = s[i];
-            if (isDigit(c)) {
-                int val = c - '0';
-                int j = i+1;
-                while (j < s.size() && isDigit(s[j])) {
-                    val = val*10 + s[j] - '0';
-                    j++;
-                }
-                if (op == '*') num = num * val;
-                else if (op == '/') num = num / val;
-                else num = val;
-                i = j-1;
-            } else if (c == '+' || c == '-') {
-                res += num*sign;
-                sign = (c == '+') ? 1 : -1;
+        int sign = 1, sum = 0, num = 0;
+        char op = ' ';
+        for (int i = 0; i < s.size(); i++) {
+            if (s[i] == '+' || s[i] == '-') {
+                sum = sum + sign * num;
                 num = 0;
-                op = c;
-            } else if (c == '*' || c == '/') {
-                op = c;
-            } 
+                sign = (s[i] == '+') ? 1 : -1;
+                op = ' ';
+            } else if (s[i] == '*' || s[i] == '/') {
+                op = s[i];
+            } else if (isNumeric(s[i])) {
+                int new_num = 0;
+                while (i < s.size() && isNumeric(s[i])) {
+                    new_num = 10*new_num + (s[i] - '0');
+                    i++;
+                }
+                i--;
+                if (op == '*') num = num * new_num;
+                else if (op == '/') num = num / new_num;
+                else num = new_num;
+            }           
         }
-
-        return res + num*sign;
+        sum = sum + sign * num;
+        return sum;
     }
-
-    bool isDigit(char c) { return c >= '0' && c <= '9'; }
+    
+    bool isNumeric(char c) {
+        return c >= '0' && c <= '9';
+    }
 };
 
