@@ -29,17 +29,16 @@ public:
     int calculate(string s) {
         stack<int> st;
         int sign = 1, sum = 0;
-        for (int i = 0; i < s.size(); i++) {
-            if (s[i] == ' ') continue;
-            if (s[i] == '+') sign = 1;
-            else if (s[i] == '-') sign = -1;
-            else if (s[i] >= '0' && s[i] <= '9') {
+        for (int i = 0; i < s.size(); i++) {            
+            if (s[i] == '+' || s[i] == '-') {
+                sign = (s[i] == '+') ? 1 : -1;
+            } else if (isNumeric(s[i])) {
                 int num = 0;
-                while (i < s.size() && s[i] >= '0' && s[i] <= '9') {
+                while (i < s.size() && isNumeric(s[i])) {
                     num = 10*num + (s[i] - '0');
                     i++;
                 }
-                sum += sign * num;
+                sum = sum + sign * num;
                 i--;
             } else if (s[i] == '(') {
                 st.push(sum);
@@ -51,6 +50,10 @@ public:
             }            
         }
         return sum;
+    }
+    
+    bool isNumeric(char c) {
+        return c >= '0' && c <= '9';
     }
 };
 
