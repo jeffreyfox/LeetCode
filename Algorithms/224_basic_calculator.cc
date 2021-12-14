@@ -54,6 +54,43 @@ public:
     }
 };
 
+// Solution 2 with delayed computation. Only sum when we see a '+' or '-'. Need to update sum one more time in the end. This can be extended to LC 227 to support * and /.
+class Solution {
+public:
+    int calculate(string s) {
+        stack<int> st;
+        int sign = 1, sum = 0, num = 0;
+        for (int i = 0; i < s.size(); i++) {
+            if (s[i] == '+' || s[i] == '-') {
+                sum = sum + sign * num;
+                num = 0;
+                sign = (s[i] == '+') ? 1 : -1;
+            } else if (isNumeric(s[i])) {
+                num = 0;
+                while (i < s.size() && isNumeric(s[i])) {
+                    num = 10*num + (s[i] - '0');
+                    i++;
+                }
+                i--;
+            } else if (s[i] == '(') {
+                st.push(sum);
+                st.push(sign);
+                sum = 0; sign = 1; num = 0;
+            } else if (s[i] == ')') {
+                num = sum + sign * num;
+                sign = st.top(); st.pop();
+                sum = st.top();  st.pop();                
+            }            
+        }
+        sum = sum + sign * num;
+        return sum;
+    }
+    
+    bool isNumeric(char c) {
+        return c >= '0' && c <= '9';
+    }
+};
+
 // 2015.
 // Solution 1. Basic calculator, with "+-" and parentheses, no "*/"
 // Two stacks, one for number and one for operators (can use one, where operator can be stored by an integer sign)
