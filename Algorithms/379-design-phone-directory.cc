@@ -35,6 +35,7 @@ Constraints:
 At most 2 * 104 calls will be made to get, check, and release.
 */
 
+// Doubly linked list with a hash map.
 class PhoneDirectory {
 public:
     struct ListNode {
