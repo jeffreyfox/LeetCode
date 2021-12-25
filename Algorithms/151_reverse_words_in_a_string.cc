@@ -19,7 +19,38 @@ Clarification:
     Reduce them to a single space in the reversed string.
 */
 
-// Solution 1: kinda in-place. Procedure:
+// 2021. Solution using an auxiliary string vector. scan from left to right.
+class Solution {
+public:
+    string reverseWords(string s) {
+        if (s == "") return "";
+        vector<string> strs;
+        int n = s.size(), i = 0, j = 0;
+        while (i < n && j < n) {
+            // i points to the beginning of a word
+            while (i < n && s[i] == ' ') i++;
+            if (i == n) break;
+            
+            // j points to the next empty space
+            j = i;
+            while (j < n && s[j] != ' ') j++;
+            const auto str = s.substr(i, j-i);
+            strs.push_back(str);
+            i = j;
+        }
+        if (strs.empty()) return "";
+        string result;
+        for (auto iter = strs.rbegin(); iter != strs.rend(); ++iter) {
+            result.append(*iter);
+            result.append(" ");
+        }
+        result.pop_back();  // remove trailing space
+        return result;
+    }
+};
+
+// 2015.
+// Solution kinda in-place. Procedure:
 // 1. remove extra spaces and store the shorted string to s[0, end)
 // 2. reverse substring s[0, end)
 // 3. reverse individual string in s[0, end)
@@ -66,34 +97,6 @@ public:
             s[lo] = s[hi];
             s[hi] = c;
             lo++; hi--;
-        }
-    }
-};
-
-// Solution 2: Use an auxiliary string vector
-// Caveat: size_t i = str.size()-1 is wrong! because it will fail when str is empty(), use int i instead.
-
-class Solution {
-public:
-    void reverseWords(string &s) {
-        vector<string> strs;
-        split(s, strs);
-        s.clear();
-        for (int i = strs.size()-1; i >= 0; i--) {
-            s += strs[i];
-            if(i > 0) s += " ";
-        }
-    }
-    void split(string& s, vector<string>& strs) {
-        s += " ";
-        string word;
-        for(size_t i = 0; i < s.size(); ++i) {
-            char c = s[i];
-            if(c != ' ') word += c;
-            else if(word != "") {
-                strs.push_back(word);
-                word = "";
-            }
         }
     }
 };
