@@ -14,40 +14,42 @@ Corner Cases:
     In this case, you should ignore redundant slashes and return "/home/foo".
 */
 
-// use a double-ended queue, break the string into tokens, 
+// use a stack (implememted by a vector), break the string into tokens, 
 // when see a '.', do nothing
-// when see a "..", pop back element from queue (if not empty)
-// when see a normal word, push to back of queue
-// Then process queue and construct return string
-// if queue is empty, then return "/".
+// when see a "..", pop element from top of stack (if not empty)
+// when see a normal word, push to stack
+// Then process stack and construct return string
+// if the stack is empty, then return "/".
 
 class Solution {
 public:
     string simplifyPath(string path) {
-        string result;
-        if(path == "") return result;
-        int n = path.size();
-        deque<string> s;
-        int i = 0;
-        while(i < n) {
-            if(path[i] == '/') { i++; continue; }
-            //find string
-            int j = i+1;
-            while(j < n && path[j] != '/') j++;
-            //[i, j) is the string
-            string tmp = path.substr(i, j-i);
-            if(tmp == "..") {
-                if(!s.empty()) s.pop_back();
-            } else if(tmp == ".") ;
-            else s.push_back(tmp);
-            i = j+1;
+        std::vector<string> st;
+        int n = path.size(), i = 0, j = 0;
+        while (i < n && j < n) {
+            // i points to the next non '/.
+            while (i < n && path[i] == '/') i++;
+            if (i == n) break;
+            
+            // j points to the next '/.
+            j = i;
+            while (j < n && path[j] != '/') j++;
+            const string s = path.substr(i, j-i);
+            if (s == "..") {
+                if (!st.empty()) st.pop_back();
+            } else if (s != ".") {
+                st.push_back(s);
+            }
+            i = j;
         }
-        if(s.empty()) return "/";
-        while(!s.empty()) {
-            result += "/" + s.front();
-            s.pop_front();
+        
+        if (st.empty()) return "/";
+        
+        string result = "";
+        for (auto s : st) {
+            result.append("/");
+            result.append(s);
         }
         return result;
     }
 };
-
