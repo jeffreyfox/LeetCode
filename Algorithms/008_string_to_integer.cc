@@ -20,43 +20,47 @@ If no valid conversion could be performed, a zero value is returned. If the corr
 
 class Solution {
 public:
-    enum CharType {SPACE, SIGN, DIGIT, OTHER};
-    //states: 
-    // 0: only space read
-    // 1: sign read
-    // 2: digit read
-    // -1: error
-    int myAtoi(string str) {
-        vector<vector<int> > dfa(3, vector<int>(4, -1));
-        dfa[0][SPACE] = 0;
-        dfa[0][SIGN] = 1;
-        dfa[0][DIGIT] = 2;
-        dfa[1][DIGIT] = 2;
-        dfa[2][DIGIT] = 2;
-        int sgn = 1;
-        int ret = 0; 
-        int state = 0;
-        for(size_t i = 0; i < str.size(); ++i) {
-            char c = str[i];
-            int type = getType(c);
-            state = dfa[state][type];
-            if(state == 1) sgn = (c == '-' ? -1 : 1);
-            else if(state == 2) {
-               int num = c - '0';
-               if((INT_MAX - num) / 10 < ret) return (sgn == 1) ? INT_MAX : INT_MIN;
-               ret = ret*10 + num;
-            } else if(state == -1) {
-               return sgn*ret; //return current calcualted value
+    enum CharType {SPACE=0, SIGN, DIGIT, OTHER};
+    enum StateType {
+        ST_START=0,
+        ST_SIGN,
+        ST_DIGIT
+    };
+   
+    int myAtoi(string s) {
+        Init();
+        int state = ST_START;
+        int sign = 1, num = 0;
+        for (auto c : s) {
+            state = dfa[state][getCharType(c)];
+            if (state == -1) return sign * num;
+            else if (c == '+') sign = 1;
+            else if (c == '-') sign = -1;
+            else if (c >= '0' && c <= '9') {
+                int d = c - '0';
+                if ((INT_MAX - d) / 10 < num) return (sign == 1) ? INT_MAX : INT_MIN; 
+                num = 10*num + (c - '0');
             }
         }
-        return sgn*ret;
+        return sign * num;
     }
-    CharType getType(char c) {
-        if(c >= '0' && c <= '9') return DIGIT;
-        else if(c == '+' || c == '-') return SIGN;
-        else if(c == ' ') return SPACE;
-        else return OTHER;
+    
+    CharType getCharType(char c) {
+        if (c == '+' || c == '-') return SIGN;
+        if (c >= '0' && c <= '9') return DIGIT;
+        if (c == ' ') return SPACE;
+        return OTHER;
     }
+    void Init() {
+        dfa.resize(ST_DIGIT+1, vector<int>(OTHER+1, -1));
+        dfa[ST_START][SPACE] = ST_START;
+        dfa[ST_START][SIGN] = ST_SIGN;
+        dfa[ST_START][DIGIT] = ST_DIGIT;
+        dfa[ST_SIGN][DIGIT] = ST_DIGIT;
+        dfa[ST_DIGIT][DIGIT] = ST_DIGIT;
+    }
+private:
+    vector<vector<int>> dfa;
 };
 
 /// Solution without using dfa. First ignore all trailing spaces, then read possible signs, then read digits until a non-digit character appears or reaching the end. Be aware of overflow!
