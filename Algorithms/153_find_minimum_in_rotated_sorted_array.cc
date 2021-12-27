@@ -8,6 +8,25 @@ Find the minimum element.
 You may assume no duplicate exists in the array.
 */
 
+// 2021. Use nums[0] as pivot. Keep track of minimum seen so far.
+class Solution {
+public:
+    int findMin(vector<int>& nums) {
+        int lo = 0, hi = nums.size()-1;
+        int result = nums[0];
+        while (lo <= hi) {
+            int mid = (lo + hi) / 2;
+            result = min(nums[mid], result);
+            if (nums[mid] >= nums[0]) { // left side of array
+                lo = mid+1;
+            } else {  // right side of array
+                hi = mid-1;
+            }
+        }
+        return result;
+    }
+};
+
 /*
 General solution that also works for duplicated cases.
 Binary search. The array can be broken into two parts, 
