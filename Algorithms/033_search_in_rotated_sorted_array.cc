@@ -29,6 +29,31 @@ Difference between finding target and finding minimum:
   so it is safer to compare with nums[hi].
 */
 
+// 2021. A longer but easier to understand version:
+class Solution {
+public:
+    int search(vector<int>& nums, int target) {
+        int lo = 0, hi = nums.size()-1;
+        // [lo, hi] TBD
+        while (lo <= hi) {
+            int mid = (lo + hi) / 2;
+            if (nums[mid] == target) return mid;
+            
+            if (nums[mid] >= nums[0]) { // left side of array
+                if (nums[mid] < target) lo = mid+1;
+                else if (target >= nums[0]) hi = mid-1;
+                else lo = mid+1;
+            } else {  // right side of array
+                if (nums[mid] > target) hi = mid-1;
+                else if (target < nums[0]) lo = mid+1;
+                else hi = mid-1;
+            }
+        }
+        return -1;
+    }
+};
+
+// 2015.
 class Solution {
 public:
     int search(vector<int>& nums, int target) {
