@@ -10,6 +10,7 @@ Implement pow(x, n)
 // 2. To avoid overflow, use long instead of int
 // 3. shift n towards right one by one.
 
+// Use long to avoid integer overflow when n = INIT_MIN, -n = INT_MAX+1 > INT_MAX.
 class Solution {
 public:
     double myPow(double x, int n) {
