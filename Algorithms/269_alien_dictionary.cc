@@ -21,73 +21,105 @@ Note:
     There may be multiple valid order of letters, return any one of them is fine.
 */
 
-// Build a graph containing vertices corresponding letters 'a' to 'z'. Scan the dictionary twice. First time add vertices for seen characters. Second time compare two adjacent strings and add an edge for the pair of characters. 
-// Then do a topological sort, and return the result as string. During the topo-sort, also detect whether there is a cycle. If detected, immediately return to calling function which in turn returns "" to main function.
-// Use the 3-color scheme in CLRS (white, grey, black) to do topo-sort and cycle detection in one pass.
+// Build a graph containing vertices corresponding letters 'a' to 'z'.
+// Scan the dictionary twice. First time add vertices for seen characters. Second time compare two adjacent strings and add an edge for the pair of characters. 
+// Then do a topological sort, and return the result as string. During the topo-sort, also detect whether there is a cycle.
+// If detected, immediately return to calling function which in turn returns "" to main function.
+// Use two vectors to track visited and on-stack states. Alternatively, we can use the 3-color scheme in CLRS (white, grey, black).
+// Needs to handle the corner case where input can't be lexi sorted, e.g. ["abc", "ab"].
 
 class Graph {
 public:
-    Graph()  {
-        vertices.resize(26, false);
+    Graph() : has_cycle(false) {
         adj.resize(26);
-        color.resize(26, 0); //0: unvisited, 1: on stack, 2: finished
-	hasCycle = false;
+        in_dict.resize(26, false);
+        visited.resize(26, false);
+        on_stack.resize(26, false);
     }
+
     void addVertex(char c) {
-        vertices[c-'a'] = true; 
+        in_dict[c - 'a'] = true;
     }
+
     void addEdge(char c1, char c2) {
-        adj[c1-'a'].push_back(c2-'a');
+        int idx1 = c1 - 'a';
+        int idx2 = c2 - 'a';
+        adj[idx1].push_back(idx2);
+        in_dict[idx1] = true;
+        in_dict[idx2] = true;
     }
-
+    
     string topoSort() {
-        string s;
-        for(int v = 0; v < 26; ++v) {
-            if(vertices[v] && color[v] == 0) {
-                dfs(v, s);
-                if(hasCycle) return "";
-            }
+        for (int i = 0; i < 26; ++i) {
+            dfs(i);
+            if (has_cycle) return "";
         }
-        reverse(s.begin(), s.end());
-        return s;
+        string result;
+        while (!postorder.empty()) {
+            result.append(1, postorder.top() + 'a');
+            postorder.pop();
+        }
+        return result;
     }
 
-    void dfs(int v, string& s) {
-        if(hasCycle) return;
-        color[v] = 1;
-        for(auto w : adj[v]) {
-            if(color[w] == 0) dfs(w, s);
-            else if(color[w] == 1) { hasCycle = true; return; }
+private:    
+    void dfs(int i) {
+        if (has_cycle) return;
+        if (!in_dict[i] || visited[i]) return;
+        if (on_stack[i]) {
+            has_cycle = true;
+            return;
         }
-        color[v] = 2;
-        //after we are done with v, push back to s.
-        s.push_back(v+'a');
+        
+        on_stack[i] = true;
+        for (auto j : adj[i]) {
+            dfs(j);
+            if (has_cycle) return;
+        }
+       
+        visited[i] = true;
+        on_stack[i] = false;
+        postorder.push(i);
     }
 
-private:
-    vector<bool> vertices; //vertices (26)
-    vector<vector<int> > adj; //adjacency lists 
-    vector<int> color; // whether vertices are on stack
-    bool hasCycle;
+    bool has_cycle;
+    vector<vector<int>> adj;
+    vector<bool> in_dict;
+    vector<bool> visited;
+    vector<bool> on_stack;
+    stack<int> postorder;
 };
+
 
 class Solution {
 public:
     string alienOrder(vector<string>& words) {
-        if(words.empty()) return "";
+        Graph graph;
         int n = words.size();
-        Graph g;
-        for(int i = 0; i < n; ++i)
-            for(char c : words[i])
-                 g.addVertex(c);
-
-        for(int i = 1; i < n; ++i) {
-           int jmax = min(words[i].size(), words[i-1].size());
-           for(int j = 0; j < jmax; ++j) {
-               if(words[i-1][j] != words[i][j]) { g.addEdge(words[i-1][j], words[i][j]); break;}
-           }
+        for (const auto &w : words) {
+            for (const char c : w) {
+                graph.addVertex(c);
+            }
         }
-        return g.topoSort();
+
+        for (int i = 0; i < n-1; ++i) {            
+            const string &word1 = words[i];
+            const string &word2 = words[i+1];
+            
+            // Find order from the two words
+            int min_len = min(word1.size(), word2.size());
+            int j = 0;
+            while (j < min_len) {
+                if (word1[j] != word2[j]) {
+                    graph.addEdge(word1[j], word2[j]);
+                    break;
+                }
+                j++;
+            }
+            // corner case: ["abc", "ab"] => ""
+            if (j == min_len && word1.size() > word2.size()) return "";
+        }
+            
+        return graph.topoSort();
     }
 };
-
