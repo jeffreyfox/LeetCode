@@ -33,30 +33,14 @@ For example, the lowest common ancestor (LCA) of nodes 2 and 8 is 6. Another exa
 class Solution {
 public:
     TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
-        if(!root || !p || !q) return NULL;
-        return LCA(root, p, q);
-    }
-    TreeNode* LCA(TreeNode* root, TreeNode* p, TreeNode* q) {
-        if(!root) return NULL;
-        if(p == root || q == root) return root; //one is equal to root
-        if((p->val < root->val) ^ (q->val < root->val)) return root; //lying on two sides of root
-        if(p->val < root->val) return LCA(root->left, p, q);
-        else return LCA(root->right, p, q);
+        if (p == root || q == root) return root;
+        if ((p->val < root->val) ^ (q->val < root->val)) return root;
+        if (p->val < root->val) return lowestCommonAncestor(root->left, p, q);
+        else return lowestCommonAncestor(root->right, p, q);
     }
 };
 
-// 2021.
 // Similar idea with iteration.
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
- * };
- */
-
 class Solution {
 public:
     TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
@@ -65,8 +49,7 @@ public:
         int lo = min(p->val, q->val);
         int hi = max(p->val, q->val);
         while (curr) {
-            if (curr == p) return p;
-            if (curr == q) return q;
+            if (curr == p || curr == q) return curr;
             if (curr->val < lo) curr = curr->right;
             else if (curr->val > hi) curr = curr->left;
             else return curr;
