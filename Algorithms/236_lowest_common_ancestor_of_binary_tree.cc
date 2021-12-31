@@ -24,16 +24,6 @@ For example, the lowest common ancestor (LCA) of nodes 5 and 1 is 3. Another exa
  * };
  */
 
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
- * };
- */
-
 // The tree is not BST, so we can't use value comparison. Instead, we need to examine both subtrees recursively O(n).
 
 // Solution 1. Use two auxiliary vectors storing the search paths from root to the node. 
@@ -68,20 +58,21 @@ public:
 };
 
 // Solution 2 without the auxiliary path vector.
-// Assumes p and q are not NULL.
-// Similar to Solution 1 in that when root is equal to either node, return the root.
-// Then call the function for left and right subtrees. If both returns a non NULL value, that means one node is in left sub-tree, and the other is in the right sub-tree. In this case root is the LCA, and we return root.
+// When root is equal to either node, return the root.
+// Then call the function recursively for left and right subtrees. If both returns a non NULL value, that means one node is in left sub-tree, and the other is in the right
+// sub-tree. In this case root is the LCA, and we return root.
 // In other cases, simply return the value returned by the recursive calls.
+// Reference: https://www.youtube.com/watch?v=13m9ZCB8gjw.
 
 class Solution {
 public:
     TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
-        if(!root) return NULL;
-        if(root == p || root == q) return root;
+        if (!root) return nullptr;
+        if (root == p || root == q) return root;
         TreeNode* lca_l = lowestCommonAncestor(root->left, p, q);
         TreeNode* lca_r = lowestCommonAncestor(root->right, p, q);
-        if(lca_l && lca_r) return root;
-        else return (lca_l ? lca_l : lca_r);
+        if (lca_l && lca_r) return root;
+        return (lca_l ? lca_l : lca_r);
     }
 };
 
