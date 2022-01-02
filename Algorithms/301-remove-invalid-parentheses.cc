@@ -45,26 +45,32 @@ public:
         return result;
     }
     
-    void backtrack(string s, int left, int right, char c_open, char c_close, vector<string>& result) {
+    void backtrack(string s, int i, int j, char c_open, char c_close, vector<string>& result) {
         int count = 0;
-        int n = s.size();
-        for (; right < n; ++right) {
-            if (s[right] == c_open) count++;
-            else if (s[right] == c_close) count--;
+        for (; i < s.size(); ++i) {
+            if (s[i] == c_open) count++;
+            else if (s[i] == c_close) count--;
             if (count < 0) break;
-        }
+        }        
         if (count < 0) {
-            for (; left <= right; ++left) {
-                if (s[left] != c_close) continue;
-                if (left > 1 && s[left] == s[left-1]) continue;
+            // s[i] is the first excess closing bracket.
+            // Consider removing closing brackets from s[j] to s[i].
+            for (; j <= i; ++j) {
+                if (s[j] != c_close) continue;
+                if (j > 1 && s[j] == s[j-1]) continue; // avoids duplicates
                 string t = s;
-                t.erase(left, 1);
-                backtrack(t, left, right, c_open, c_close, result);
+                t.erase(j, 1); // removes s[j]
+                // Can't use '(', and ')' explicitly here because the reversed case may also reach here
+                // through recursive calls.
+                backtrack(t, i, j, c_open, c_close, result);
             }
         } else if (count > 0) {
+            // have excess open brackets. Reverse the string and also swap the role of open/close brackets
+            // so ')(' is a matching pair.
             string t = s;
-            reverse(t.begin(), t.end());
-            backtrack(t, 0, 0, ')', '(', result);
+            reverse(t.begin(), t.end());            
+            // Can use ')', and '(' explicitly here because we won't reach here for the reversed case.
+            backtrack(t, 0, 0, c_close, c_open, result);
         } else {
             string t = s;
             if (c_open == ')') reverse(t.begin(), t.end());
