@@ -65,45 +65,30 @@ public:
 };
 
 /*
-A simplified version. For each subtree only calculate the maximum path originating from root, but keep a global maxSum variable that calculates the maximum path sum for each subtree. Update the maxSum for each subtree.
+A simplified version. For each subtree only calculate the maximum path originating from root, but keep a global maxSum variable that calculates the maximum path sum originating
+from root for each subtree. Update the maxSum for each subtree.
 */
 
 class Solution {
 public:
     int maxPathSum(TreeNode* root) {
-        if(!root) return 0;
-        int maxSum = INT_MIN;
-        maxFromRoot(root, maxSum);
-        return maxSum;
+        recurse(root);
+        return max_path_sum;
     }
-    int maxFromRoot(TreeNode* root, int& maxSum) {
-        if(!root) return INT_MIN;
-        int left = max(maxFromRoot(root->left, maxSum), 0);
-        int right = max(maxFromRoot(root->right, maxSum), 0);
-        maxSum = max(maxSum, root->val + left + right); //update maxSum
-        return root->val + max(left, right);
+    
+    // Returns the max path sum for a path that starts at root and ends at any node (could be leaf, non-leaf, or the root itself).
+    int recurse(TreeNode* root) {
+        if (!root) return 0;
+        int max_left = recurse(root->left);
+        int max_right = recurse(root->right);
+        max_left = max(0, max_left);
+        max_right = max(0, max_right);
+        // updates the global variable.
+        max_path_sum = max(max_path_sum, max_left + max_right + root->val);
+        return max(max_left, max_right) + root->val;
     }
+    
+private:
+    int max_path_sum = INT_MIN;
 };
-
-/*
-Can further simplify, and put maxSum as a class member.
-*/
-
-class Solution {
-public:
-    int maxPathSum(TreeNode* root) {
-        if(!root) return 0;
-        maxFromRoot(root);
-        return maxSum;
-    }
-    int maxFromRoot(TreeNode* root) {
-        if(!root) return INT_MIN;
-        int left = max(maxFromRoot(root->left), 0);
-        int right = max(maxFromRoot(root->right), 0);
-        maxSum = max(maxSum, root->val + left + right); //update maxSum
-        return root->val + max(left, right);
-    }
-    int maxSum = INT_MIN;
-};
-
 
