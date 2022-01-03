@@ -24,6 +24,45 @@ findMedian() -> 2
 // Solution: use two priority queues, one max-queue and the other min-queue. Store first half of data in max-queue and second half of data in min-queue.
 // Need to take care of corner cases (count == 0)
 
+// 2022. Slightly cleaner implementation.
+class MedianFinder {
+public:
+    MedianFinder() : n(0) {
+        
+    }
+    
+    void addNum(int num) {
+        n++;
+        // When n is even, make sure the numbers are evenly split
+        // when n is odd, max_queue has one more element.
+        // This means that when n is even, should add to min queue, when n is odd, should add to max queue.
+        // corner case, when queue is empty
+        if (max_queue.empty() || num <= max_queue.top()) {
+            max_queue.push(num);
+            if (n % 2 == 0) {                
+                min_queue.push(max_queue.top());
+                max_queue.pop();
+            }                
+        } else {
+            min_queue.push(num);
+            if (n % 2 == 1) {
+                max_queue.push(min_queue.top());
+                min_queue.pop();                
+            }
+        }
+    }
+    
+    double findMedian() {
+        if (n % 2 == 1) return max_queue.top();
+        return (max_queue.top() + min_queue.top()) / 2.0;
+    }
+private:
+    int n;
+    priority_queue<int> max_queue;
+    priority_queue<int, vector<int>, std::greater<int>> min_queue;
+};
+
+// 2015
 class MedianFinder {
 public:
     MedianFinder() : N(0) {}
