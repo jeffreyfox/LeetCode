@@ -11,25 +11,18 @@ class Solution {
 public:
     bool isValid(string s) {
         stack<char> st;
-        int n = s.size();
-        for (int i = 0; i < n; ++i) {
-            char c = s[i];
-            if(isLeft(c)) st.push(c);
-            else if (st.empty() || !match(st.top(), c)) return false; //is right, no match
-            else st.pop(); //match, pop out
+        for (auto c : s) {
+            if (c == '(' || c == '{' || c == '[') st.push(c);
+            else if (st.empty() || !isMatch(st.top(), c)) return false;
+            else st.pop();            
         }
         return st.empty();
     }
-    
-    bool isLeft(char c) {
-        return c == '(' || c == '[' || c == '{';
-    }
-    bool isRight(char c) {
-        return c == '(' || c == '[' || c == '{';
-    }
-    bool match(char c1, char c2) {
-        return (c1 == '(' && c2 == ')') ||
-                (c1 == '[' && c2 == ']') ||
-                (c1 == '{' && c2 == '}');
+
+    char isMatch(char c1, char c2) {
+        if (c1 == '{' && c2 == '}') return true;
+        if (c1 == '[' && c2 == ']') return true;
+        if (c1 == '(' && c2 == ')') return true;
+        return false;
     }
 };
