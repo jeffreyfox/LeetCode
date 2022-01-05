@@ -11,11 +11,7 @@ set(key, value) - Set or insert the value if the key is not already present. Whe
  When an element has been touched, move to end of list
  When inserting a new element, first check if reaching maximum capacity. If yes, first delete head element. Then append new element to tail.
  Also included proper delete functions when nodes are removed and in the destructor.
- Caveat:
-  1. When using dummy head and tail, should create a new node, not doing this in the constructor:
-   ListNode dum1(0), *head = &dum1
-  It will cause failure in the set routine when head is referenced. This is because dum1 is a local variable in constructor, and outside this function it will be out-of-scope and later referencing will give segmentation fault error. The correct way is to use new to allocate space on the heap: ListNode *head = new ListNode(-1, 0);
-  2. The ListNode should have two data entries, key and value. Value is obvious, key is also needed to find the entry in the map when the entry needs to be erased.
+ Uses a dummy head (dummy tail is not needed)
 */
 class LRUCache {
 public:
@@ -33,9 +29,8 @@ public:
         N = 0;
         maxN = capacity;
         head = new DLLNode();
-        tail = new DLLNode();
-        head->next = tail;
-        tail->prev = head;
+        head->next = head;
+        head->prev = head;
     }
     
     int get(int key) {
@@ -83,18 +78,18 @@ public:
     }
     // Add node to the tail of the list
     void push_back(DLLNode *node) {
-        DLLNode *prev = tail->prev;
-        prev->next = node;
-        tail->prev = node;
-        node->prev = prev;
-        node->next = tail;
+        auto *tail = head->prev;
+        tail->next = node;        
+        node->prev = tail;
+        node->next = head;
+        head->prev = node;
     }
 
 private:
     int maxN;  // capacity of the cache
     int N;  // number of keys in the cache
     unordered_map<int, DLLNode*> dict;
-    DLLNode *head, *tail;  // dummy head and tail
+    DLLNode *head;  // dummy head
 };
 
 /**
