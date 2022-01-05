@@ -26,6 +26,7 @@ num1 and num2 consist of only digits.
 num1 and num2 don't have any leading zeros except for the zero itself.
 */
 
+// Start from the right most digits and move leftwards.
 class Solution {
 public:
     string addStrings(string num1, string num2) {
@@ -33,14 +34,13 @@ public:
         int len = max(len1, len2);
         string result(len, ' ');
         int carry = 0;
-        for (int i = len1-1, j = len2-1, k = len-1; i >= 0 || j >= 0;) {
+        for (int i = len1-1, j = len2-1, k = len-1; i >= 0 || j >= 0; i--, j--, k--) {
             int v1 = (i >= 0) ? (num1[i] - '0') : 0;
             int v2 = (j >= 0) ? (num2[j] - '0') : 0;
             int sum = v1 + v2 + carry;
             carry = sum / 10;
             sum %= 10;
-            result[k--] = sum + '0';
-            i--; j--;
+            result[k] = sum + '0';
         }
         if (carry == 1) result.insert(0, "1");
         return result;
