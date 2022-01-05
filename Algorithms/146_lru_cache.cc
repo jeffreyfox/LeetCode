@@ -34,8 +34,8 @@ public:
     }
     
     int get(int key) {
-        auto iter = key_to_list.find(key);
-        if (iter == key_to_list.end()) {
+        auto iter = key_to_node.find(key);
+        if (iter == key_to_node.end()) {
             return -1;
         }
         DLLNode *node = iter->second;
@@ -45,8 +45,8 @@ public:
     }
     
     void put(int key, int value) {        
-        auto iter = key_to_list.find(key);
-        if (iter != key_to_list.end()) {
+        auto iter = key_to_node.find(key);
+        if (iter != key_to_node.end()) {
             // key already exists, updates value and move to the end of the list
             auto *node = iter->second;            
             node->value = value;            
@@ -57,12 +57,12 @@ public:
             // key does not exist, create a record in hashtable and add it to the end of the list
             DLLNode *new_node = new DLLNode(key, value);
             push_back(new_node);
-            key_to_list[key] = new_node;
+            key_to_node[key] = new_node;
             N++;
             // If reaching capacity, remove the LRU element from cache and list
             if (N > maxN) {
                 DLLNode *old_node = head->next;
-                key_to_list.erase(old_node->key);
+                key_to_node.erase(old_node->key);
                 remove(old_node);
                 delete old_node;
                 N--;
@@ -88,7 +88,7 @@ public:
 private:
     int maxN;  // capacity of the cache
     int N;  // number of keys in the cache
-    unordered_map<int, DLLNode*> key_to_list;
+    unordered_map<int, DLLNode*> key_to_node;
     DLLNode *head;  // dummy head
 };
 
