@@ -5,7 +5,18 @@ get(key) - Get the value (will always be positive) of the key if the key exists 
 set(key, value) - Set or insert the value if the key is not already present. When the cache reached its capacity, it should invalidate the least recently used item before inserting a new item. 
 */
 
-// 2021. Same idea as before, but with cleaner code.
+/*
+ Use a double-linked list, and use a dummy head and tail.
+ Maintain a count of elements and capiticy.
+ When an element has been touched, move to end of list
+ When inserting a new element, first check if reaching maximum capacity. If yes, first delete head element. Then append new element to tail.
+ Also included proper delete functions when nodes are removed and in the destructor.
+ Caveat:
+  1. When using dummy head and tail, should create a new node, not doing this in the constructor:
+   ListNode dum1(0), *head = &dum1
+  It will cause failure in the set routine when head is referenced. This is because dum1 is a local variable in constructor, and outside this function it will be out-of-scope and later referencing will give segmentation fault error. The correct way is to use new to allocate space on the heap: ListNode *head = new ListNode(-1, 0);
+  2. The ListNode should have two data entries, key and value. Value is obvious, key is also needed to find the entry in the map when the entry needs to be erased.
+*/
 class LRUCache {
 public:
     // Uses a double-linked list for O(1) deletion
@@ -93,19 +104,69 @@ private:
  * obj->put(key,value);
  */
 
-// 2015.
-/*
- Use a double-linked list, and use a dummy head and tail.
- Maintain a count of elements and capiticy.
- When an element has been touched, move to end of list
- When inserting a new element, first check if reaching maximum capacity. If yes, first delete head element. Then append new element to tail.
- Also included proper delete functions when nodes are removed and in the destructor.
- Caveat:
-  1. When using dummy head and tail, should create a new node, not doing this in the constructor:
-   ListNode dum1(0), *head = &dum1
-  It will cause failure in the set routine when head is referenced. This is because dum1 is a local variable in constructor, and outside this function it will be out-of-scope and later referencing will give segmentation fault error. The correct way is to use new to allocate space on the heap: ListNode *head = new ListNode(-1, 0);
-  2. The ListNode should have two data entries, key and value. Value is obvious, key is also needed to find the entry in the map when the entry needs to be erased.
-*/
+// Same idea using std::list.
+// Use std::prev to point to the last element.
+// std::list does not expose a way to move an element to the end. So we first delete and then push back a new one. This means we need to update the hashtable (whereas in the
+// previous implementation the same node is moved to the end of list.
+
+class LRUCache {
+public:
+    // Uses a double-linked list for O(1) deletion
+    struct Record {
+        int key;
+        int value;
+        Record(int k, int v) : key(k), value(v) {}
+    };
+    
+    LRUCache(int capacity) {
+        N = 0;
+        maxN = capacity;        
+    }
+    
+    int get(int key) {
+        auto iter = dict.find(key);
+        if (iter == dict.end()) {
+            return -1;
+        }
+        auto list_iterator = iter->second;
+        auto record = *list_iterator;
+        records.erase(list_iterator);
+        records.push_back(record);
+        dict[key] = prev(records.end(), 1);
+        return record.value;
+    }
+    
+    void put(int key, int value) {        
+        auto iter = dict.find(key);
+        if (iter != dict.end()) {
+            // key already exists, updates value and move to the end of the list
+            auto list_iterator = iter->second;
+            list_iterator->value = value;   
+            // Move the node to the end of the list
+            auto record = *list_iterator;
+            records.erase(list_iterator);
+            records.push_back(record);
+            dict[key] = prev(records.end(), 1);
+        } else {
+            // key does not exist, create a record in hashtable and add it to the end of the list
+            records.push_back(Record(key, value));
+            dict[key] = prev(records.end(), 1);
+            N++;
+            // If reaching capacity, remove the LRU element from cache and list
+            if (N > maxN) {                
+                dict.erase(records.begin()->key);
+                records.erase(records.begin());
+                N--;
+            }
+        }
+    }
+
+private:
+    int maxN;  // capacity of the cache
+    int N;  // number of keys in the cache
+    unordered_map<int, list<Record>::iterator> dict;
+    list<Record> records;
+};
 
 class LRUCache{
 
