@@ -37,6 +37,29 @@ All the values of coins are unique.
 0 <= amount <= 5000
 */
 
+// Each time decide whether to pick coin[i] or not (2-way branching).
+// Note that we should init mem table to -1 and then check for value != -1. If we use 0 instead we end up recomputing lots of cases of zero counts which leads RTE.
+class Solution {
+public:
+    int change(int amount, vector<int>& coins) {
+        int n = coins.size();
+        // mem[i][amount]: counts of forming amount from coins[i .. n)        
+        vector<vector<int>> mem(n, vector<int>(amount+1, -1));
+        return helper(amount, coins, 0, mem);        
+    }
+    
+    // start picking from coins[i .. end)
+    int helper(int amount, vector<int> &coins, int i, vector<vector<int>> &mem) {
+        if (amount == 0) return 1;
+        if (amount < 0 || i == coins.size()) return 0;
+        if (mem[i][amount] != -1) return mem[i][amount];        
+        // pick or not pick coins[i]
+        int count = helper(amount, coins, i+1, mem) + helper(amount - coins[i], coins, i, mem);
+        mem[i][amount] = count;
+        return count;
+    }
+};
+
 // This solution results in RTE.
 class Solution {
 public:
