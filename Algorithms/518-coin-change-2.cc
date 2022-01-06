@@ -60,14 +60,14 @@ public:
     }
 };
 
-// This solution results in RTE.
+// Another solution with n-way branching. Each time decide whether to pick coins[i] 0, 1, ... times.
 class Solution {
 public:
     int change(int amount, vector<int>& coins) {
         sort(coins.begin(), coins.end(), std::greater<int>());
         int n = coins.size();
         // mem[i][amount]: counts of forming amount from coins[i .. n)        
-        vector<vector<int>> mem(n, vector<int>(amount+1, 0));
+        vector<vector<int>> mem(n, vector<int>(amount+1, -1));
         return helper(amount, coins, 0, mem);        
     }
     
@@ -75,7 +75,7 @@ public:
     int helper(int amount, vector<int> &coins, int i, vector<vector<int>> &mem) {
         if (amount == 0) return 1;
         if (amount < 0 || i == coins.size()) return 0;
-        if (mem[i][amount] > 0) return mem[i][amount];        
+        if (mem[i][amount] != -1) return mem[i][amount];        
         // pick coins[i] 0, 1 .. etc times
         int count = 0;
         for (int k = 0; k <= amount / coins[i]; ++k) {
