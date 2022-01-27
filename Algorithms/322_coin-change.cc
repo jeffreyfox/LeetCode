@@ -30,10 +30,12 @@ Constraints:
 */
 
 // Solution using top-down DP with memoization.
-
+// Uses a 1D mem table to store answers already explored. 0 means not explored, -1 means can't make amount from coins.
+// When amount is 0, return 0 directly instead of looking up the mem table.
 class Solution {
 public:
     int coinChange(vector<int>& coins, int amount) {
+        // 0 means uninitialized. -1 means can't make amount from coins.
         vector<int> mem(amount+1, 0);
         return getCount(coins, amount, mem);
     }
@@ -44,10 +46,10 @@ public:
         int min_value = INT_MAX;
         for (int coin : coins) {
             if (coin > amount) continue;
-            int value = getCount(coins, amount - coin, mem);
-            if (value >= 0 && value < min_value) min_value = value;
+            int value = getCount(coins, amount - coin, mem) + 1;
+            if (value != 0 && value < min_value) min_value = value;
         }
-        mem[amount] = (min_value == INT_MAX) ? -1 : min_value + 1;
+        mem[amount] = (min_value == INT_MAX) ? -1 : min_value;
         return mem[amount];
     }
 };
