@@ -47,6 +47,7 @@ public:
 
 /// One pass solution using DFS. Make sure only visit unvisited nodes. First create a copy for current node, and then recursively process its neighors,
 /// Maintain a map from old node to new node, which also serves as the visited marker
+/// Remember to insert the old-new node mapping after new node creation!
 
 class Solution {
 public:
