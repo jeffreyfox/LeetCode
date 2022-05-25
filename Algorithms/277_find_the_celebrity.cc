@@ -28,6 +28,22 @@ the last two loops can be combined into one
         if((i < x && knows(x, i)) || !knows(i, x) ) return -1;
 */
 
+// 2022. A more straightforward solution without optimization.
+// Needs to have i!=c condition because knows(c, c) returns true
+class Solution {
+public:
+    int findCelebrity(int n) {
+        int c = 0;
+        for (int i = 0; i < n; ++i) {
+            if (knows(c, i)) c = i;
+        }
+        for (int i = 0; i < n; ++i) {
+            if((i != c && knows(c, i)) || !knows(i, c) ) return -1;
+        }
+        return c;
+    }
+};
+
 class Solution {
 public:
     int findCelebrity(int n) {
