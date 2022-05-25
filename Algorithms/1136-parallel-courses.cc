@@ -33,7 +33,7 @@ prevCoursei != nextCoursei
 All the pairs [prevCoursei, nextCoursei] are unique.
 */
 
-// Use BFS to do topological sorting
+// Solution 1. Use BFS to do topological sorting
 // Track the in-degree of each node.
 // Maintain two queues, current level and next level.
 // Start with nodes with in-degree of 0. Add to the current queue. When iterating over the current queue, add the neighbors with 0 in-degree to the next queue.
@@ -86,5 +86,68 @@ public:
             g.addEdge(r[0]-1, r[1]-1);
         }
         return g.minSteps();
+    }
+};
+
+// Solution 2. Use DFS and keep track of cycles and the max length at each node.
+// Uses an auxiliary vector to store results for visited nodes to avoid recomputation (memoization).
+class Graph {
+public:
+    Graph(int _V): V(_V) {
+        adj.resize(V);       
+        visited.resize(V);
+        on_stack.resize(V);
+        length.resize(V);
+    }
+    void addEdge(int v, int w) {
+        adj[v].push_back(w);     
+    }
+        
+    int maxLength() {
+        for (int v = 0; v < V; ++v) {
+            if (!visited[v]) dfs(v);            
+        }
+        return has_cycle ? -1 : max_length;
+    }
+
+    void dfs(int v) {
+        if (has_cycle) return;
+        if (visited[v]) return;
+        visited[v] = true;
+        on_stack[v] = true;
+        int len = 1;
+        for (const int w : adj[v]) {
+            if (on_stack[w]) {
+                has_cycle = true;
+                return;
+            }
+            if (!visited[w]) {
+                dfs(w);                
+            }
+            len = max(len, length[w] + 1);
+        }
+        on_stack[v] = false;
+        length[v] = len;
+        max_length = max(max_length, len);
+    }
+
+private:
+    int V;
+    bool has_cycle = false;
+    int max_length = 0;
+    vector<int> length;    
+    vector<vector<int>> adj;
+    vector<bool> visited;
+    vector<bool> on_stack;
+};
+
+class Solution {
+public:
+    int minimumSemesters(int n, vector<vector<int>>& relations) {
+        Graph g(n);
+        for (const auto &r : relations) {
+            g.addEdge(r[0]-1, r[1]-1);
+        }
+        return g.maxLength();
     }
 };
