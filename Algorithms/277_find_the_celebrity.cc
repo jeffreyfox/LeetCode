@@ -18,9 +18,14 @@ For two person i and j, check knows(i, j). Two outcomes:
 2. if i does not know j, then for sure j is not celebrity.
 Thus for each comparison, we can rule out one person.
 
-We can do a linear run, each time compare the next person with the current celebrity candidate. In the end, we will have one candidate x. Then we simply check if everyone knows x, and x does not know anyone.
+We can do a linear run, each time compare the next person with the current celebrity candidate. In the end, we will have one candidate x.
+Then we simply check if everyone knows x, and x does not know anyone.
 
 One optimization is that in the first pass, we already checked that x does not know every one after x. So the second loop only checks people before x.
+
+the last two loops can be combined into one
+    for(int i = 0; i < n; ++i)
+        if((i < x && knows(x, i)) || !knows(i, x) ) return -1;
 */
 
 class Solution {
@@ -33,9 +38,6 @@ public:
             if(knows(x, i)) return -1;
         for(int i = 0; i < n; ++i)
             if(!knows(i, x)) return -1;
-// the last two loops can be combined into one
-//         for(int i = 0; i < n; ++i)
-//            if((i < x && knows(x, i)) || !knows(i, x) ) return -1;
         return x;
     }
 };
