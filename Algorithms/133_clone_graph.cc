@@ -45,47 +45,23 @@ public:
 };
 */
 
-/// One pass solution using DFS. Make sure only visit unvisited nodes. First create a copy for current node, and then process its neighors,
-/// It neighbor already visited (indicated by the map), then use the copy as the new neighbor, otherwise dfs on the neighbor.
+/// One pass solution using DFS. Make sure only visit unvisited nodes. First create a copy for current node, and then recursively process its neighors,
 /// Maintain a map from old node to new node, which also serves as the visited marker
 
 class Solution {
 public:
-    typedef UndirectedGraphNode Node;
-    UndirectedGraphNode *cloneGraph(UndirectedGraphNode *node) {
-        if(!node) return NULL;
-        return dfs(node);
-    }
-    Node* dfs(Node* node) {
-        Node* newnode = new Node(node->label);
-        dict[node] = newnode; //insert to map before processing neighbors (handle self-loops)
-        newnode->neighbors = node->neighbors;
-        for(int i = 0; i < node->neighbors.size(); i++) {
-            if(dict.count(node->neighbors[i])) newnode->neighbors[i] = dict[node->neighbors[i]];
-            else newnode->neighbors[i] = dfs(node->neighbors[i]);
-        }
-        return newnode;
-    }
-    unordered_map<Node*, Node*> dict;
-};
-
-/// Solution 2, slightly different one. In DFS, first check if node is visited or not. If visited, just return the copy.
-
-class Solution {
-public:
     Node* cloneGraph(Node* node) {
-        if (!node) return nullptr;
-        return dfs(node);
-    }
-    Node* dfs(Node* node) {
-        if(dict.count(node)) return dict[node];
-        Node* new_node = new Node(node->label);
-        dict[node] = new_node; //insert to map before processing neighbors (handle self-loops)
-        new_node->neighbors.resize(node->neighbors.size());
-        for(int i = 0; i < node->neighbors.size(); i++) {
-            new_node->neighbors[i] = dfs(node->neighbors[i]);
+        if (node == nullptr) return nullptr;
+        if (dict.count(node)) return dict[node];
+        Node* new_node = new Node(node->val);
+        dict[node] = new_node;
+        for (auto* v : node->neighbors) {
+            Node* new_v = cloneGraph(v);
+            new_node->neighbors.push_back(new_v);
         }
         return new_node;
     }
+    
+private:
     unordered_map<Node*, Node*> dict;
 };
