@@ -45,7 +45,7 @@ public:
 };
 */
 
-/// One pass solution using DFS. Make sure only visit unvisited nodes. First create a copy for current node, and then recursively process its neighors,
+/// Solution 1 using DFS. Make sure only visit unvisited nodes. First create a copy for current node, and then recursively process its neighors,
 /// Maintain a map from old node to new node, which also serves as the visited marker
 /// Remember to insert the old-new node mapping after new node creation!
 
@@ -65,4 +65,36 @@ public:
     
 private:
     unordered_map<Node*, Node*> dict;
+};
+
+/// Solution 2 using BFS. BFS on the old graph, and create new nodes before appending to the queue. Add edges from parent to child when processing the
+/// neighbor list.
+/// Remember to insert the old-new node mapping after new node creation!
+
+class Solution {
+public:
+    Node* cloneGraph(Node* node) {
+        if (node == nullptr) return nullptr;
+        bfs(node);
+        return dict[node];
+    }
+    
+    void bfs(Node* node) {
+        dict[node] = new Node(node->val);        
+        q.push_back(node);
+        while (!q.empty()) {
+            Node* old_node = q.front(); q.pop_front();
+            Node* new_node = dict[old_node];
+            for (Node* nb : old_node->neighbors) {
+                if (!dict.count(nb)) {
+                    dict[nb] = new Node(nb->val);
+                    q.push_back(nb);
+                }
+                new_node->neighbors.push_back(dict[nb]);                
+            }
+        }
+    }
+private:
+    unordered_map<Node*, Node*> dict;
+    deque<Node*> q;
 };
