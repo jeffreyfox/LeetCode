@@ -32,65 +32,56 @@ Hints:
 
 class Graph {
 public:
-    Graph(int NN) : N(NN) {
-        adj.resize(N);
+    Graph(int _V) : V(_V), has_cycle(false) {
+        adj.resize(V);
+        visited.resize(V, false);
+        on_stack.resize(V, false);
     }
-    void addEdge(int v, int w) {
-        adj[v].push_back(w);
+    void addEdge(int v, int w) { adj[v].push_back(w); }
+    vector<int> topoSort() {
+        for (int v = 0; v < V; ++v) {
+            if (!visited[v]) dfs(v);
+        }
+        if (has_cycle) return {};
+        std::reverse(topo_sorted.begin(), topo_sorted.end());
+        return topo_sorted;
     }
-    int NV() const { return N; }
-    const vector<int>& neighbors(int v) const { return adj[v]; }
-private:
-    int N; //number of vertices
-    vector<vector<int> > adj; //adjacency lists
-};
 
-class TopoSort {
-public:
-    TopoSort(const Graph& gg): g(gg), hasCycle(false) {
-        status.resize(g.NV(), 0);
-    }
-    //detect cycle using dfs, immediately return if found cycle
-    void sort() { 
-        for(int v = 0; v < g.NV() && !hasCycle; v++) {
-            if(status[v] == 0) dfs(v);
-        }
-    }
-    vector<int> getOrder() {
-        vector<int> result;
-        if(hasCycle) return result;
-        result = order;
-        reverse(result.begin(), result.end());
-        return result;
-    }
-private:
     void dfs(int v) {
-        status[v] = 1; //on stack
-        for(auto w : g.neighbors(v)) {
-            if(hasCycle) return; //found cycle, just return
-            if(status[w] == 1) { hasCycle = true; return; } //found cycle!
-            else if(status[w] == 0) dfs(w); //unvisited, visit
+        if (has_cycle) return;
+        if (visited[v]) return;
+        visited[v] = true;
+        on_stack[v] = true;
+        for (const int w : adj[v]) {
+            if (on_stack[w]) {
+                has_cycle = true;
+                return;
+            }
+            if (!visited[w]) {
+                dfs(w);
+            }
         }
-        status[v] = 2; //finished
-        order.push_back(v); //push after finished
+        on_stack[v] = false;        
+        topo_sorted.push_back(v);
     }
-    const Graph& g;
-    bool hasCycle; //has cycle
-    vector<int> status; //vertex status during dfs (0: unvisited, 1: onstack, 2: finished)
-    vector<int> order; //topological order
+    bool hasCycle() { return has_cycle; }
+    
+private:
+    int V;
+    vector<vector<int>> adj;
+    vector<bool> visited;
+    vector<bool> on_stack;
+    vector<int> topo_sorted;
+    bool has_cycle;
 };
 
 class Solution {
 public:
-    vector<int> findOrder(int numCourses, vector<pair<int, int>>& prerequisites) {
-        //construct directed graph
+    vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites) {
         Graph g(numCourses);
-        for(auto c : prerequisites) 
-            g.addEdge(c.second, c.first);
-        //detect cycle using dfs
-        TopoSort ts(g);
-        ts.sort();
-        return ts.getOrder();
+        for (const auto &pre : prerequisites) {
+            g.addEdge(pre[1], pre[0]);
+        }
+        return g.topoSort();          
     }
 };
-
