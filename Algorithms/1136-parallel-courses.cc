@@ -89,25 +89,25 @@ public:
     }
 };
 
-// Solution 2. Use DFS and keep track of cycles and the max length at each node.
-// Uses an auxiliary vector to store results for visited nodes to avoid recomputation (memoization).
+// Solution 2. Use DFS and keep track of cycles and the maximum path lengths for each vertex.
+// Uses an auxiliary vector to store results for visited vertices to avoid recomputation (memoization).
 class Graph {
 public:
     Graph(int _V): V(_V) {
         adj.resize(V);       
         visited.resize(V);
         on_stack.resize(V);
-        length.resize(V);
+        path_length.resize(V);
     }
     void addEdge(int v, int w) {
         adj[v].push_back(w);     
     }
         
-    int maxLength() {
+    int maxPathLength() {
         for (int v = 0; v < V; ++v) {
             if (!visited[v]) dfs(v);            
         }
-        return has_cycle ? -1 : max_length;
+        return has_cycle ? -1 : max_path_length;
     }
 
     void dfs(int v) {
@@ -115,7 +115,8 @@ public:
         if (visited[v]) return;
         visited[v] = true;
         on_stack[v] = true;
-        int len = 1;
+        // The longest path length of vertex v
+        int pl = 0;
         for (const int w : adj[v]) {
             if (on_stack[w]) {
                 has_cycle = true;
@@ -124,18 +125,20 @@ public:
             if (!visited[w]) {
                 dfs(w);                
             }
-            len = max(len, length[w] + 1);
+            pl = max(pl, path_length[w]);
         }
         on_stack[v] = false;
-        length[v] = len;
-        max_length = max(max_length, len);
+        path_length[v] = pl + 1;
+        max_path_length = max(max_path_length, path_length[v]);
     }
 
 private:
     int V;
     bool has_cycle = false;
-    int max_length = 0;
-    vector<int> length;    
+    // The longest path length from the vertex to any of its sinks
+    vector<int> path_length;
+    // The longest path length among all vertices
+    int max_path_length = 0;
     vector<vector<int>> adj;
     vector<bool> visited;
     vector<bool> on_stack;
@@ -148,6 +151,6 @@ public:
         for (const auto &r : relations) {
             g.addEdge(r[0]-1, r[1]-1);
         }
-        return g.maxLength();
+        return g.maxPathLength();
     }
 };
