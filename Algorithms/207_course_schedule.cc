@@ -26,7 +26,62 @@ Hints:
     Topological sort could also be done via BFS.
 */
 
-// Solution using graph cycle-detection using dfs
+// 2022. Solution using DFS cycle detection
+// Note: We need to run DFS on all nodes because there could be several partitions in the graph.
+
+class Graph {
+public:
+    Graph(int _V) : V(_V), has_cycle(false) {
+        adj.resize(V);
+        visited.resize(V, false);
+        on_stack.resize(V, false);
+    }
+    void addEdge(int v, int w) { adj[v].push_back(w); }
+    bool detectCycle() {
+        for (int v = 0; v < V; ++v) {
+            if (!visited[v]) dfs(v);
+        }
+        return has_cycle;
+    }
+
+    void dfs(int v) {
+        if (has_cycle) return;
+        if (visited[v]) return;
+        visited[v] = true;
+        on_stack[v] = true;
+        for (const int w : adj[v]) {
+            if (on_stack[w]) {
+                has_cycle = true;
+                return;
+            }
+            if (!visited[w]) {
+                dfs(w);
+            }
+        }
+        on_stack[v] = false;        
+    }
+    bool hasCycle() { return has_cycle; }
+    
+private:
+    int V;
+    vector<vector<int>> adj;
+    vector<bool> visited;
+    vector<bool> on_stack;
+    bool has_cycle;
+};
+
+class Solution {
+public:
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+        Graph g(numCourses);
+        for (const auto &pre : prerequisites) {
+            g.addEdge(pre[1], pre[0]);
+        }
+        return !g.detectCycle();        
+    }
+};
+
+// 2015. Solution using graph cycle-detection using dfs
 
 class Graph {
 public:
