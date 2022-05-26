@@ -40,6 +40,42 @@ newInterval.length == 2
 0 <= start <= end <= 105
  */
 
+// 2022. Scan from left to right
+// If scanned interval overlaps with newInterval, make newInterval the merged one
+// If scanned interval is to the left of newInterval, insert scanned interval to result
+// If scanned interval is to the right of newInterval, terminate
+// Now we end up with newInterval and remainder of intervals (which could be empty(). We simply add newInterval and the remainder to result.
+bool isOverlap(const vector<int> &a, const vector<int>& b) {
+    return a[0] <= b[1] && b[0] <= a[1];
+}
+
+vector<int> merge(const vector<int> &a, const vector<int>& b) {
+    return {min(a[0], b[0]), max(a[1], b[1])};
+}
+
+class Solution {
+public:
+    vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval) {
+        vector<vector<int>> result;
+        auto iter = intervals.begin();
+        for (; iter != intervals.end(); ++iter) {
+            const auto& interval = *iter;
+            if (isOverlap(interval, newInterval)) {
+                newInterval = merge(interval, newInterval);
+            } else if (interval[1] < newInterval[0]) {
+                // Interval is to the left of newInterval
+                result.push_back(interval);
+            } else {
+                // Interval is to the right of newInterval
+                break;
+            }
+        }
+        result.push_back(newInterval);
+        result.insert(result.end(), iter, intervals.end());
+        return result;
+    }
+};
+
 /// Solution 1.
 // First adds intervals with starting times <= that of the new interval to the result.
 // Then append the new interval to end of the result vector. the new interval can only overlap with at most one interval in the vector (the last one). Merge if there is overlap.
