@@ -30,6 +30,62 @@ Note: Do not use class member/global/static variables to store states. Your seri
 // Codec codec;
 // codec.deserialize(codec.serialize(root));
 
+
+// 2022. Use a recursive solution.
+// When serializing, recursively add node value, and left child and right child (delimited by ','). If any node is null, use "N".
+// When deserializing, use an offset to track the current position, and scan the number of "N" until seeing the delimiting charater ','. Do it recursively.
+
+class Codec {
+public:
+
+    // Encodes a tree to a single string.
+    string serialize(TreeNode* root) {
+        return serializeHelper(root);
+    }
+
+    // Decodes your encoded data to tree.
+    TreeNode* deserialize(string data) {
+        int offset = 0;
+        return deserializeHelper(data, offset);
+    }
+    
+private:
+    void append(string &s, const string &suffix) {
+        if (s.empty()) s = suffix;
+        s.append(",");
+        s.append(suffix);  
+    }
+    string serializeHelper(TreeNode *root) {
+        if (root == nullptr) return "N";
+        string result = to_string(root->val);
+        append(result, serializeHelper(root->left));
+        append(result, serializeHelper(root->right));
+        return result;
+    }    
+    
+    TreeNode* deserializeHelper(const string &data, int& offset) {
+        if (data[offset] == 'N') {
+            offset += 2;
+            return nullptr;
+        }
+        int k = offset;
+        while (k < data.size() && data[k] != ',') k++;
+        // k points to a ',' or end of data.
+        int val = stoi(data.substr(offset, k-offset));
+        TreeNode *node = new TreeNode(val);
+        offset = k+1;
+        node->left = deserializeHelper(data, offset);
+        node->right = deserializeHelper(data, offset);
+        return node;
+    }
+};
+
+// Your Codec object will be instantiated and called as such:
+// Codec ser, deser;
+// TreeNode* ans = deser.deserialize(ser.serialize(root));
+
+
+// 2016
 // Solution 1. Use leetcode format, null represented by "#". Do level-order traversal. For the last layer, ignore all "#"s (using hasNode variable)
 
 class Codec {
