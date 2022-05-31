@@ -17,6 +17,54 @@ Note:
 You can assume that no duplicate edges will appear in edges. Since all edges are undirected, [0, 1] is the same as [1, 0] and thus will not appear together in edges.
 */
 
+// Solution using DFS on a birectional graph.
+class Graph {
+public:
+    Graph(int _V) : V(_V) {
+        adj.resize(V);
+        visited.resize(V);
+    }
+    
+    void addEdge(int i, int j) {
+        adj[i].push_back(j);
+        adj[j].push_back(i);
+    }
+
+    int numComponents() {
+        int nc = 0;
+        for (int i = 0; i < V; ++i) {
+            if (!visited[i]) {
+                dfs(i);
+                nc ++;
+            }
+        }
+        return nc;
+    }
+
+    void dfs(int i) {
+        visited[i] = true;
+        for (const int j : adj[i]) {
+            if (!visited[j]) dfs(j);
+        }
+    }
+    
+private:
+    int V;
+    vector<vector<int>> adj;    
+    vector<bool> visited;
+};
+
+class Solution {
+public:
+    int countComponents(int n, vector<vector<int>>& edges) {
+        Graph g(n);
+        for (const auto &edge : edges) {
+            g.addEdge(edge[0], edge[1]);
+        }
+        return g.numComponents();
+    }
+};
+
 // Solution using union find (weighted quick union with path compression by halving)
 class UnionFind {
 public:
