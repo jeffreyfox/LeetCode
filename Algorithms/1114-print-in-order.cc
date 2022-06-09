@@ -1,3 +1,41 @@
+// Solution using conditional variable. We need to call notify_all in all three functions.
+
+class Foo {
+public:
+    Foo() {
+        
+    }
+
+    void first(function<void()> printFirst) {
+        std::unique_lock<mutex> ul(m);
+        // printFirst() outputs "first". Do not change or remove this line.
+        printFirst();
+        counter = 1;
+        cv.notify_all();
+    }
+
+    void second(function<void()> printSecond) {
+        std::unique_lock<mutex> ul(m);
+        cv.wait(ul, [this]{return counter == 1;});
+        // printSecond() outputs "second". Do not change or remove this line.        
+        printSecond();
+        counter = 2;
+        cv.notify_all();
+    }
+
+    void third(function<void()> printThird) {
+        std::unique_lock<mutex> ul(m);
+        cv.wait(ul, [this]{return counter == 2;});
+        // printThird() outputs "third". Do not change or remove this line.
+        printThird();
+        cv.notify_all();
+    }
+private:
+    int counter = 0;
+    std::mutex m;    
+    condition_variable cv;
+};
+
 // Solution using C semaphore. One semaphore for each dependency
 
 #include <semaphore.h>
