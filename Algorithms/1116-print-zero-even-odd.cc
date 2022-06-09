@@ -57,7 +57,11 @@ public:
     }
 };
 
-// For some reason, the following solution doesn't work:
+// Slightly modified version:
+// state = 0: print 0
+// state = 1: print odd
+// state = 2: print even
+// For some reason, the following solution doesn't work on LeetCode. But it gives expected results on an online C++ compiler.
 class ZeroEvenOdd {
 private:
     int n;
