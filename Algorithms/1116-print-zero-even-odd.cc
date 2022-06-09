@@ -56,3 +56,55 @@ public:
         }
     }
 };
+
+// For some reason, the following solution doesn't work:
+class ZeroEvenOdd {
+private:
+    int n;
+    int state = 0;
+    int val = 1;
+    condition_variable cv;
+    mutex m;
+
+public:
+    ZeroEvenOdd(int n) {
+        this->n = n;
+    }
+
+    // printNumber(x) outputs "x", where x is an integer.
+    void zero(function<void(int)> printNumber) {
+        while (val <= n) {
+            unique_lock<mutex> l(m);
+            cv.wait(l, [this]{ return state == 0 || val > n;});
+            if (val > n) break;
+            printNumber(0);                
+            state = (val % 2) + 1;
+            l.unlock();
+            cv.notify_all();        
+        }
+    }
+
+    void even(function<void(int)> printNumber) {
+        while (val <= n) {
+            unique_lock<mutex> l(m);
+            cv.wait(l, [this]{ return state == 2 || val > n;});
+            if (val > n) break;
+            printNumber(val++);
+            state = 0;
+            l.unlock();
+            cv.notify_all();
+        }
+    }
+
+    void odd(function<void(int)> printNumber) {
+        while (val <= n) {
+            unique_lock<mutex> l(m);
+            cv.wait(l, [this]{ return state == 1 || val > n;});
+            if (val > n) break;
+            printNumber(val++);
+            state = 0;
+            l.unlock();
+            cv.notify_all();
+        }
+    }
+};
