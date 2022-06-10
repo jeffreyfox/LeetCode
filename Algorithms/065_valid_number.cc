@@ -11,8 +11,75 @@ Some examples:
 Note: It is intended for the problem statement to be ambiguous. You should gather all requirements up front before implementing one. 
 */
 
+// 2022. An easier to understand version.
+class Solution {
+public:
+    enum CharType { NUMBER=0, DOT, SIGN, EXPO, OTHER };
+    enum StateType {
+        ST_START=0,  // initial state, no characters seen
+        ST_SIGN,  // seen a sign before any number
+        ST_INTEGER,  // seen a number as the integer part
+        ST_DOT_NO_INTEGER, // seen a dot with no preceding integer part (e.g. [-.]34)
+        ST_DOT_AFTER_INTEGER, // seen a dot with preceding integer part (e.g. [34.]56)
+        ST_FRACTIONAL,  // seen a number as the fractional part (e.g. [-34.5]6)
+        ST_EXPO, // seen an exponential 'e/E' (e.g. [34.56e]63)
+        ST_SIGN_AFTER_EXPO,  // seen a sign after exponential sign (e.g. [34.56e-]45)
+        ST_NUMBER_AFTER_EXPO,  // seen a number after the exponential sign (e.g. [34.56e-3]4)
+    };
+    
+    CharType getCharType(char c) {
+        if (c == '.') return DOT;
+        if (c == '+' || c == '-') return SIGN;
+        if (c == 'E' || c == 'e') return EXPO;
+        if (c >= '0' && c <= '9') return NUMBER;
+        return OTHER;
+    }
+
+    bool isNumber(string s) {
+        InitDfa();
+        int state = ST_START;
+        for (auto c : s) {
+            state = dfa[state][getCharType(c)];
+            if (state == -1) return false;
+        }
+        return state == ST_INTEGER || state == ST_FRACTIONAL || state == ST_NUMBER_AFTER_EXPO || state == ST_DOT_AFTER_INTEGER;
+    }
+    
+    void InitDfa() {
+        dfa.resize(ST_NUMBER_AFTER_EXPO+1, vector<int>(OTHER+1, -1));
+        
+        dfa[ST_START][NUMBER] = ST_INTEGER;
+        dfa[ST_START][DOT] = ST_DOT_NO_INTEGER;
+        dfa[ST_START][SIGN] = ST_SIGN;
+        
+        dfa[ST_SIGN][NUMBER] = ST_INTEGER;
+        dfa[ST_SIGN][DOT] = ST_DOT_NO_INTEGER;
+        
+        dfa[ST_INTEGER][NUMBER] = ST_INTEGER;
+        dfa[ST_INTEGER][DOT] = ST_DOT_AFTER_INTEGER;
+        dfa[ST_INTEGER][EXPO] = ST_EXPO;
+        
+        dfa[ST_DOT_NO_INTEGER][NUMBER] = ST_FRACTIONAL;
+        
+        dfa[ST_DOT_AFTER_INTEGER][NUMBER] = ST_FRACTIONAL;
+        dfa[ST_DOT_AFTER_INTEGER][EXPO] = ST_EXPO;
+     
+        dfa[ST_FRACTIONAL][NUMBER] = ST_FRACTIONAL;
+        dfa[ST_FRACTIONAL][EXPO] = ST_EXPO;
+        
+        dfa[ST_EXPO][SIGN] = ST_SIGN_AFTER_EXPO;
+        dfa[ST_EXPO][NUMBER] = ST_NUMBER_AFTER_EXPO;
+        
+        dfa[ST_SIGN_AFTER_EXPO][NUMBER] = ST_NUMBER_AFTER_EXPO;
+        
+        dfa[ST_NUMBER_AFTER_EXPO][NUMBER] = ST_NUMBER_AFTER_EXPO;
+    }
+private:
+    vector<vector<int>> dfa;
+};
+
 // 2021.
-// Solution with finite automata. Simplified version with no consideration of spaces. 8 states and 5 character types.
+// Solution with finite automata. Combines the above ST_DOT_AFTER_INTEGER and ST_FRACTIONAL into one state. This leads to 8 states and 5 character types.
 // Needs to distinguish the state of .3 and 2.3.
 class Solution {
 public:
