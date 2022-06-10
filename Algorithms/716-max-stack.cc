@@ -1,3 +1,62 @@
+// A simple solution using a regular stack and a max stack to track the maximum.
+// push(), pop(), top() and peekMax(): O(1)
+// popMax(): O(n). Needs to pop the elements out until finding the maximum and put them back.
+class MaxStack {
+public:
+    MaxStack() {
+        
+    }
+    
+    void push(int x) {
+        st.push(x);
+        if (max_st.empty()) max_st.push(x);
+        else max_st.push(max(max_st.top(), x));
+    }
+    
+    int pop() {
+        int val = st.top();
+        st.pop();
+        max_st.pop();
+        return val;
+    }
+    
+    int top() {
+        return st.top();
+    }
+    
+    int peekMax() {
+        return max_st.top();
+    }
+    
+    int popMax() {
+        int max = max_st.top();
+        stack<int> tmp;
+        while (st.top() != max) {
+            tmp.push(st.top());
+            st.pop(); max_st.pop();
+        }
+        st.pop(); max_st.pop();
+        while (!tmp.empty()) {
+            push(tmp.top());
+            tmp.pop();
+        }
+        return max;
+    }
+
+private:
+    stack<int> st;
+    stack<int> max_st;
+};
+
+/**
+ * Your MaxStack object will be instantiated and called as such:
+ * MaxStack* obj = new MaxStack();
+ * obj->push(x);
+ * int param_2 = obj->pop();
+ * int param_3 = obj->top();
+ * int param_4 = obj->peekMax();
+ * int param_5 = obj->popMax();
+ */
 // Solution using doubly linked list and an ordered map of value to list of nodes to facilitate max operations.
 // push() inserts a node to the end of the list and inserts an entry to the ordered map.
 // pop() removes a node from the end of the list.
