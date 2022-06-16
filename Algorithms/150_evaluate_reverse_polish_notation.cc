@@ -15,29 +15,21 @@ Some examples:
 class Solution {
 public:
     int evalRPN(vector<string>& tokens) {
-        deque<int> st; //stack
-        for(size_t i = 0; i < tokens.size(); ++i) {
-            const string& str = tokens[i];
-            if(str == "+" || str == "-" || str == "*" || str == "/") {
-                 int num2 = st.back(); st.pop_back();
-                 int num1 = st.back(); st.pop_back();
-                 if(str == "+") st.push_back(num1+num2);
-                 else if(str == "-") st.push_back(num1-num2);
-                 else if(str == "*") st.push_back(num1*num2);
-                 else if(str == "/") st.push_back(num1/num2);
+        stack<int> s;
+        for (const auto &t : tokens) {
+            if (t == "+" || t == "-" || t == "*" || t == "/") {
+                int v2 = s.top(); s.pop();
+                int v1 = s.top(); s.pop();
+                int v = 0;
+                if (t == "+")  v = v1 + v2;
+                else if (t == "-") v = v1 - v2;
+                else if (t == "*") v = v1 * v2;
+                else if (t == "/") v = v1 / v2;
+                s.push(v);
             } else {
-                 st.push_back(eval(str));
+                s.push(stoi(t));            
             }
         }
-        return st.back();
-    }
-    int eval(const string& str) {
-        int v = 0;
-        int sign = 1;
-        for(size_t i = 0; i < str.size(); ++i) {
-            if(i == 0 && (str[i] == '-' || str[i] == '+')) sign = (str[i] == '+') ? 1 : -1;
-            else v = v*10 + (str[i] - '0');
-        }
-        return sign*v;
+        return s.top();
     }
 };
