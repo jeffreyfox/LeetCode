@@ -22,11 +22,12 @@ public:
             auto iter = std::next(curr, 1);
             while (iter != dll.end() && iter->val < curr->val) iter++;
             if (iter != std::next(curr, 1)) {
-                // insert before iter (remove and insert a new one)
-                Record record(*curr);
-                dll.erase(curr);
-                // Needs to update dict
-                dict[key] = dll.insert(iter, record);                
+                // Move the node curr to the position at iter (i.e. before iter)
+                dll.splice(iter, dll, curr);
+                // Can also remove and insert a new one, in which case we need to update dict
+                // Record record(*curr);
+                // dll.erase(curr);                
+                // dict[key] = dll.insert(iter, record);                
             }
         }        
     }
@@ -42,12 +43,12 @@ public:
             auto iter = std::next(curr, -1);
             while (iter != std::next(dll.begin(), -1) && iter->val > curr->val) iter--;
             if (iter != std::next(curr, -1)) {
-                // insert after iter (remove and insert a new one)
-                Record record(*curr);
-                dll.erase(curr);                
-                ++iter;
-                // Needs to update dict.
-                dict[key] = dll.insert(iter, record);
+                // move the node curr to the position after iter.
+                dll.splice(++iter, dll, curr);
+                // Can also remove and insert a new one, in which case we need to update dict
+                // Record record(*curr);
+                // dll.erase(curr);                                
+                // dict[key] = dll.insert(++iter, record);
             }
         }
     }
