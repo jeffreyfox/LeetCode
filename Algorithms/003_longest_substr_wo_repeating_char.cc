@@ -49,7 +49,7 @@ public:
     }
 };
 
-// Solution 3, use a map to store the position of each character. Scan from left to right,
+// Solution 3, sliding window optimized (no nested while loop). Use a map to store the position of each character. Scan from left to right,
 // and maintain a map to store characters already seen and its last position, update length each time.
 // Use a pointer (i) to store the current front of substring
 // When a character is not in the map, insert it to map; 
