@@ -93,7 +93,14 @@ private:
 };
 
 // Same idea using std::list.
-// Use list::splice to move an element from middle of the list to the end of the list.
+// Use list::splice to move an element from middle of the list to the end of the list. Usage:
+// splice(position to be inserted into, the list that the element is currently in, the element to be inserted)
+// E.g. to move X to the end of dll:
+// A -> B -> X -> C  => A -> B -> C -> X
+// First argument: the end of dll.end()
+// second argument: the list dll
+// third argument: the iterator pointing to X
+
 class LRUCache {
 public:
     struct Record {
