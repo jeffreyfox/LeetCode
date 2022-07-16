@@ -27,7 +27,7 @@ public:
             if (val > n) break;  // breaks when val > n
             printNumber(0);                
             state ++;
-          //  l.unlock();  // probably don't need this
+            l.unlock();
             cv.notify_all();        
         }
     }
@@ -39,7 +39,7 @@ public:
             if (val > n) break;
             printNumber(val++);
             state = 0;
-         //   l.unlock();
+            l.unlock();
             cv.notify_all();
         }
     }
@@ -51,7 +51,7 @@ public:
             if (val > n) break;
             printNumber(val++);
             state = 2;
-        //    l.unlock();
+            l.unlock();
             cv.notify_all();
         }
     }
