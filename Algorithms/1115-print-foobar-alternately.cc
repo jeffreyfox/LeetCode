@@ -1,4 +1,5 @@
 // Solution using a condition variable.
+// Can also put the unique_lock line into the for loop. It increases the overhead of lock creation and destruction.
 
 class FooBar {
 private:
@@ -13,8 +14,8 @@ public:
     }
 
     void foo(function<void()> printFoo) {        
-        for (int i = 0; i < n; i++) {
-            unique_lock<mutex> ul(m);
+        unique_lock<mutex> ul(m);
+        for (int i = 0; i < n; i++) {            
             cv.wait(ul, [this]{return turn == 0;}); 
         	// printFoo() outputs "foo". Do not change or remove this line.
             printFoo();
@@ -23,9 +24,9 @@ public:
         }
     }
 
-    void bar(function<void()> printBar) {        
-        for (int i = 0; i < n; i++) {
-            unique_lock<mutex> ul(m);
+    void bar(function<void()> printBar) {
+        unique_lock<mutex> ul(m);
+        for (int i = 0; i < n; i++) {            
             cv.wait(ul, [this]{return turn == 1;});
         	// printBar() outputs "bar". Do not change or remove this line.
             printBar();
