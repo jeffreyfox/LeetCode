@@ -1,4 +1,13 @@
 // Solution using conditional variable. We need to call notify_all in all three functions.
+// In first(), we cannot use notify_one otherwise it could lead to deadlock under this scenario
+// 1. third() executes first, since counter is 0, it waits on cv and releases the mutex.
+// 2. second() executes next, similarly, it waits on cv and releases the mutex.
+// 3. first executes next, it increments counter and calls notify_one().
+// 4. Thread that executes third() wakes up. It acquires m only to find counter is 1 (condition still not satisfied). It releases the lock
+//    and goes to sleep again without notifying waiting threads
+// 5. Thread that executes second() is still blocked on cv. Since it is not being notified, it will be stuck in wait. ==> deadlock.
+// To prevent this, we should call notify_all() in first() so both second() and third() are waken up. In this case, in step #5, second() will unblock and
+// execute the code that sets counter to 2. and then third() can unblock.
 
 class Foo {
 public:
@@ -11,6 +20,7 @@ public:
         // printFirst() outputs "first". Do not change or remove this line.
         printFirst();
         counter = 1;
+        // Cannot use notify_one(). See comments above.
         cv.notify_all();
     }
 
@@ -20,6 +30,7 @@ public:
         // printSecond() outputs "second". Do not change or remove this line.        
         printSecond();
         counter = 2;
+        // Can use notify_one() because only one thread (third) is waiting.
         cv.notify_all();
     }
 
@@ -28,7 +39,8 @@ public:
         cv.wait(ul, [this]{return counter == 2;});
         // printThird() outputs "third". Do not change or remove this line.
         printThird();
-        cv.notify_all();
+        // We don't need to call notify because third() is the one that runs last so there will be no threads waiting on cv.
+        // cv.notify_all();
     }
 private:
     int counter = 0;
