@@ -21,7 +21,7 @@ public:
         	// printFoo() outputs "foo". Do not change or remove this line.
             printFoo();
             turn = 1;
-            cv.notify_all();
+            cv.notify_one();
         }
     }
 
@@ -32,7 +32,7 @@ public:
         	// printBar() outputs "bar". Do not change or remove this line.
             printBar();
             turn = 0;
-            cv.notify_all();
+            cv.notify_one();
         }
     }
 };
