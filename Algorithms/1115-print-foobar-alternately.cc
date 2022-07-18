@@ -1,5 +1,6 @@
 // Solution using a condition variable.
 // Can also put the unique_lock line into the for loop. It increases the overhead of lock creation and destruction.
+// At any given time, one thread is waiting and the other thread is executing.
 
 class FooBar {
 private:
