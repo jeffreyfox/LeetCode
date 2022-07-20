@@ -1,4 +1,5 @@
-// Solution using conditional variable. We need to call notify_all in all three functions.
+// Solution using conditional variable.
+
 // In first(), we cannot use notify_one otherwise it could lead to deadlock under this scenario
 // 1. third() executes first, since counter is 0, it waits on cv and releases the mutex.
 // 2. second() executes next, similarly, it waits on cv and releases the mutex.
